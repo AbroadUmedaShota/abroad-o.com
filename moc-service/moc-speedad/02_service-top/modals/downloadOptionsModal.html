@@ -1,0 +1,67 @@
+<div id="downloadOptionsModal" class="fixed inset-0 flex items-center justify-center p-4 modal-overlay hidden z-[60]" data-state="closed">
+    <div class="bg-surface rounded-lg p-6 w-full max-w-lg modal-content-transition" data-state="closed">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-on-surface text-xl font-semibold">ダウンロードオプション</h3>
+            <button class="text-on-surface-variant hover:text-on-surface" onclick="closeModal('downloadOptionsModal')" aria-label="モーダルを閉じる">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <form class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-on-surface mb-2">ダウンロードするデータ</label>
+                <div class="space-y-2">
+                    <div>
+                        <input type="radio" id="download_answer" name="download_type" value="answer" class="rounded-full text-primary focus:ring-primary" required>
+                        <label for="download_answer" class="ml-2 text-sm font-medium text-on-surface">回答データ</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="download_business_card" name="download_type" value="business_card" class="rounded-full text-primary focus:ring-primary">
+                        <label for="download_business_card" class="ml-2 text-sm font-medium text-on-surface">名刺データ</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="download_both" name="download_type" value="both" class="rounded-full text-primary focus:ring-primary">
+                        <label for="download_both" class="ml-2 text-sm font-medium text-on-surface">回答 + 名刺データ</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="download_image" name="download_type" value="image" class="rounded-full text-primary focus:ring-primary">
+                        <label for="download_image" class="ml-2 text-sm font-medium text-on-surface">名刺画像</label>
+                    </div>
+                </div>
+                <p class="error-message hidden" id="download_type-error"></p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-on-surface mb-2">期間</label>
+                <div class="space-y-2">
+                    <div>
+                        <input type="radio" id="period_all" name="download_period" value="all" class="rounded-full text-primary focus:ring-primary" checked>
+                        <label for="period_all" class="ml-2 text-sm font-medium text-on-surface">全て</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="period_custom" name="download_period" value="custom" class="rounded-full text-primary focus:ring-primary">
+                        <label for="period_custom" class="ml-2 text-sm font-medium text-on-surface">期間指定</label>
+                        <div id="customPeriodInputs" class="flex items-center gap-2 mt-2 hidden">
+                            <div class="relative flex-1">
+                                <input type="date" id="download_start_date" name="download_start_date" placeholder=" " class="class="input-field w-full rounded-md focus:border-secondary focus:ring-secondary sm:text-sm p-2 text-on-surface bg-surface-bright"">
+                                <label class="input-label" for="download_start_date">開始日</label>
+                                <p class="error-message hidden" id="download_start_date-error"></p>
+                            </div>
+                            <span class="text-on-surface-variant">～</span>
+                            <div class="relative flex-1">
+                                <input type="date" id="download_end_date" name="download_end_date" placeholder=" " class="class="input-field w-full rounded-md focus:border-secondary focus:ring-secondary sm:text-sm p-2 text-on-surface bg-surface-bright"">
+                                <label class="input-label" for="download_end_date">終了日</label>
+                                <p class="error-message hidden" id="download_end_date-error"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="error-message hidden" id="download_period-error"></p>
+            </div>
+            <div class="flex justify-end gap-3 pt-4">
+                <button class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors" onclick="closeModal('downloadOptionsModal')" type="button" aria-label="キャンセル">キャンセル</button>
+                <button class="gradient-primary-bg text-on-primary py-2 px-4 rounded-md text-sm font-semibold leading-normal transition-colors" type="submit" aria-label="ダウンロード" onclick="showToast('データダウンロード機能は未実装です。', 'info'); return false;">
+                    ダウンロード
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

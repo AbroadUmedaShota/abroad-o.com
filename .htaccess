@@ -1,0 +1,16 @@
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.html -f
+RewriteRule ^(.*)$ $1.html
+
+# 最終行の後には空行を入れましょう
+# .htmlなしでアクセスするコード
+
+<IfModule mod_rewrite.c>
+RewriteEngine on 
+RewriteCond %{ENV:HTTPS} !on 
+RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L] 
+</IfModule>
+
+# 最終行の後には空行を入れましょう
+# httpをhttpsへリダイレクト

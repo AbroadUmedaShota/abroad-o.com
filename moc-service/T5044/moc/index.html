@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THK LMシステム 展示会フォローアップシート</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="favicon.ico">
+</head>
+<body>
+
+    <h1>THK LMシステム 展示会フォローアップシート</h1>
+
+    <div class="accordion">
+        <!-- Q.01 -->
+        <div class="accordion-item">
+            <h3 class="accordion-header" id="q1-header"><span class="question-number">Q.01</span>社員CD (5桁もしくは8桁)<span class="required">必須</span></h3>
+            <div class="accordion-content">
+                <div class="question">
+                    <input type="text" class="answer-input" id="employee-id" placeholder="回答欄" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q.02 -->
+        <div class="accordion-item">
+            <h3 class="accordion-header" id="q2-header"><span class="question-number">Q.02</span>お客様の主な業界 (いずれか一つを選択)<span class="required">必須</span></h3>
+            <div class="accordion-content">
+                <div class="question">
+                    <label><input type="radio" name="industry" value="半導体/液晶" required>半導体/液晶</label>
+                    <label><input type="radio" name="industry" value="電気/電子部品">電気/電子部品</label>
+                    <label><input type="radio" name="industry" value="FAロボット製造業">FAロボット製造業</label>
+                    <label><input type="radio" name="industry" value="工作機械">工作機械</label>
+                    <label><input type="radio" name="industry" value="輸送用機器">輸送用機器</label>
+                    <label><input type="radio" name="industry" value="食品/薬品/化粧品">食品/薬品/化粧品</label>
+                    <label><input type="radio" name="industry" value="医療">医療</label>
+                    <label><input type="radio" name="industry" value="商社">商社</label>
+                    <label><input type="radio" name="industry" value="運輸">運輸</label>
+                    <label><input type="radio" name="industry" value="倉庫">倉庫</label>
+                    <label><input type="radio" name="industry" value="流通(小売・卸売)">流通(小売・卸売)</label>
+                    <label><input type="radio" name="industry" value="その他物流">その他物流</label>
+                    <label><input type="radio" name="industry" value="商業施設・サービス業">商業施設・サービス業</label>
+                    <label><input type="radio" name="industry" value="官公庁">官公庁</label>
+                    <label><input type="radio" name="industry" value="学校">学校</label>
+                    <label><input type="radio" name="industry" value="その他">その他(テキスト入力欄へ)</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q.03 -->
+        <div class="accordion-item">
+            <h3 class="accordion-header" id="q3-header"><span class="question-number">Q.03</span>お客様の主な業界で『その他』を選んだ場合は下記にご記入ください。</h3>
+            <div class="accordion-content">
+                <div class="question">
+                    <input type="text" class="answer-input" id="industry-other" placeholder="回答欄">
+                </div>
+            </div>
+        </div>
+
+        <!-- Q.04 -->
+        <div class="accordion-item">
+            <h3 class="accordion-header" id="q4-header"><span class="question-number">Q.04</span>打ち合わせ・案件情報: 打ち合わせ種類 (複数選択可)<span class="required">必須</span></h3>
+            <div class="accordion-content">
+                <div class="question">
+                    <label><input type="checkbox" name="meeting_type" value="要素部品">要素部品</label>
+                    <label><input type="checkbox" name="meeting_type" value="新製品(SPH)">新製品(SPH)</label>
+                    <label><input type="checkbox" name="meeting_type" value="新製品(RT)">新製品(RT)</label>
+                    <label><input type="checkbox" name="meeting_type" value="アクチュエータ">アクチュエータ</label>
+                    <label><input type="checkbox" name="meeting_type" value="ユニット(立体自動倉庫・MLS)">ユニット(立体自動倉庫・MLS)</label>
+                    <label><input type="checkbox" name="meeting_type" value="OMNIedge">OMNIedge</label>
+                    <label><input type="checkbox" name="meeting_type" value="PRS-TNH">PRS-TNH</label>
+                    <label><input type="checkbox" name="meeting_type" value="リニア">リニア</label>
+                    <label><input type="checkbox" name="meeting_type" value="PPR">PPR</label>
+                    <label><input type="checkbox" name="meeting_type" value="SIGNAS">SIGNAS</label>
+                    <label><input type="checkbox" name="meeting_type" value="該当なし">該当なし</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q.05～Q.07 (省略) -->
+        <div class="accordion-item">
+            <h3 class="accordion-header" id="q5-header"><span class="question-number">Q.05</span>ライン名・装置名など (案件名)</h3>
+            <div class="accordion-content">
+                <div class="question">
+                    <input type="text" class="answer-input" id="project-name" placeholder="回答欄">
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h3 class="accordion-header" id="q6-header"><span class="question-number">Q.06</span>必要時期(見込時期)</h3>
+            <div class="accordion-content">
+                <div class="question">
+                    <label><input type="radio" name="timing" value="至急">至急</label>
+                    <label><input type="radio" name="timing" value="6ヶ月以内">6ヶ月以内</label>
+                    <label><input type="radio" name="timing" value="1年以内">1年以内</label>
+                    <label><input type="radio" name="timing" value="それ以降">それ以降</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h3 class="accordion-header" id="q7-header"><span class="question-number">Q.07</span>打ち合わせ・案件情報 (いずれか一つを選択)</h3>
+            <div class="accordion-content">
+                <div class="question">
+                    <label><input type="radio" name="project_info" value="開発 (試作)">開発 (試作)</label>
+                    <label><input type="radio" name="project_info" value="量産">量産</label>
+                    <label><input type="radio" name="project_info" value="今回限り">今回限り</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q.08 -->
+        <div class="accordion-item">
+            <h3 class="accordion-header" id="q8-header"><span class="question-number">Q.08</span>開発要望</h3>
+            <div class="accordion-content">
+                <div class="question">
+                    <div class="question-title">開発要望 (THKに対する新製品の開発要望があればチェックを入れてください。詳細は下記にお願いします)</div>
+                    <label><input type="checkbox" name="dev_request" id="dev-request-checkbox" value="開発要望あり">開発要望あり</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q.09 -->
+        <div class="accordion-item">
+            <h3 class="accordion-header" id="q9-header"><span class="question-number">Q.09</span>打ち合わせ内容<span class="required dev-req-required">必須</span></h3>
+            <div class="accordion-content">
+                <div class="question">
+                    <div class="question-title">打ち合わせ内容 (文面) : 「SPH」「RT」に関しては、お客様へ感想・要望を確認のうえ記載お願いします。</div>
+                    <textarea class="answer-input" id="meeting-details" placeholder="回答欄" required></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q.10 (お絵かきツール) -->
+        <div class="accordion-item">
+            <h3 class="accordion-header" id="q10-header"><span class="question-number">Q.10</span>イメージ図・ポンチ絵</h3>
+            <div class="accordion-content">
+                <div class="question">
+                    <div class="drawing-area">
+                        <canvas id="drawing-canvas" width="600" height="400"></canvas>
+                        <div class="toolbar">
+                            <button id="pen-tool" class="tool-button active">ペン</button>
+                            <button id="eraser-tool" class="tool-button">消しゴム</button>
+                            <select id="line-width">
+                                <option value="1">細</option>
+                                <option value="3" selected>中</option>
+                                <option value="5">太</option>
+                            </select>
+                            <input type="color" id="color-picker" value="#000000">
+                            <button id="undo-button" class="tool-button">戻る</button>
+                            <button id="redo-button" class="tool-button">やり直し</button>
+                            <button id="clear-button" class="tool-button">全消し</button>
+                        </div>
+                    </div>
+                    <input type="hidden" id="drawing-data" name="drawing-data">
+                </div>
+            </div>
+        </div>
+
+        <!-- Q.11 -->
+        <div class="accordion-item">
+            <h3 class="accordion-header" id="q11-header"><span class="question-number">Q.11</span>緊急度<span class="required">必須</span></h3>
+            <div class="accordion-content">
+                <div class="question">
+                    <div class="question-title">緊急度※ライン名・装置名 or 必要時期のどちらかは必ず記載ください。(複数選択可)</div>
+                    <label><input type="checkbox" name="urgency" value="大至急 営業訪問">大至急 営業訪問</label>
+                    <label><input type="checkbox" name="urgency" value="営業打ち合わせ希望(客先要望)">営業打ち合わせ希望(客先要望)</label>
+                    <label><input type="checkbox" name="urgency" value="営業打ち合わせ希望(THK要望)">営業打ち合わせ希望(THK要望)</label>
+                    <label><input type="checkbox" name="urgency" value="説明員判断でフォローが必要">説明員判断でフォローが必要</label>
+                    <label><input type="checkbox" name="urgency" value="カタログ希望, 情報収集">カタログ希望, 情報収集</label>
+                    <label><input type="checkbox" name="urgency" value="挨拶・見込み">挨拶・見込み</label>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Q.12～Q.16 (省略) -->
+        <div class="accordion-item">
+            <h3 class="accordion-header" id="q12-header"><span class="question-number">Q.12</span>カタログ：総合カタログ</h3>
+            <div class="accordion-content">
+                <div class="question">
+                    <div class="question-title">カタログの請求：総合カタログ (複数選択可)</div>
+                    <label><input type="checkbox" name="catalog_general" value="1 会社案内(Company Profile)">1 会社案内(Company Profile)</label>
+                    <label><input type="checkbox" name="catalog_general" value="2 直動総合カタログ">2 直動総合カタログ</label>
+                    <label><input type="checkbox" name="catalog_general" value="3 General Catalog">3 General Catalog</label>
+                    <label><input type="checkbox" name="catalog_general" value="4 電動アクチュエータ総合カタログ">4 電動アクチュエータ総合カタログ</label>
+                    <label><input type="checkbox" name="catalog_general" value="5 ユニットソリューション総合カタログ">5 ユニットソリューション総合カタログ</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h3 class="accordion-header" id="q13-header"><span class="question-number">Q.13</span>カタログ：免震</h3>
+            <div class="accordion-content">
+                <div class="question">
+                    <div class="question-title">カタログの請求：免震 (複数選択可)</div>
+                    <label><input type="checkbox" name="catalog_seismic" value="6 ユーティリティスライド ATG">6 ユーティリティスライド ATG</label>
+                    <label><input type="checkbox" name="catalog_seismic" value="7 Advanced Wheel Guide(AWG)">7 Advanced Wheel Guide(AWG)</label>
+                    <label><input type="checkbox" name="catalog_seismic" value="8 超高速LMガイド FHS">8 超高速LMガイド FHS</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h3 class="accordion-header" id="q14-header"><span class="question-number">Q.14</span>カタログ：既存・EA</h3>
+            <div class="accordion-content">
+                <div class="question">
+                    <div class="question-title">カタログの請求：既存・EA (複数選択可)</div>
+                    <label><input type="checkbox" name="catalog_existing_ea" value="9 クロスローラーリング RB-H/RE-H/RU-H">9 クロスローラーリング RB-H/RE-H/RU-H</label>
+                    <label><input type="checkbox" name="catalog_existing_ea" value="10 RTカタログ">10 RTカタログ</label>
+                    <label><input type="checkbox" name="catalog_existing_ea" value="11 超低ウェービング ボールリテーナ入りLMガイド (SPH)">11 超低ウェービング ボールリテーナ入りLMガイド (SPH)</label>
+                    <label><input type="checkbox" name="catalog_existing_ea" value="12 高加減速対応_低摺動 ミニチュアLMガイド (AHR)">12 高加減速対応_低摺動 ミニチュアLMガイド (AHR)</label>
+                    <label><input type="checkbox" name="catalog_existing_ea" value="13 冷却ボールねじ">13 冷却ボールねじ</label>
+                    <label><input type="checkbox" name="catalog_existing_ea" value="14 ケージずれ防止機構付き クロスローラーガイド (VRG/VRG-W)">14 ケージずれ防止機構付き クロスローラーガイド (VRG/VRG-W)</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h3 class="accordion-header" id="q15-header"><span class="question-number">Q.15</span>カタログ：ロボット系</h3>
+            <div class="accordion-content">
+                <div class="question">
+                    <div class="question-title">カタログの請求：ロボット系 (複数選択可)</div>
+                    <label><input type="checkbox" name="catalog_robot" value="15 Robot Products Guidebook">15 Robot Products Guidebook</label>
+                    <label><input type="checkbox" name="catalog_robot" value="16 既存EA">16 既存EA</label>
+                    <label><input type="checkbox" name="catalog_robot" value="17 ロボット系">17 ロボット系</label>
+                    <label><input type="checkbox" name="catalog_robot" value="18 ピッキングロボットハンドシステム PRS">18 ピッキングロボットハンドシステム PRS</label>
+                    <label><input type="checkbox" name="catalog_robot" value="19 PRS-A/PRS-A-HYB">19 PRS-A/PRS-A-HYB</label>
+                    <label><input type="checkbox" name="catalog_robot" value="20 SIGNAS">20 SIGNAS</label>
+                    <label><input type="checkbox" name="catalog_robot" value="21 Pick and Place Robot PPR">21 Pick and Place Robot PPR</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h3 class="accordion-header" id="q16-header"><span class="question-number">Q.16</span>カタログ：フリー記入</h3>
+            <div class="accordion-content">
+                <div class="question">
+                    <div class="question-title">カタログの請求：フリー記入(1~21以外のカタログで要求するものがあれば、下記に記載してください)</div>
+                    <textarea class="answer-input" id="catalog-free" placeholder="回答欄"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ボタン -->
+    <div class="business-card-container">
+        <div>
+            <label for="business-card-front" class="file-input-label">名刺画像(表)を添付</label>
+            <input type="file" id="business-card-front" accept="image/*">
+            <img id="preview-front" class="preview-image" src="#" alt="名刺(表)プレビュー" style="display: none;">
+        </div>
+        <div>
+            <label for="business-card-back" class="file-input-label">名刺画像(裏)を添付</label>
+            <input type="file" id="business-card-back" accept="image/*">
+            <img id="preview-back" class="preview-image" src="#" alt="名刺(裏)プレビュー" style="display: none;">
+        </div>
+    </div>
+
+
+    <div class="button-container">
+        <button class="button button-alt" id="manual-input">名刺がない為手入力する</button>
+    </div>
+
+    <div class="button-container">
+        <button class="button button-purple" id="submit-form">アンケート送信</button>
+    </div>
+
+    <!-- モーダルウィンドウ (各種) -->
+    <!-- エラーモーダル -->
+    <div id="error-modal" class="modal">
+        <!-- (内容は script.js で動的に生成) -->
+        <div class="modal-content">
+            <span class="close-button" id="close-error-modal">×</span>
+            <p id="error-modal-message"></p>
+            <ul id="error-missing-items-list"></ul>
+        </div>
+    </div>
+
+    <!-- 確認モーダル -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-confirm-modal">×</span>
+            <p id="confirm-modal-message"></p>
+            <div class="modal-button-container">
+                <button class="modal-button yes" id="confirm-yes">はい</button>
+                <button class="modal-button no" id="confirm-no">いいえ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- プログレスモーダル -->
+    <div id="progress-modal" class="modal">
+        <div class="modal-content">
+            <p id="progress-modal-message">送信中...</p>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <p id="progress-percentage">0%</p>
+            <!-- <button class="modal-button" id="cancel-upload">中断</button> -->
+        </div>
+    </div>
+
+    <!-- 送信完了モーダル -->
+    <div id="complete-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-complete-modal">×</span>
+            <p id="complete-modal-message">アンケートを送信しました。</p>
+            <div class="modal-button-container">
+                <button class="modal-button restart" id="restart-form">再回答</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

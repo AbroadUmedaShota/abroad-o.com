@@ -1,0 +1,2 @@
+#!/bin/bash
+gh issue create --title "UI/UX改善: 名刺データ化設定とお礼メール設定ページの未完了タスク対応" --body-file "C:/SharedFolder/WorkSpace/【00.NewTopics】/01_SPEED_AD_Project/00_dev_speed_ad_user/02_dashboard/temp_issue_body.md" --label "type:feature" --label "status:planning"

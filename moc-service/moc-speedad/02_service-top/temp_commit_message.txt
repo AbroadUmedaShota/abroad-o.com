@@ -1,0 +1,15 @@
+feat: Implement mock UI for Bizcard and Thank You Email settings & Fix JS Syntax Error
+
+This commit implements the initial mock UI for the Bizcard Data Conversion Settings page (bizcardSettings.html) and the Thank You Email Settings page (thankYouEmailSettings.html) based on the AI_Message.md specifications. It also includes a fix for a syntax error in thankYouEmailSettings.js.
+
+Changes include:
+- bizcardSettings.html:
+  - Added placeholder for coupon code feedback.
+  - Integrated loading state elements for the save button.
+- thankYouEmailSettings.html:
+  - Updated page title and H1 to dynamically display survey name.
+  - Added placeholder for real-time email body preview.
+  - Enhanced recipient list display with count and conditional messages.
+  - Integrated loading state elements for save and send email buttons.
+- src/thankYouEmailSettings.js:
+  - Fixed Uncaught SyntaxError: Unexpected end of input by adding a missing closing brace.

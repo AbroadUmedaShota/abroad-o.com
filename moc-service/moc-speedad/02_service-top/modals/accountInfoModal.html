@@ -1,0 +1,204 @@
+<div id="accountInfoModal" class="fixed inset-0 flex items-center justify-center p-4 modal-overlay hidden z-[60]" data-state="closed">
+    <!-- モーダルの最大幅と高さを調整（max-h-[90vh] は既に適用済み） -->
+    <div class="bg-surface rounded-lg p-6 w-full max-w-3xl flex flex-col modal-content-transition max-h-[90vh]" data-state="closed">
+        <div class="flex justify-between items-center mb-6 flex-shrink-0">
+            <h3 class="text-on-surface text-xl font-semibold">アカウント情報</h3>
+            <button class="text-on-surface-variant hover:text-on-surface" id="closeAccountInfoModalBtn" aria-label="モーダルを閉じる">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <form class="space-y-4 overflow-y-auto flex-grow pr-2"> <!-- フォーム内容をスクロール可能にする -->
+            <!-- プロフィール画像とメールアドレス (アカウント基本情報) -->
+            <div class="section-card">
+                <!-- 変更点: aria-expanded="true" に設定 -->
+                <button type="button" class="section-header" aria-expanded="true" aria-controls="basicInfoContent">
+                    <h4 class="text-on-surface text-lg font-semibold">アカウント基本情報</h4>
+                    <span class="material-icons expand-icon">expand_less</span>
+                </button>
+                <div id="basicInfoContent" class="section-content">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="bg-surface-variant aspect-square rounded-full size-20 border-2 border-outline-variant flex items-center justify-center">
+                            <span class="material-icons text-on-surface-variant text-6xl" aria-hidden="true">account_circle</span>
+                        </div>
+                        <div>
+                            <button class="text-primary hover:text-secondary font-medium" type="button" aria-label="プロフィール画像を変更">プロフィール画像を変更</button>
+                            <p class="text-on-surface-variant text-xs mt-1">JPG, PNG, GIF (最大5MB)</p>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <!-- 変更点: value属性を削除 -->
+                        <input class="input-field" id="userEmail" name="userEmail" readonly type="email"/>
+                        <label class="input-label" for="userEmail">メールアドレス</label>
+                        <p class="error-message hidden" id="userEmail-error"></p>
+                    </div>
+                    <div class="pt-2">
+                        <label class="block text-sm font-medium text-on-surface mb-1" for="userPassword">パスワード</label>
+                        <button class="text-primary hover:text-secondary font-medium" type="button" aria-label="パスワードを変更する">パスワードを変更する</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 会社情報 -->
+            <div class="section-card">
+                <!-- 変更点: aria-expanded="true" に設定 -->
+                <button type="button" class="section-header" aria-expanded="true" aria-controls="companyInfoContent">
+                    <h4 class="text-on-surface text-lg font-semibold">会社情報</h4>
+                    <span class="material-icons expand-icon">expand_less</span>
+                </button>
+                <div id="companyInfoContent" class="section-content">
+                    <div class="input-group">
+                        <!-- 変更点: value属性を削除 -->
+                        <input class="input-field" id="companyName" name="companyName" placeholder=" " type="text"/>
+                        <label class="input-label" for="companyName">会社名</label>
+                        <p class="error-message hidden" id="companyName-error"></p>
+                    </div>
+                    <div class="input-group">
+                        <!-- 変更点: value属性を削除 -->
+                        <input class="input-field" id="departmentName" name="departmentName" placeholder=" " type="text"/>
+                        <label class="input-label" for="departmentName">部署名</label>
+                        <p class="error-message hidden" id="departmentName-error"></p>
+                    </div>
+                    <div class="input-group">
+                        <!-- 変更点: value属性を削除 -->
+                        <input class="input-field" id="positionName" name="positionName" placeholder=" " type="text"/>
+                        <label class="input-label" for="positionName">役職名</label>
+                        <p class="error-message hidden" id="positionName-error"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 統合された個人連絡先・請求情報セクション -->
+            <div class="section-card">
+                <!-- 変更点: aria-expanded="true" に設定 -->
+                <button type="button" class="section-header" aria-expanded="true" aria-controls="contactBillingInfoContent">
+                    <h4 class="text-on-surface text-lg font-semibold">個人連絡先・請求情報</h4>
+                    <span class="material-icons expand-icon">expand_less</span>
+                </button>
+                <div id="contactBillingInfoContent" class="section-content">
+                    <!-- 個人連絡先部分 -->
+                    <div class="flex gap-4">
+                        <div class="input-group flex-1">
+                            <!-- 変更点: value属性を削除 -->
+                            <input class="input-field" id="lastName" name="lastName" placeholder=" " type="text"/>
+                            <label class="input-label" for="lastName">氏名 (姓)</label>
+                            <p class="error-message hidden" id="lastName-error"></p>
+                        </div>
+                        <div class="input-group flex-1">
+                            <!-- 変更点: value属性を削除 -->
+                            <input class="input-field" id="firstName" name="firstName" placeholder=" " type="text"/>
+                            <label class="input-label" for="firstName">氏名 (名)</label>
+                            <p class="error-message hidden" id="firstName-error"></p>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <!-- 変更点: value属性を削除 -->
+                        <input class="input-field" id="phoneNumber" name="phoneNumber" type="text" placeholder=" "/>
+                        <label class="input-label" for="phoneNumber">電話番号</label>
+                        <p class="error-message hidden" id="phoneNumber-error"></p>
+                    </div>
+                    <div class="input-group">
+                        <!-- 変更点: value属性を削除 -->
+                        <input class="input-field" id="postalCode" name="postalCode" type="text" placeholder=" "/>
+                        <label class="input-label" for="postalCode">郵便番号</label>
+                        <p class="error-message hidden" id="postalCode-error"></p>
+                    </div>
+                    <div class="input-group">
+                        <!-- 変更点: value属性を削除 -->
+                        <input class="input-field" id="address" name="address" type="text" placeholder=" "/>
+                        <label class="input-label" for="address">住所</label>
+                        <p class="error-message hidden" id="address-error"></p>
+                    </div>
+                    <div class="input-group">
+                        <!-- 変更点: value属性を削除 -->
+                        <input class="input-field" id="buildingFloor" name="buildingFloor" type="text" placeholder=" "/>
+                        <label class="input-label" for="buildingFloor">建物名・階数</label>
+                        <p class="error-message hidden" id="buildingFloor-error"></p>
+                    </div>
+
+                    <!-- ご請求書の宛名 (ラジオボタン) -->
+                    <div class="pt-2 border-t border-outline-variant mt-4"> <!-- 区切り線 -->
+                        <label class="block text-sm font-medium text-on-surface mb-2 mt-4">ご請求書の宛名</label>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div>
+                                <input type="radio" id="billingSame" name="billingAddressType" value="same" class="rounded-full text-primary focus:ring-primary" checked>
+                                <label for="billingSame" class="ml-2 text-sm font-medium text-on-surface">上記と同じ</label>
+                            </div>
+                            <div>
+                                <input type="radio" id="billingDifferent" name="billingAddressType" value="different" class="rounded-full text-primary focus:ring-primary">
+                                <label for="billingDifferent" class="ml-2 text-sm font-medium text-on-surface">上記と異なる</label>
+                            </div>
+                        </div>
+
+                        <!-- 請求先詳細入力フィールド (条件付き表示) -->
+                        <div id="billingDetailsSection" class="space-y-4 hidden">
+                            <div class="input-group">
+                                <!-- 変更点: value属性を削除 -->
+                                <input class="input-field" id="billingCompanyName" name="billingCompanyName" type="text" placeholder=" "/>
+                                <label class="input-label" for="billingCompanyName">会社名（請求先）</label>
+                                <p class="error-message hidden" id="billingCompanyName-error"></p>
+                            </div>
+                            <div class="input-group">
+                                <!-- 変更点: value属性を削除 -->
+                                <input class="input-field" id="billingDepartmentName" name="billingDepartmentName" type="text" placeholder=" "/>
+                                <label class="input-label" for="billingDepartmentName">部署名（請求先）</label>
+                                <p class="error-message hidden" id="billingDepartmentName-error"></p>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="input-group flex-1">
+                                    <!-- 変更点: value属性を削除 -->
+                                    <input class="input-field" id="billingLastName" name="billingLastName" type="text" placeholder=" "/>
+                                    <label class="input-label" for="billingLastName">氏名 (姓 - 請求先)</label>
+                                    <p class="error-message hidden" id="billingLastName-error"></p>
+                                </div>
+                                <div class="input-group flex-1">
+                                    <!-- 変更点: value属性を削除 -->
+                                    <input class="input-field" id="billingFirstName" name="billingFirstName" type="text" placeholder=" "/>
+                                    <label class="input-label" for="billingFirstName">氏名 (名 - 請求先)</label>
+                                    <p class="error-message hidden" id="billingFirstName-error"></p>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <!-- 変更点: value属性を削除 -->
+                                <input class="input-field" id="billingPhoneNumber" name="billingPhoneNumber" type="text" placeholder=" "/>
+                                <label class="input-label" for="billingPhoneNumber">電話番号（請求先）</label>
+                                <p class="error-message hidden" id="billingPhoneNumber-error"></p>
+                            </div>
+                            <div class="input-group">
+                                <!-- 変更点: value属性を削除 -->
+                                <input class="input-field" id="billingPostalCode" name="billingPostalCode" type="text" placeholder=" "/>
+                                <label class="input-label" for="billingPostalCode">郵便番号（請求先）</label>
+                                <p class="error-message hidden" id="billingPostalCode-error"></p>
+                            </div>
+                            <div class="input-group">
+                                <!-- 変更点: value属性を削除 -->
+                                <input class="input-field" id="billingAddress" name="billingAddress" type="text" placeholder=" "/>
+                                <label class="input-label" for="billingAddress">住所（請求先）</label>
+                                <p class="error-message hidden" id="billingAddress-error"></p>
+                            </div>
+                            <div class="input-group">
+                                <!-- 変更点: value属性を削除 -->
+                                <input class="input-field" id="billingBuildingFloor" name="billingBuildingFloor" type="text" placeholder=" "/>
+                                <label class="input-label" for="billingBuildingFloor">建物名・階数（請求先）</label>
+                                <p class="error-message hidden" id="billingBuildingFloor-error"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- パスワード変更ボタン (どのセクションにも属さない独立項目) -->
+            <div class="pt-2 border-t border-outline-variant mt-4"> <!-- 区切り線 -->
+                <label class="block text-sm font-medium text-on-surface mb-1 mt-4" for="userPassword">パスワード</label>
+                <button class="text-primary hover:text-secondary font-medium" type="button" aria-label="パスワードを変更する">パスワードを変更する</button>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4">
+                <button class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md text-sm font-semibold leading-normal tracking-wide transition-colors" onclick="closeModal('accountInfoModal')" type="button" aria-label="キャンセル">キャンセル</button>
+                <button class="gradient-primary-bg text-on-primary py-2 px-4 rounded-md text-sm font-semibold leading-normal transition-colors" type="submit" aria-label="保存する" id="saveAccountInfoBtn">
+                    保存する
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

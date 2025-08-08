@@ -1,0 +1,38 @@
+<div id="contactModal" class="fixed inset-0 flex items-center justify-center p-4 modal-overlay hidden z-[60]" data-state="closed">
+    <div class="bg-surface rounded-lg shadow-xl p-6 w-full max-w-xl modal-content-transition" data-state="closed">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-on-surface text-xl font-semibold">お問い合わせ</h3>
+            <button class="text-on-surface-variant hover:text-on-surface" id="closeContactModalBtn" aria-label="モーダルを閉じる">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <form class="space-y-4">
+            <div class="input-group">
+                <input class="input-field" id="contactName" name="contactName" placeholder=" " type="text" required/>
+                <label class="input-label" for="contactName">お名前</label>
+                <p class="error-message hidden" id="contactName-error"></p>
+            </div>
+            <div class="input-group">
+                <input class="input-field" id="contactEmail" name="contactEmail" placeholder=" " type="email" required/>
+                <label class="input-label" for="contactEmail">メールアドレス</label>
+                <p class="error-message hidden" id="contactEmail-error"></p>
+            </div>
+            <div class="input-group">
+                <input class="input-field" id="contactSubject" name="contactSubject" placeholder=" " type="text" required/>
+                <label class="input-label" for="contactSubject">件名</label>
+                <p class="error-message hidden" id="contactSubject-error"></p>
+            </div>
+            <div class="input-group">
+                <textarea class="input-field" id="contactMessage" name="contactMessage" placeholder=" " rows="4" required></textarea>
+                <label class="input-label" for="contactMessage">お問い合わせ内容</label>
+                <p class="error-message hidden" id="contactMessage-error"></p>
+            </div>
+            <div class="flex justify-end gap-3 pt-4">
+                <button class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors" onclick="closeModal('contactModal')" type="button" aria-label="キャンセル">キャンセル</button>
+                <button class="gradient-primary-bg text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors" id="sendContactFormBtn" class="gradient-primary-bg text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors" type="submit" aria-label="送信する">
+                    送信する
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

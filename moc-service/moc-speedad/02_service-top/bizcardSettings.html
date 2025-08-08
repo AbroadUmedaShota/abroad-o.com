@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedAd - 名刺データ化設定</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Material Icons CDN -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="service-top-style.css">
+    <!-- Custom Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+</head>
+<body class="bg-background text-on-background">
+
+<!-- 1. アプリケーション全体構造 -->
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+
+    <!-- サイドバー用オーバーレイ -->
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+
+    <!-- 2. ヘッダー -->
+    <header class="fixed top-0 left-0 right-0 z-50 flex h-16 items-center justify-between px-4 sm:px-6 gradient-primary-bg">
+        <div class="flex items-center gap-3">
+            <!-- モバイル用サイドバートグル -->
+            <button class="lg:hidden text-on-primary hover:text-primary-container" id="sidebarToggleMobile" aria-label="モバイルメニューを開く">
+                <span class="material-icons text-3xl">menu</span>
+            </button>
+            <!-- ブランドロゴ -->
+            <div class="flex items-center gap-2">
+                <div class="size-8 text-on-primary" role="img" aria-label="SpeedAdロゴ">
+                    <svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13.8261 30.5736C16.7203 29.8826 20.2244 29.4783 24 29.4783C27.7756 29.4783 31.2797 29.8826 34.1739 30.5736C36.9144 31.2278 39.9967 32.7669 41.3563 33.8352L24.8486 7.36089C24.4571 6.73303 23.5429 6.73303 23.1514 7.36089L6.64374 33.8352C8.00331 32.7669 11.0856 31.2278 13.8261 30.5736Z" fill="currentColor"></path>
+                        <path clip-rule="evenodd" d="M39.998 35.764C39.9944 35.7463 39.9875 35.7155 39.9748 35.6706C39.9436 35.5601 39.8949 35.4259 39.8346 35.2825C39.8168 35.2403 39.7989 35.1993 39.7813 35.1602C38.5103 34.2887 35.9788 33.0607 33.7095 32.5189C30.9875 31.8691 27.6413 31.4783 24 31.4783C20.3587 31.4783 17.0125 31.8691 14.2905 32.5189C12.0012 33.0654 9.44505 34.3104 8.18538 35.1832C8.17384 35.2075 8.16216 35.233 8.15052 35.2592C8.09919 35.3751 8.05721 35.4886 8.02977 35.589C8.00356 35.6848 8.00039 35.7333 8.00004 35.7388C8.00004 35.739 8 35.7393 8.00004 35.7388C8.00004 35.7641 8.0104 36.0767 8.68485 36.6314C9.34546 37.1746 10.4222 37.7531 11.9291 38.2772C14.9242 39.319 19.1919 40 24 40C28.8081 40 33.0758 39.319 36.0709 38.2772C37.5778 37.7531 38.6545 37.1746 39.3151 36.6314C39.9006 36.1499 39.9857 35.8511 39.998 35.764ZM4.95178 32.7688L21.4543 6.30267C22.6288 4.4191 25.3712 4.41909 26.5457 6.30267L43.0534 32.777C43.0709 32.8052 43.0878 32.8338 43.104 32.8629L41.3563 33.8352C43.104 32.8629 43.1038 32.8626 43.104 32.8629L43.1051 32.865L43.1065 32.8675L43.1101 32.8739L43.1199 32.8918C43.1276 32.906 43.1377 32.9246 43.1497 32.9473C43.1738 32.9925 43.2062 33.0545 43.244 33.1299C43.319 33.2792 43.4196 33.489 43.5217 33.7317C43.6901 34.1321 44 34.9311 44 35.7391C44 37.4427 43.003 38.7775 41.8558 39.7209C40.6947 40.6757 39.1354 41.4464 37.385 42.0552C33.8654 43.2794 29.133 44 24 44C18.867 44 14.1346 43.2794 10.615 42.0552C8.86463 41.4464 7.30529 40.6757 6.14419 39.7209C4.99695 38.7775 3.99999 37.4427 3.99999 35.7391C3.99999 34.8725 4.29264 34.0922 4.49321 33.6393C4.60375 33.3898 4.71348 33.1804 4.79687 33.0311C4.83898 32.9556 4.87547 32.8935 4.9035 32.8471C4.91754 32.8238 4.92954 32.8043 4.93916 32.7889L4.94662 32.777L4.95178 32.7688ZM35.9868 29.004L24 9.77997L12.0131 29.004C12.4661 28.8609 12.9179 28.7342 13.3617 28.6282C16.4281 27.4783 20.0901 27.4783 24 27.4783C27.9099 27.4783 31.5719 27.8961 34.6383 28.6282C35.082 28.7342 35.5339 28.8609 35.9868 29.004Z" fill="currentColor"></path>
+                    </svg>
+                </div>
+                <span class="text-on-primary text-xl font-bold leading-tight tracking-tight text-shadow-sm">SPEED-AD</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-x-3 sm:gap-x-4">
+            
+            <!-- ユーザー情報 -->
+            <a href="#" class="text-on-primary font-bold text-shadow-sm transition-opacity" aria-label="現在のユーザー情報" onclick="window.openAccountInfoModal(window.dummyUserData);">user@example.comさん</a>
+        </div>
+    </header>
+
+    <div class="flex flex-1 pt-16 bg-background">
+        <!-- 3. サイドバー -->
+        <aside class="fixed inset-y-0 left-0 z-40 flex flex-col border-r border-outline-variant bg-surface pt-16 overflow-y-auto sidebar" id="sidebar">
+            <!-- プロファイルブロック -->
+            <div class="p-4 border-b border-outline-variant profile-block">
+                <div class="flex items-center gap-3">
+                    <div class="bg-on-primary-fixed-variant aspect-square rounded-full size-10 border-2 border-outline-variant flex items-center justify-center">
+                        <span class="material-icons text-primary text-4xl leading-none">account_circle</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-on-surface text-sm font-semibold">user@example.com</p>
+                        <p class="text-on-surface-variant text-xs">Current Group</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- グループ管理 -->
+            <div class="p-4 border-b border-outline-variant sidebar-group-control">
+                <select id="user_select" class="w-full rounded-md shadow-sm bg-on-primary-fixed-variant text-primary focus:ring-secondary focus:border-secondary transition-all text-sm py-2 px-3 appearance-none" aria-label="ユーザーグループを選択">
+                    <option value="current">Current Group</option>
+                    <option value="group_a">Group A</option>
+                    <option value="group_b">Group B</option>
+                </select>
+                <button class="w-full mt-2 gradient-primary-bg text-on-primary py-2 px-3 rounded-md shadow-sm font-semibold text-sm" aria-label="グループを切り替える">
+                    切替
+                </button>
+                <button class="w-full mt-2 gradient-primary-bg text-on-primary py-2 px-3 rounded-md shadow-sm font-semibold text-sm" aria-label="グループを新規作成" onclick="handleOpenModal('newGroupModal', 'modals/newGroupModal.html')">
+                    グループ新規作成
+                </button>
+            </div>
+
+            <!-- ナビゲーション -->
+            <nav class="flex-1 space-y-1 p-2">
+                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="index.html" aria-label="アンケート一覧へ移動">
+                    <span class="material-icons text-xl">list_alt</span>
+                    <span class="sidebar-nav-label whitespace-nowrap">アンケート一覧</span>
+                </a>
+                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="surveyCreation.html" aria-label="アンケート新規作成へ移動">
+                    <span class="material-icons text-xl">add_box</span>
+                    <span class="sidebar-nav-label whitespace-nowrap">アンケート新規作成</span>
+                </a>
+                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="invoiceList.html" aria-label="請求書一覧へ移動">
+                    <span class="material-icons text-xl">receipt_long</span>
+                    <span class="sidebar-nav-label whitespace-nowrap">請求書一覧</span>
+                </a>
+                <div class="border-t border-outline-variant my-2"></div>
+                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="#" id="sidebarAccountInfoLink" aria-label="アカウント情報を表示">
+                    <span class="material-icons text-xl">account_circle</span>
+                    <span class="sidebar-nav-label whitespace-nowrap">アカウント情報</span>
+                </a>
+                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="#" aria-label="ログアウトする" id="logoutButton">
+                    <span class="material-icons text-lg">logout</span>
+                    <span class="sidebar-nav-label whitespace-nowrap">ログアウト</span>
+                </a>
+            </nav>
+            <!-- テーマ切り替えボタン (サイドバー下部) -->
+            <div class="mt-auto p-2 border-t border-outline-variant">
+                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="#" aria-label="テーマを切り替える" id="sidebarThemeToggle">
+                    <span class="material-icons text-lg" id="sidebarThemeIcon">light_mode</span>
+                    <span class="sidebar-nav-label whitespace-nowrap">テーマ切替</span>
+                </a>
+            </div>
+        </aside>
+            
+        </aside>
+
+        <!-- 4. メインコンテンツ -->
+        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+                <!-- パンくずリストコンテナ -->
+                <div id="breadcrumb-container" class="mb-4"></div>
+
+                <!-- タイトルエリア -->
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
+                    <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight" id="pageTitle">アンケート『[アンケート名]』の名刺データ化設定</h1>
+                </div>
+
+                <!-- アンケート基本情報表示エリア -->
+                <div class="bg-surface p-4 rounded-lg mb-6">
+                    <h2 class="text-on-surface text-xl font-bold mb-2">アンケート基本情報</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-on-surface-variant">
+                        <div><span class="font-bold text-on-surface">アンケート名:</span> <span id="surveyNameDisplay"></span></div>
+                        <div><span class="font-bold text-on-surface">ID:</span> <span id="surveyIdDisplay"></span></div>
+                        <div><span class="font-bold text-on-surface">会期:</span> <span id="surveyPeriodDisplay"></span></div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col lg:flex-row gap-6">
+                    <!-- 名刺データ化設定フォーム -->
+                    <div class="bg-surface p-6 rounded-xl space-y-6 lg:w-2/3">
+                        <div class="flex items-center justify-between p-4 bg-surface-container rounded-lg shadow-sm">
+                            <label for="bizcardEnabledToggle" class="text-on-surface font-semibold text-lg">名刺データ化</label>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" value="" id="bizcardEnabledToggle" class="sr-only peer">
+                                <div class="w-11 h-6 bg-outline-variant peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-container rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                <span class="ml-3 text-sm font-medium text-on-surface-variant" id="bizcardEnabledStatus">無効</span>
+                            </label>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="number" id="bizcardRequest" min="0" placeholder=" " class="input-field">
+                            <label for="bizcardRequest" class="input-label">名刺データ化依頼枚数</label>
+                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">枚</span>
+                        </div>
+
+                        <div id="bizcardSettingsFields" class="space-y-6">
+
+                            <!-- データ化項目プラン -->
+                            <div class="space-y-2">
+                                <label class="text-on-surface font-semibold">データ化項目プラン</label>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="dataConversionPlanSelection">
+                                    <!-- Plan cards will be dynamically inserted here -->
+                                </div>
+                            </div>
+
+                            <!-- データ化スピードプラン -->
+                            <div class="space-y-2">
+                                <label class="text-on-surface font-semibold">データ化スピードプラン</label>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="dataConversionSpeedSelection">
+                                    <!-- Speed plan cards will be dynamically inserted here -->
+                                </div>
+                            </div>
+
+                            <!-- 名刺データ化依頼枚数 -->
+                            <div class="input-group">
+                                <input type="number" id="bizcardRequest" min="1" placeholder=" " class="input-field">
+                                <label for="bizcardRequest" class="input-label">名刺データ化依頼枚数</label>
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">枚</span>
+                                <p class="input-error-message"></p>
+                            </div>
+
+                            <!-- クーポンコード -->
+                            <div class="input-group">
+                                <input type="text" id="couponCode" placeholder=" " class="input-field pr-20">
+                                <label for="couponCode" class="input-label">クーポンコード</label>
+                                <button id="applyCouponBtn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-on-primary rounded-md px-4 py-2 text-sm font-semibold hover:bg-primary-dark transition-colors shadow-sm">適用</button>
+                                <p class="input-error-message" id="couponCodeErrorMessage"></p>
+                            </div>
+                            <p id="couponMessage" class="text-sm -mt-4 text-secondary"></p>
+                            <div id="couponFeedback" class="hidden mt-2 p-2 rounded-md text-sm"></div>
+
+                        </div>
+
+                        <!-- メモ欄セクション -->
+                        <div class="border-t border-outline-variant pt-6">
+                            <button id="toggleMemoSection" class="flex justify-between items-center w-full text-left">
+                                <h3 class="text-on-surface font-semibold">メモ（社内共有用）</h3>
+                                <span class="material-icons transition-transform">expand_more</span>
+                            </button>
+                            <div id="memoSection" class="hidden mt-4">
+                                <div class="input-group">
+                                    <textarea id="internalMemo" placeholder=" " class="input-field min-h-[100px]"></textarea>
+                                    <label for="internalMemo" class="input-label">メモ内容</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end gap-4 pt-4">
+                            <button id="cancelBizcardSettings" class="min-w-[100px] px-6 py-2 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">キャンセル</button>
+                            <button id="saveBizcardSettingsBtn" class="min-w-[100px] px-6 py-2 rounded-full gradient-primary-bg text-on-primary font-semibold transition-colors" disabled>
+                                <span id="saveBizcardSettingsBtnText">設定を保存して依頼を確定する</span>
+                                <span id="saveBizcardSettingsBtnLoading" class="hidden material-icons animate-spin ml-2">sync</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 見積もりサマリーエリア -->
+                    <div class="bg-surface p-6 rounded-xl space-y-6 lg:w-1/3 h-fit sticky top-24">
+                        <h2 class="text-on-surface text-xl font-bold mb-4">名刺データ化費用見積もり</h2>
+                        <div class="input-group">
+                            <div id="estimatedAmount" class="input-field-static text-right text-2xl font-bold text-primary">¥0</div>
+                            <label class="input-label-static">請求見込み金額</label>
+                        </div>
+                        <div class="input-group">
+                            <div id="estimatedCompletionDate" class="input-field-static text-right text-lg font-bold">未定</div>
+                            <label class="input-label-static">データ化完了予定日</label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- 5. フッター -->
+    <footer class="border-t border-outline-variant bg-surface-variant" id="main-footer">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+                <div class="col-span-2 md:col-span-4 lg:col-span-1">
+                    <div class="flex items-center gap-2 text-on-surface mb-4">
+                        <div class="size-7 text-primary">
+                             <svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.8261 30.5736C16.7203 29.8826 20.2244 29.4783 24 29.4783C27.7756 29.4783 31.2797 29.8826 34.1739 30.5736C36.9144 31.2278 39.9967 32.7669 41.3563 33.8352L24.8486 7.36089C24.4571 6.73303 23.5429 6.73303 23.1514 7.36089L6.64374 33.8352C8.00331 32.7669 11.0856 31.2278 13.8261 30.5736Z" fill="currentColor"></path>
+                                <path clip-rule="evenodd" d="M39.998 35.764C39.9944 35.7463 39.9875 35.7155 39.9748 35.6706C39.9436 35.5601 39.8949 35.4259 39.8346 35.2825C39.8168 35.2403 39.7989 35.1993 39.7813 35.1602C38.5103 34.2887 35.9788 33.0607 33.7095 32.5189C30.9875 31.8691 27.6413 31.4783 24 31.4783C20.3587 31.4783 17.0125 31.8691 14.2905 32.5189C12.0012 33.0654 9.44505 34.3104 8.18538 35.1832C8.17384 35.2075 8.16216 35.233 8.15052 35.2592C8.09919 35.3751 8.05721 35.4886 8.02977 35.589C8.00356 35.6848 8.00039 35.7333 8.00004 35.7388C8.00004 35.739 8 35.7393 8.00004 35.7388C8.00004 35.7641 8.0104 36.0767 8.68485 36.6314C9.34546 37.1746 10.4222 37.7531 11.9291 38.2772C14.9242 39.319 19.1919 40 24 40C28.8081 40 33.0758 39.319 36.0709 38.2772C37.5778 37.7531 38.6545 37.1746 39.3151 36.6314C39.9006 36.1499 39.9857 35.8511 39.998 35.764ZM4.95178 32.7688L21.4543 6.30267C22.6288 4.4191 25.3712 4.41909 26.5457 6.30267L43.0534 32.777C43.0709 32.8052 43.0878 32.8338 43.104 32.8629L41.3563 33.8352C43.104 32.8629 43.1038 32.8626 43.104 32.8629L43.1051 32.865L43.1065 32.8675L43.1101 32.8739L43.1199 32.8918C43.1276 32.906 43.1377 32.9246 43.1497 32.9473C43.1738 32.9925 43.2062 33.0545 43.244 33.1299C43.319 33.2792 43.4196 33.489 43.5217 33.7317C43.6901 34.1321 44 34.9311 44 35.7391C44 37.4427 43.003 38.7775 41.8558 39.7209C40.6947 40.6757 39.1354 41.4464 37.385 42.0552C33.8654 43.2794 29.133 44 24 44C18.867 44 14.1346 43.2794 10.615 42.0552C8.86463 41.4464 7.30529 40.6757 6.14419 39.7209C4.99695 38.7775 3.99999 37.4427 3.99999 35.7391C3.99999 34.8725 4.29264 34.0922 4.49321 33.6393C4.60375 33.3898 4.71348 33.1804 4.79687 33.0311C4.83898 32.9556 4.87547 32.8935 4.9035 32.8471C4.91754 32.8238 4.92954 32.8043 4.93916 32.7889L4.94662 32.777L4.95178 32.7688ZM35.9868 29.004L24 9.77997L12.0131 29.004C12.4661 28.8609 12.9179 28.7342 13.3617 28.6282C16.4281 27.4783 20.0901 27.4783 24 27.4783C27.9099 27.4783 31.5719 27.8961 34.6383 28.6282C35.082 28.7342 35.5339 28.8609 35.9868 29.004Z" fill="currentColor"></path>
+                    </svg>
+                </div>
+                <h2 class="text-on-surface text-lg font-bold leading-tight tracking-tight">SPEED-AD</h2>
+            </div>
+            <p class="text-on-surface-variant text-sm leading-relaxed">アンケート作成から分析まで、<br/>オールインワンで提供します。</p>
+        </div>
+        <div>
+            <h3 class="text-on-surface text-sm font-semibold mb-4">サービス</h3>
+            <ul class="space-y-2">
+                <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">アンケート作成</a></li>
+                <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">アンケート配信</a></li>
+                <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">回答分析</a></li>
+                <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">レポート機能</a></li>
+            </ul>
+        </div>
+        <div>
+            <h3 class="text-on-surface text-sm font-semibold mb-4">サポート</h3>
+            <ul class="space-y-2">
+                <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">ヘルプセンター</a></li>
+                <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">よくある質問</a></li>
+                <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#" onclick="handleOpenModal('contactModal', 'modals/contactModal.html')">お問い合わせ</a></li>
+            </ul>
+        </div>
+        <div>
+            <h3 class="text-on-surface text-sm font-semibold mb-4">会社情報</h3>
+            <ul class="space-y-2">
+                <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">会社概要</a></li>
+                <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">採用情報</a></li>
+                <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">プレスリリース</a></li>
+            </ul>
+        </div>
+        <div>
+            <h3 class="text-on-surface text-sm font-semibold mb-4">規約等</h3>
+            <ul class="space-y-2">
+                <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">利用規約</a></li>
+                <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">プライバシーポリシー</a></li>
+                <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">特定商取引法に基づく表示</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="mt-8 pt-8 border-t border-outline-variant text-center">
+        <p class="text-on-surface-variant text-sm">© 2025 Abroad Outsourcing Co.,Inc. All rights reserved.</p>
+    </div>
+</div>
+</footer>
+
+</div>
+
+<!-- JSファイル -->
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

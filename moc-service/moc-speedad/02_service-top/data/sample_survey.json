@@ -1,0 +1,36 @@
+{
+  "surveyId": "svy_12345",
+  "name": "サンプルアンケート",
+  "displayTitle": "サンプルアンケート（回答者向け）",
+  "description": "これはサンプルアンケートの説明です。",
+  "periodStart": "2025-08-01",
+  "periodEnd": "2025-08-31",
+  "plan": "Standard",
+  "deadline": "2025-09-15",
+  "memo": "これは社内用のメモです。",
+  "questionGroups": [
+    {
+      "groupId": "group1",
+      "title": "質問グループ 1",
+      "questions": [
+        {
+          "questionId": "q101",
+          "type": "free_answer",
+          "text": "ご意見・ご感想をお聞かせください。",
+          "required": false
+        },
+        {
+          "questionId": "q102",
+          "type": "single_answer",
+          "text": "あなたの性別を教えてください。",
+          "required": true,
+          "options": [
+            { "optionId": "opt1", "text": "男性" },
+            { "optionId": "opt2", "text": "女性" },
+            { "optionId": "opt3", "text": "その他" }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,804 @@
+/* Custom CSS Variables based on Material 3 inspired color_guideline */:root {
+    /* COLOR_PALETTE_INCONSISTENCY: 新しいカラーガイドライン案2025-06-02.txt に基づいて更新 */
+    /* Base Colors */
+    --color-base-white: #FFFFFF;
+    --color-base-black: #000000;
+    --color-base-background-main: #FFFFFF;
+    --color-base-background-sub: #F8F8F8;
+    --color-base-card: #FFFFFF;
+    --color-base-border-divider: #E0E0E0;
+    --color-base-shadow-soft: none; /* shadow_soft に名称変更 */
+    --color-base-shadow-strong: none; /* shadow_strong を新規追加 */
+
+    /* Text Colors */
+    --color-text-main: #1A1A1A;
+    --color-text-sub: #6B6B6B;
+    --color-primary: var(--color-brand-base-primary); /* ガイドラインに合わせて変更 */
+    --color-text-disabled: #AAAAAA; /* 新規追加 */
+
+    /* Brand Colors */
+    --color-brand-base-primary: #4285F4; /* ブランド基本プライマリ色 (Google Blue) */
+    --color-brand-base-secondary: #BDBDBD; /* ブランド基本セカンダリ色 (Material Grey 400) */
+    --gradient-brand-accent: linear-gradient(90deg, var(--color-brand-base-primary) 0%, var(--color-brand-base-secondary) 100%); /* 名称変更 */
+
+    /* State Colors */
+    --color-state-info: #2196F3;
+    --color-state-success: #4CAF50;
+    --color-state-warning: #FFC107;
+    --color-state-error: #D32F2F;
+    --color-state-on-info: #FFFFFF;
+    --color-state-on-success: #FFFFFF;
+    --color-state-on-warning: #1A1A1A;
+    --color-state-on-error: #FFFFFF;
+
+    /* Button Colors */
+    --color-button-primary-bg: #4285F4;
+    --color-button-primary-text: #FFFFFF;
+    --color-button-primary-hover-bg: #3367D6; /* プライマリの濃い色 */
+    --color-button-secondary-bg: #E0EDFF; /* プライマリブランドカラーの薄い色合いで視認性改善 */
+    --color-button-secondary-text: #1A1A1A;
+    --color-button-secondary-hover-bg: #9E9E9E; /* セカンダリの濃い色 */
+    --color-button-danger-bg: #D32F2F;
+    --color-button-danger-text: #FFFFFF;
+    --color-button-danger-hover-bg: #B02727; /* 新規追加 (D32F2Fを少し暗く) */
+    --color-button-disabled-bg: #E0E0E0; /* 新規追加 */
+    --color-button-disabled-text: #AAAAAA; /* 新規追加 */
+
+    /* Input Colors */
+    --color-input-bg: #FFFFFF;
+    --color-input-text: #1A1A1A;
+    --color-input-placeholder: #B0B0B0;
+    --color-input-border-default: #D0D0D0; /* 名称変更 */
+    --color-input-border-focus: var(--color-brand-base-primary); /* プライマリカラーに統一 */
+    --color-input-border-error: #D32F2F; /* 名称変更 */
+    --color-input-text-error: #D32F2F; /* 名称変更 */
+    --color-input-disabled-bg: #F5F5F5; /* 新規追加 */
+    --color-input-disabled-text: #AAAAAA; /* 新規追加 */
+
+    /* M3_CONTAINER_COLOR_MISMATCH: Material 3由来のコンテナカラーの定義残存と再マッピング */
+    --color-secondary: var(--color-brand-base-secondary);
+    --color-on-secondary: var(--color-state-on-info);
+    --color-secondary-container: var(--color-button-secondary-bg); /* セカンダリーボタン背景色にマッピング */
+    --color-on-secondary-container: var(--color-button-secondary-text);
+
+    --color-error: var(--color-state-error);
+    --color-on-error: var(--color-state-on-error);
+    --color-error-container: var(--color-state-error); /* エラー色自体にマッピング、またはもっと薄い色を検討 */
+    --color-on-error-container: var(--color-on-error);
+
+    /* Scrim Color (for modal overlays) */
+    --color-scrim: rgba(0, 0, 0, 0.15); /* ライトモードの透過度 */
+
+    /* Accent Gradient (from guideline) */
+    --gradient-primary-bg: var(--color-brand-base-primary); /* ヘッダーを単色に */
+    --color-button-primary-solid-bg: var(--color-button-primary-bg); /* ボタンを単色に */
+    --color-button-secondary-solid-bg: var(--color-brand-base-secondary); /* セカンダリグラデーションを単色に */
+
+    /* TYPOGRAPHY_SCALE_PRECISION: Material 3 type scale definitions (example) */
+    --font-size-display-large: 3.5rem; /* 56px */
+    --font-size-headline-large: 2rem;   /* 32px */
+    --font-size-title-large: 1.375rem;  /* 22px */
+    --font-size-body-large: 1rem;       /* 16px */
+    --font-size-body-medium: 0.875rem;  /* 14px */
+    --font-size-body-small: 0.75rem;    /* 12px */
+
+    /* RGB values for shadow/ring */
+    --color-input-border-focus-rgb: 32, 100, 168; /* ERROR_HANDLING_INLINE_VALIDATION */
+    --color-input-error-border-rgb: 211, 47, 47; /* ERROR_HANDLING_INLINE_VALIDATION */
+}
+
+/* Dark Mode Palette (example derivation - adjust values for optimal dark mode appearance) */
+/* DARK_MODE_DEFINITION_MISSING_IN_NEW_GUIDELINE: 新しいガイドラインにダークモード定義が欠如しているため、既存の定義を維持 */
+body.dark-mode {
+    /* DARK_MODE_COLOR_PALETTE_ACCURACY: ガイドラインのdark_modeパレットに合わせてHEX値を修正 */
+    --color-base-white: #000000;
+    --color-base-black: #FFFFFF;
+    --color-base-background-main: #1A1A1A;
+    --color-base-background-sub: #282828;
+    --color-base-card: #282828;
+    --color-base-border-divider: #3A3A3A;
+    --color-base-shadow-soft: rgba(255, 255, 255, 0.08);
+    --color-base-shadow-strong: rgba(0, 0, 0, 0.6); /* DARK_MODE_COLOR_PALETTE_ACCURACY: ダークモードではより透過率を上げて控えめに */
+
+    --color-text-main: #E0E0E0;
+    --color-text-sub: #BBBBBB;
+    --color-text-link: #90CAF9;
+    --color-text-disabled: #616161;
+
+    --color-brand-primary-purple: #BB86FC;
+    --color-brand-secondary-blue: #03DAC6;
+    --gradient-brand-accent: linear-gradient(90deg, var(--color-brand-primary-purple) 0%, var(--color-brand-secondary-blue) 100%);
+
+    --color-state-info: #80D8FF;
+    --color-state-success: #A5D6A7;
+    --color-state-warning: #FFECB3;
+    --color-state-error: #FFB4AB;
+    --color-state-on-info: #000000;
+    --color-state-on-success: #000000;
+    --color-state-on-warning: #000000;
+    --color-state-on-error: #000000;
+
+    --color-button-primary-bg: #BB86FC;
+    --color-on-primary-fixed-variant: #E0E0E0; /* 新規追加 */
+    --color-button-primary-hover-bg: #03DAC6; /* BUTTON_HOVER_STYLE_CONSISTENCY: 新規追加 */
+    --color-button-secondary-bg: #333333;
+    --color-button-secondary-text: #E0E0E0;
+    --color-button-secondary-hover-bg: #424242; /* BUTTON_HOVER_STYLE_CONSISTENCY: 新規追加 */
+    --color-button-danger-bg: #CF6679;
+    --color-button-danger-text: #000000;
+    --color-button-danger-hover-bg: #A34E5D; /* 新規追加 (CF6679を少し暗く) */
+    --color-button-disabled-bg: #424242;
+    --color-button-disabled-text: #616161;
+
+    --color-input-bg: #282828;
+    --color-input-text: #E0E0E0;
+    --color-input-placeholder: #616161;
+    --color-input-border-default: #424242;
+    --color-input-border-focus: #03DAC6;
+    --color-input-border-error: #CF6679;
+    --color-input-text-error: #FFB4AB;
+    --color-input-disabled-bg: #2C2C2C;
+    --color-input-disabled-text: #616161;
+
+    --color-primary-container: #3E1B6D; /* Darker primary container */
+    --color-on-primary-container: #FFFFFF; /* Maintain white text */
+    --color-secondary-container: #1A4670; /* Darker secondary container */
+    --color-on-secondary-container: #FFFFFF; /* Maintain white text */
+    --color-error-container: #FFB4AB; /* Darker error container */
+    --color-on-error-container: #000000;
+
+    --color-scrim: rgba(0, 0, 0, 0.6); /* DARK_MODE_COLOR_PALETTE_ACCURACY: ダークモードの透過度 */
+
+    /* RGB values for shadow/ring */
+    --color-input-border-focus-rgb: 3, 218, 198; /* DARK_MODE_COLOR_PALETTE_ACCURACY: エラー色のRGB */
+    --color-input-error-border-rgb: 207, 102, 121; /* DARK_MODE_COLOR_PALETTE_ACCURACY: エラー色のRGB */
+}
+
+
+/* Custom utility classes (mapping CSS variables to Tailwind-like usage) */
+/* Backgrounds */
+.bg-primary { background-color: var(--color-primary); }
+.bg-background { background-color: var(--color-base-background-main); }
+.bg-surface { background-color: var(--color-base-card); } /* cardにマッピング */
+.bg-surface-variant { background-color: var(--color-base-background-sub); } /* background_subにマッピング */
+.bg-surface-bright { background-color: var(--color-input-bg); } /* input.bgにマッピング */
+.bg-primary-container { background-color: var(--color-primary-container); } /* M3_CONTAINER_COLOR_MISMATCH 考慮 */
+.bg-secondary-container { background-color: var(--color-secondary-container); } /* M3_CONTAINER_COLOR_MISMATCH 考慮 */
+.bg-error-container { background-color: var(--color-error-container); } /* M3_CONTAINER_COLOR_MISMATCH 考慮 */
+.bg-scrim { background-color: var(--color-scrim); } /* for modal overlay */
+
+/* Texts */
+.text-on-background { color: var(--color-text-main); } /* text.mainにマッピング */
+.text-on-surface { color: var(--color-text-main); } /* text.mainにマッピング */
+.text-on-surface-variant { color: var(--color-text-sub); } /* text.subにマッピング */
+.text-on-primary { color: var(--color-button-primary-text); }
+.text-on-secondary { color: var(--color-button-secondary-text); } /* button.secondary_textにマッピング */
+.text-on-primary-container { color: var(--color-on-primary-container); } /* M3_CONTAINER_COLOR_MISMATCH 考慮 */
+.text-on-secondary-container { color: var(--color-on-secondary-container); } /* M3_CONTAINER_COLOR_MISMATCH 考慮 */
+.text-error { color: var(--color-state-error); } /* state.errorにマッピング */
+.text-on-error-container { color: var(--color-on-error-container); } /* M3_CONTAINER_COLOR_MISMATCH 考慮 */
+.text-primary { color: var(--color-primary); } /* brand.primaryにマッピング */
+.text-secondary { color: var(--color-secondary); } /* brand.secondaryにマッピング */
+.text-disabled { color: var(--color-text-disabled); } /* 新規追加 */
+
+
+/* Borders */
+.border-outline { border-color: var(--color-base-border-divider); } /* base.border_dividerにマッピング */
+.border-outline-variant { border-color: var(--color-base-border-divider); } /* base.border_dividerにマッピング */
+
+.button-gradient-bg { background: var(--gradient-button-bg); }
+.button-gradient-bg:hover {
+    background: var(--color-button-primary-hover-bg);
+}
+
+.button-primary {
+    background-color: var(--color-button-primary-bg);
+    color: var(--color-button-primary-text);
+}
+
+.gradient-primary-bg {
+    background: var(--gradient-primary-bg);
+}
+
+
+/* Other custom styles */
+.shadow-soft { box-shadow: var(--color-base-shadow-soft); } /* base.shadowにマッピング */
+.shadow-strong { box-shadow: var(--color-base-shadow-strong); } /* 新しいshadowガイドラインに合わせた調整が必要 */
+.text-shadow-sm { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); } /* 新しいshadowガイドラインに合わせた調整が必要 */
+
+
+/* Global font family */
+body {
+    font-family: "Noto Sans JP", "Inter", sans-serif;
+}
+/* Prevent body scroll when mobile sidebar/modal is open */
+body.overflow-hidden {
+    overflow: hidden;
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--color-base-background-sub); /* background_subにマッピング */
+}
+::-webkit-scrollbar-thumb {
+    background: #94a3b8; /* slate-400 - ガイドラインに直接の色指定なし、既存値を維持 */
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #64748b; /* slate-500 - ガイドラインに直接の色指定なし、既存値を維持 */
+}
+
+/* --- Sidebar specific styles --- */
+/* sidebar fixed left-0 width control */
+.sidebar {
+    width: 0; /* Default hidden for screens smaller than lg */
+    transform: translateX(-100%);
+    transition: width 0.3s ease-in-out, transform 0.3s ease-in-out;
+    overflow-x: hidden; /* Hide labels by default */
+    z-index: 40; /* Ensure it's above main content, below header */
+    flex-shrink: 0; /* Prevent sidebar from shrinking */
+    will-change: width, transform; /* Hint for browser optimization */
+}
+/* Mobile: Sidebar opened by JS */
+.sidebar.is-open-mobile {
+    width: 16rem; /* Full width for mobile sidebar */
+    transform: translateX(0);
+}
+/* Mobile: Ensure profile block and labels are always visible */
+.sidebar.is-open-mobile .profile-block,
+.sidebar.is-open-mobile .sidebar-nav-label,
+.sidebar.is-open-mobile .sidebar-group-control { /* Include group control for mobile */
+    display: flex !important; /* Override media query display none */
+    flex-direction: column !important; /* Force column for mobile when open */
+    opacity: 1;
+    transform: translateX(0);
+}
+
+
+/* PC (1024px and above) */
+@media (min-width: 1024px) {
+    .sidebar {
+        width: 4rem; /* Default collapsed on XL */
+        transform: translateX(0); /* Always visible */
+    }
+    .sidebar:hover {
+        width: 16rem; /* Expand on hover */
+    }
+
+    /* Profile block visibility on XL */
+    /* サイドバーが折りたたまれているときは非表示 */
+    .sidebar .profile-block,
+    .sidebar .sidebar-group-control {
+        display: none; /* Default hidden on XL when collapsed */
+        opacity: 0; /* トランジションのためにopacityも初期値として設定 */
+        transform: translateX(-8px); /* トランジションのためにtransformも初期値として設定 */
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+    }
+    /* サイドバーにホバーしたときに表示 */
+    .sidebar:hover .profile-block,
+    .sidebar:hover .sidebar-group-control {
+        display: flex; /* Show on hover */
+        flex-direction: column; /* SIDBAR LAYOUT FIX: Ensure column direction on hover */
+        align-items: flex-start; /* Ensure items start at the beginning */
+        gap: 8px; /* Add gap for consistency */
+        opacity: 1; /* フェードイン */
+        transform: translateX(0); /* スライドイン */
+        transition-delay: 150ms; /* Delay for smoother reveal */
+    }
+
+    /* Labels visibility on XL */
+    .sidebar .sidebar-nav-label {
+        opacity: 0; /* Default hidden on XL */
+        transform: translateX(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+    }
+    .sidebar:hover .sidebar-nav-label {
+        opacity: 1; /* Show on hover */
+        transition-delay: 150ms; /* Delay for smoother reveal */
+    }
+    /* Header mobile toggle should be hidden on XL+ */
+    .header-theme-toggle { display: block; } /* Show header theme toggle on XL+ */
+    .lg\\:hidden { display: none !important; } /* Hide mobile toggle button */
+}
+
+/* Mobile Screens (Small to Medium Tablets) */
+@media (max-width: 1023px) { /* Screens smaller than LG */
+    .header-theme-toggle { display: none; } /* Hide header theme toggle on mobile */
+    .lg\\:hidden { display: block; } /* Show mobile toggle button */
+}
+
+/* --- Main content and footer Layout Adjustment --- */
+/* The main content area no longer needs padding adjustments as the sidebar will overlay it on all screen sizes. */
+
+/* Headerも画面いっぱいに広がり、サイドバーは固定 */
+.fixed.top-0.left-0.right-0 {
+    left: 0;
+    right: 0;
+    width: 100%;
+}
+
+
+/* --- Mobile sidebar overlay --- */
+.mobile-sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-scrim);
+    z-index: 39; /* Below sidebar, above content */
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none; /* Do not block clicks by default */
+}
+.mobile-sidebar-overlay.is-visible {
+    opacity: 1;
+    pointer-events: auto; /* Block clicks when visible */
+}
+
+/* --- Modal transitions --- */
+/* Ensure modals are always centered */
+.modal-overlay {
+    display: flex; /* Use flex to center */
+    align-items: center; /* Vertical center */
+    justify-content: center; /* Horizontal center */
+    background-color: var(--color-scrim);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 60;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+.modal-overlay[data-state="closed"] { opacity: 0; pointer-events: none; }
+.modal-overlay[data-state="open"] { opacity: 1; pointer-events: auto; }
+
+.modal-content-transition {
+    transform: translateY(20px) scale(0.95);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.modal-overlay[data-state="open"] .modal-content-transition {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+/* --- Responsive Table --- */
+@media (max-width: 768px) {
+    .survey-table, .survey-table thead, .survey-table tbody, .survey-table th, .survey-table td, .survey-table tr {
+        display: block;
+    }
+
+    .survey-table thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    .survey-table tr {
+        margin-bottom: 1rem;
+        border: 1px solid var(--color-base-border-divider);
+        border-radius: 0.8rem;
+        overflow: hidden;
+        box-shadow: var(--color-base-shadow-soft);
+    }
+
+    .survey-table td {
+        border-bottom: 1px solid var(--color-base-border-divider);
+        position: relative;
+        padding-left: 50%;
+        text-align: right;
+    }
+
+    .survey-table td:last-child {
+        border-bottom: 0;
+    }
+
+    .survey-table td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: bold;
+        color: var(--color-text-sub);
+        font-size: 0.9rem;
+    }
+
+    .actions-cell {
+        justify-content: flex-end;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+}
+
+/* --- Custom select appearance for removing default arrow --- */
+select.appearance-none {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236B6B6B'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.25rem;
+    padding-right: 2.5rem;
+}
+/* Dark Mode Select Arrow adjustment */
+body.dark-mode select.appearance-none {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23BBBBBB'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+}
+
+/* INPUT_FLOATING_LABELS_IMPLEMENTATION: インプットの浮動ラベルスタイル */
+.input-group {
+    position: relative;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    width: 100%; /* URLフィールドの幅を強制的に100%に */
+}
+
+.input-field {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 0.75rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--color-input-border-default);
+    background-color: var(--color-input-bg);
+    color: var(--color-input-text);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+/* Placeholderを透明にして、ラベルが常に表示されるようにする */
+.input-field::placeholder {
+    color: transparent; /* プレースホルダーテキストを透明化 */
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--color-input-border-focus);
+    box-shadow: 0 0 0 3px rgba(var(--color-input-border-focus-rgb), 0.2);
+}
+/* フォーカス時にラベルの色を変更 */
+.input-field:focus + .input-label {
+    color: var(--color-input-border-focus);
+}
+/* フォーカス時のテキスト色がinput-border-focusになるようにする */
+.input-field.is-focused + .input-label {
+    color: var(--color-input-border-focus);
+}
+/* オートフィル時のラベルの位置調整 */
+.input-field:-webkit-autofill + .input-label {
+    top: -0.75rem;
+    font-size: 0.75rem;
+    color: var(--color-input-border-focus); /* オートフィル時はフォーカス時と同じ色 */
+    background-color: var(--color-input-bg);
+    padding: 0 0.25rem;
+    left: 0.5rem;
+}
+
+
+.input-label {
+    position: absolute;
+    top: -0.75rem; /* 最初から上に配置 */
+    left: 0.5rem;  /* 少し内側に配置 */
+    font-size: 0.75rem; /* 小さいフォントサイズ */
+    color: var(--color-text-sub); /* 通常時の色 */
+    background-color: var(--color-base-card); /* 背景色を指定して下の枠線を隠す */
+    padding: 0 0.25rem; /* 背景色のための左右パディング */
+    pointer-events: none;
+    transition: color 0.2s ease-out;
+}
+
+/* Readonly fields in input-group style (e.g., URL in QR modal) */
+.input-field-static {
+    display: block;
+    width: 100%; /* 親のinput-groupの幅いっぱいに広がるように */
+    border-radius: 0.375rem;
+    border: 1px solid var(--color-base-border-divider);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--color-surface-variant);
+    color: var(--color-on-surface-variant);
+}
+
+.input-label-static {
+    position: absolute;
+    top: -0.75rem;
+    left: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--color-text-sub);
+    background-color: var(--color-surface);
+    padding: 0 0.25rem;
+    z-index: 1;
+}
+
+
+/* ERROR_HANDLING_INLINE_VALIDATION: エラーハンドリングUI */
+.input-field.input-error,
+select.input-error,
+input[type="date"].input-error {
+    border-color: var(--color-input-border-error);
+}
+.input-field.input-error:focus,
+select.input-error:focus,
+input[type="date"].input-error:focus {
+    border-color: var(--color-input-border-error);
+    box-shadow: 0 0 0 3px rgba(var(--color-input-error-border-rgb), 0.2);
+}
+.error-message {
+    color: var(--color-input-text-error);
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+/* 無効化ボタンのスタイル */
+button:disabled,
+.button-disabled {
+    background-color: var(--color-button-disabled-bg);
+    color: var(--color-button-disabled-text);
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+button:disabled:hover,
+.button-disabled:hover {
+    background-color: var(--color-button-disabled-bg);
+    color: var(--color-button-disabled-text);
+    transform: none !important;
+}
+
+
+/* 非ブロッキングトースト通知コンポーネントの基本スタイル */
+.toast-notification {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--color-text-main);
+    color: var(--color-base-white);
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px var(--color-base-shadow-soft);
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+    white-space: nowrap;
+}
+.toast-notification.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-10px);
+}
+.toast-notification.toast-success { background-color: var(--color-state-success); color: var(--color-state-on-success); }
+.toast-notification.toast-error { background-color: var(--color-state-error); color: var(--color-state-on-error); }
+.toast-notification.toast-info { background-color: var(--color-state-info); color: var(--color-state-on-info); }
+
+
+/* REDUCED_MOTION_SUPPORT: prefers-reduced-motionへの対応 - ブロックを有効化 */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition-duration: 0.001ms !important;
+        animation-duration: 0.001ms !important;
+        transition-delay: 0s !important;
+        animation-delay: 0s !important;
+    }
+
+    .transition-colors,
+    .transition-all,
+    .hover\\:scale-105 {
+        transition: none !important;
+        transform: none !important;
+    }
+
+    .modal-overlay,
+    .modal-content-transition,
+    .sidebar,
+    .mobile-sidebar-overlay,
+    .main-content,
+    .main-footer {
+        transition: none !important;
+        animation: none !important;
+        transform: none !important;
+    }
+
+    .modal-overlay[data-state="closed"] {
+        opacity: 0 !important;
+        display: none !important;
+    }
+    .modal-overlay[data-state="open"] {
+        opacity: 1 !important;
+        display: flex !important;
+    }
+    .modal-overlay[data-state="closed"] .modal-content-transition,
+    .modal-overlay[data-state="open"] .modal-content-transition {
+        transform: none !important;
+        opacity: 1 !important;
+    }
+
+    .sidebar.is-open-mobile {
+        transform: translateX(0) !important;
+        width: 16rem !important;
+    }
+    .sidebar {
+        transform: translateX(0) !important;
+    }
+    @media (min-width: 1280px) {
+        .sidebar { width: 4rem !important; }
+        .sidebar:hover { width: 16rem !important; }
+        .sidebar .sidebar-nav-label { opacity: 0 !important; }
+        .sidebar:hover .sidebar-nav-label { opacity: 1 !important; }
+        .sidebar .profile-block, .sidebar .sidebar-group-control { display: none !important; }
+        .sidebar:hover .profile-block, .sidebar:hover .sidebar-group-control { display: flex !important; }
+    }
+    .mobile-sidebar-overlay.is-visible { opacity: 1 !important; }
+}
+
+/* --- Account Info Modal specific styles (New/Refined) --- */
+.section-card {
+    border: 1px solid var(--color-base-border-divider);
+    border-radius: 0.5rem; /* rounded-md */
+    background-color: var(--color-base-card); /* bg-surface */
+    box-shadow: var(--color-base-shadow-soft); /* shadow-soft */
+    margin-bottom: 1rem; /* space-y-4 に合わせて調整 */
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 1rem; /* p-4 */
+    background-color: var(--color-surface-variant); /* bg-surface-variant */
+    border-bottom: 1px solid var(--color-base-border-divider);
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+    cursor: pointer;
+    text-align: left;
+    color: var(--color-text-main); /* text-on-surface */
+    transition: background-color 0.2s ease;
+}
+.section-header:hover {
+    background-color: var(--color-base-border-divider); /* わずかに明るく */
+}
+.section-header[aria-expanded="true"] {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.section-header .expand-icon {
+    transition: transform 0.2s ease;
+}
+.section-header[aria-expanded="true"] .expand-icon {
+    transform: rotate(180deg);
+}
+
+.section-content {
+    padding: 1rem; /* p-4 */
+    background-color: var(--color-base-card); /* bg-surface */
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    overflow: hidden; /* Hide overflow during transition */
+    transition: height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out; /* Height transition for smooth open/close */
+}
+
+.accordion-content {
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out, opacity 0.3s ease-out;
+    overflow: hidden;
+    opacity: 1;
+}
+
+.accordion-content.hidden {
+    max-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    opacity: 0 !important;
+}
+
+/* 請求先詳細セクションの条件付き表示用スタイル */
+#billingDetailsSection.hidden {
+    display: none; /* JavaScriptで直接displayを切り替える */
+}
+
+/* `flex-grow` を持つ `input-group` の子要素が正しく幅を占めるように、親に `display: flex;` を追加 */
+/* ただし、`input-group`自体はposition: relative;で、その子にabsoluteなラベルを持つため,
+   `display: flex`の追加には注意が必要です。今回はHTML側でflex-1クラスを付与し,
+   input-groupがflexアイテムになることで親のflexコンテナから幅を受け取る構造を想定しています。
+   もしinput-group自体がflexコンテナで、その中のinput-fieldがflexアイテムである場合は,
+   以下のCSSは不要、または再調整が必要です。
+*/
+/* input-group は既に width: 100% を持つため、input-field-static も width: 100% で対応 */
+
+/* Ensure input fields are dark in dark mode */
+body.dark-mode .input-field,
+body.dark-mode .input-field-static,
+body.dark-mode .bg-surface-bright {
+    background-color: var(--color-input-bg);
+    color: var(--color-input-text);
+    border-color: var(--color-input-border-default);
+}
+
+/* Force border-radius for date inputs */
+input[type="date"].input-field {
+    border-radius: 0.375rem !important; /* Tailwindのrounded-mdに相当 */
+}
+
+/* Force border-radius for readonly text inputs with input-field class */
+input.input-field[readonly] {
+    border-radius: 0.375rem !important;
+}
+
+
+
+/* Drag and Drop styles */
+.question-item.dragging {
+    opacity: 0.4;
+    border-style: dashed;
+    border-color: var(--color-primary);
+}
+
+.question-item.drag-over {
+    background-color: var(--color-surface-variant);
+    border-color: var(--color-secondary);
+}
+
+/* Active sidebar link style */
+.sidebar nav a.active {
+    background-color: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+    font-weight: 600; /* semibold */
+}
+
+/* Sidebar link default color */
+.sidebar nav a {
+    color: var(--color-text-main); /* デフォルトのテキスト色を保証 */
+}
+
+/* Sidebar link hover style */
+.sidebar nav a:hover {
+    background-color: #2064a8;
+    color: #ffffff;
+}
+
+.sidebar nav a.active .material-icons {
+    color: var(--color-primary);
+}
+
+/* flatpickrのテーマカスタマイズ */
+.flatpickr-calendar .flatpickr-day.selected,
+.flatpickr-calendar .flatpickr-day.startRange,
+.flatpickr-calendar .flatpickr-day.endRange,
+.flatpickr-calendar .flatpickr-day.selected.inRange,
+.flatpickr-calendar .flatpickr-day.startRange.inRange,
+.flatpickr-calendar .flatpickr-day.endRange.inRange,
+.flatpickr-calendar .flatpickr-day.selected:focus,
+.flatpickr-calendar .flatpickr-day.startRange:focus,
+.flatpickr-calendar .flatpickr-day.endRange:focus,
+.flatpickr-calendar .flatpickr-day.selected:hover,
+.flatpickr-calendar .flatpickr-day.startRange:hover,
+.flatpickr-calendar .flatpickr-day.endRange:hover,
+.flatpickr-calendar .flatpickr-day.selected.prevMonthDay,
+.flatpickr-calendar .flatpickr-day.startRange.prevMonthDay,
+.flatpickr-calendar .flatpickr-day.endRange.prevMonthDay,
+.flatpickr-calendar .flatpickr-day.selected.nextMonthDay,
+.flatpickr-calendar .flatpickr-day.startRange.nextMonthDay,
+.flatpickr-calendar .flatpickr-day.endRange.nextMonthDay {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.flatpickr-calendar .flatpickr-day:hover {
+    background: var(--color-primary-container);
+}
+
+

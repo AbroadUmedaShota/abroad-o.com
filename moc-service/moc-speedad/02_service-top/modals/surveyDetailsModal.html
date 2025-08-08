@@ -1,0 +1,148 @@
+<div id="surveyDetailsModal" class="fixed inset-0 flex items-center justify-center p-4 modal-overlay hidden z-[60]" data-state="closed">
+    <div class="bg-surface rounded-lg shadow-xl p-6 w-full max-w-3xl flex flex-col modal-content-transition max-h-[90vh]" data-state="closed">
+        <div class="flex justify-between items-center mb-6 flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <h3 id="surveyDetailName" class="text-on-surface text-xl font-semibold"></h3>
+                <span id="surveyDetailStatusBadge" class="inline-flex items-center rounded-full text-xs px-2 py-1"></span>
+            </div>
+            <button class="text-on-surface-variant hover:text-on-surface" id="closeSurveyDetailsModalBtn" aria-label="モーダルを閉じる">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <form id="surveyDetailsForm" class="space-y-6 overflow-y-auto flex-grow pr-2">
+            <!-- Basic Info Section -->
+            <div class="space-y-4">
+                <h4 class="text-on-surface text-lg font-semibold border-b border-outline-variant pb-2">基本情報</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    <div>
+                        <label class="text-on-surface-variant text-sm font-bold">アンケートID</label>
+                        <p id="detail_surveyId" class="text-on-surface text-base view-mode"></p>
+                    </div>
+                    <div class="input-group">
+                        <p id="detail_plan_view" class="text-on-surface text-base view-mode"></p>
+                        <select id="detail_plan" name="plan" class="input-field edit-mode hidden">
+                            <option value="Standard">Standard</option>
+                            <option value="Premium">Premium</option>
+                            <option value="Free">Free</option>
+                            <option value="N/A">N/A</option>
+                        </select>
+                        <label for="detail_plan" class="input-label">プラン</label>
+                    </div>
+                    <div class="md:col-span-2 input-group">
+                        <p id="detail_surveyNameInternal_view" class="text-on-surface text-base view-mode"></p>
+                        <input type="text" id="detail_surveyNameInternal" name="name" class="input-field edit-mode hidden">
+                        <label for="detail_surveyNameInternal" class="input-label font-bold">アンケート名（社内管理用）</label>
+                    </div>
+                    <div class="md:col-span-2 input-group">
+                        <p id="detail_displayTitle_view" class="text-on-surface text-base view-mode"></p>
+                        <input type="text" id="detail_displayTitle" name="displayTitle" class="input-field edit-mode hidden">
+                        <label for="detail_displayTitle" class="input-label font-bold">表示タイトル</label>
+                    </div>
+                    <div class="md:col-span-2 input-group">
+                        <p id="detail_surveyMemo_view" class="text-on-surface text-base whitespace-pre-wrap view-mode"></p>
+                        <textarea id="detail_surveyMemo" name="memo" class="input-field edit-mode hidden" rows="3"></textarea>
+                        <label for="detail_surveyMemo" class="input-label font-bold">メモ</label>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="text-on-surface-variant text-sm font-bold view-mode">展示会会期</label>
+                        <p id="detail_surveyPeriod_view" class="text-on-surface text-base view-mode"></p>
+                        <div class="flex items-center gap-2 edit-mode hidden">
+                            <div class="input-group relative flex-1 mt-0 mb-0">
+                                <input type="date" id="detail_periodStart" name="periodStart" class="input-field">
+                                <label for="detail_periodStart" class="input-label">開始日</label>
+                            </div>
+                            <span class="text-on-surface-variant">～</span>
+                            <div class="input-group relative flex-1 mt-0 mb-0">
+                                <input type="date" id="detail_periodEnd" name="periodEnd" class="input-field">
+                                <label for="detail_periodEnd" class="input-label">終了日</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data & Billing Section -->
+            <div class="space-y-4">
+                <h4 class="text-on-surface text-lg font-semibold border-b border-outline-variant pb-2">データ & 請求</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    <div>
+                        <label class="text-on-surface-variant text-sm font-bold">回答数</label>
+                        <p id="detail_answerCount" class="text-on-surface text-base"></p>
+                    </div>
+                    <div>
+                        <label class="text-on-surface-variant text-sm font-bold">見込み請求額</label>
+                        <p id="detail_estimatedBillingAmount_view" class="text-on-surface text-base view-mode"></p>
+                    </div>
+                    <div>
+                        <label class="text-on-surface-variant text-sm font-bold">データ化完了予定日</label>
+                        <p id="detail_dataCompletionDate_view" class="text-on-surface text-base view-mode"></p>
+                    </div>
+                    <div>
+                        <label class="text-on-surface-variant text-sm font-bold">ダウンロード期限</label>
+                        <p id="detail_deadline_view" class="text-on-surface text-base view-mode"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div class="space-y-4">
+                <h4 class="text-on-surface text-lg font-semibold border-b border-outline-variant pb-2">名刺データ設定</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    <div>
+                        <label class="text-on-surface-variant text-sm font-bold">名刺データ化</label>
+                        <p id="detail_bizcardEnabled_view" class="text-on-surface text-base"></p>
+                    </div>
+                    <div>
+                        <label class="text-on-surface-variant text-sm font-bold">名刺データ化件数</label>
+                        <p id="detail_bizcardCompletionCount" class="text-on-surface text-base"></p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <button type="button" id="goToBizcardSettingsBtn" class="w-full button-primary text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold">名刺データ化設定へ</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h4 class="text-on-surface text-lg font-semibold border-b border-outline-variant pb-2">お礼メール設定</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    <div>
+                        <label class="text-on-surface-variant text-sm font-bold">御礼メール設定</label>
+                        <p id="detail_thankYouEmailSettings_view" class="text-on-surface text-base"></p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <button type="button" id="goToThankYouEmailSettingsBtn" class="w-full button-primary text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold">お礼メール設定へ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Access Info Section (Not editable) -->
+            <div class="space-y-4">
+                <h4 class="text-on-surface text-lg font-semibold border-b border-outline-variant pb-2">アンケートアクセス情報</h4>
+                <div class="input-group">
+                    <input type="text" id="detail_surveyUrl" readonly class="input-field cursor-pointer" placeholder=" ">
+                    <label for="detail_surveyUrl" class="input-label font-bold">アンケートURL</label>
+                </div>
+                <div class="text-center">
+                    <img id="detail_qrCodeImage" alt="QR Code" class="mx-auto mb-4 border border-outline-variant p-2 rounded" />
+                    <button type="button" id="downloadQrCodeBtn" class="button-primary text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors w-full" aria-label="QRコードをダウンロード">
+                        <span class="material-icons text-xl">download</span>
+                        QRコードをダウンロード
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="viewModeButtons" class="flex justify-end gap-3 pt-4 flex-shrink-0">
+            <div class="mr-auto">
+                <button id="deleteSurveyBtn" class="bg-red-500 text-white py-2 px-4 rounded-md shadow-sm text-sm font-semibold" type="button">アンケートを削除</button>
+            </div>
+            <button id="editSurveyBtn" class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold" type="button">編集</button>
+            <button class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold" type="button">分析</button>
+            <button id="detailDownloadBtn" class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold" type="button">データダウンロード</button>
+            <button class="button-primary text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold" id="footerCloseSurveyDetailsModalBtn" type="button">閉じる</button>
+        </div>
+        <div id="editModeButtons" class="hidden justify-end gap-3 pt-4 flex-shrink-0">
+            <button id="cancelEditBtn" class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold" type="button">キャンセル</button>
+            <button id="saveSurveyBtn" class="button-primary text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold" type="button">保存</button>
+        </div>
+    </div>
+</div>

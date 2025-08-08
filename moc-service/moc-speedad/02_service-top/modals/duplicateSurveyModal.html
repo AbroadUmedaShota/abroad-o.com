@@ -1,0 +1,36 @@
+<!-- Duplicate Survey Modal -->
+<div id="duplicateSurveyModal" class="modal-overlay" data-state="closed">
+    <div class="modal-content-transition w-full max-w-lg p-6 bg-surface rounded-xl">
+        <div class="flex justify-between items-center pb-4 border-b border-outline-variant">
+            <h2 class="text-lg font-semibold text-on-surface">アンケートを複製</h2>
+            <button class="text-on-surface-variant hover:text-primary" onclick="closeModal('duplicateSurveyModal')" aria-label="閉じる">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div class="py-6 space-y-4">
+            <div class="input-group">
+                <input type="text" id="newSurveyName" placeholder=" " class="input-field">
+                <label for="newSurveyName" class="input-label">新しいアンケート名</label>
+            </div>
+            <div class="flex items-end gap-2">
+                <div class="input-group flex-1">
+                    <input type="date" id="newPeriodStart" class="input-field" placeholder=" ">
+                    <label for="newPeriodStart" class="input-label">新しい開始日</label>
+                </div>
+                <span class="pb-2 text-on-surface-variant">～</span>
+                <div class="input-group flex-1">
+                    <input type="date" id="newPeriodEnd" class="input-field" placeholder=" ">
+                    <label for="newPeriodEnd" class="input-label">新しい終了日</label>
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant">
+            <button id="duplicateSurveyCancelBtn" class="min-w-[80px] px-4 py-2 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors" onclick="closeModal('duplicateSurveyModal')">
+                キャンセル
+            </button>
+            <button id="duplicateSurveyConfirmBtn" class="min-w-[80px] px-4 py-2 rounded-full bg-primary text-on-primary font-semibold transition-colors">
+                複製
+            </button>
+        </div>
+    </div>
+</div>

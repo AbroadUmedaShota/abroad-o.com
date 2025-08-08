@@ -1,0 +1,50 @@
+<div id="newSurveyModal" class="fixed inset-0 flex items-center justify-center p-4 modal-overlay hidden z-[60]" data-state="closed">
+    <div class="bg-surface rounded-lg shadow-xl p-6 w-full max-w-xl modal-content-transition" data-state="closed">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-on-surface text-xl font-semibold">アンケート新規作成</h3>
+            <button class="text-on-surface-variant hover:text-on-surface" id="closeNewSurveyModalBtn" aria-label="モーダルを閉じる">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <form class="space-y-4">
+            <div class="input-group">
+                <input class="input-field" id="surveyName" name="surveyName" placeholder=" " type="text" required/>
+                <label class="input-label" for="surveyName">アンケート名</label>
+                <p class="error-message hidden" id="surveyName-error"></p>
+            </div>
+            <div class="input-group">
+                <input class="input-field" id="displayTitle" name="displayTitle" placeholder=" " type="text" required/>
+                <label class="input-label" for="displayTitle">表示タイトル</label>
+                <p class="error-message hidden" id="displayTitle-error"></p>
+            </div>
+            <div class="input-group">
+                <textarea class="input-field" id="surveyMemo" name="surveyMemo" placeholder=" " rows="3"></textarea>
+                <label class="input-label" for="surveyMemo">メモ（任意）</label>
+                <p class="error-message hidden" id="surveyMemo-error"></p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-on-surface mb-1">回答期間</label>
+                <div class="flex items-center gap-2 mt-4"> <!-- mt-4 を追加して上部との間隔を確保 -->
+                    <div class="input-group relative flex-1 mt-0 mb-0">
+                        <input type="date" id="surveyStartDate" name="surveyStartDate" placeholder=" " class="input-field w-full rounded-md border-outline-variant shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm p-2 text-on-surface bg-surface-bright" required>
+                        <label class="input-label" for="surveyStartDate">開始日</label>
+                        <p class="error-message hidden" id="surveyStartDate-error"></p>
+                    </div>
+                    <span class="text-on-surface-variant">～</span>
+                    <div class="input-group relative flex-1 mt-0 mb-0">
+                        <input type="date" id="surveyEndDate" name="surveyEndDate" placeholder=" " class="input-field w-full rounded-md border-outline-variant shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm p-2 text-on-surface bg-surface-bright" required>
+                        <label class="input-label" for="surveyEndDate">終了日</label>
+                        <p class="error-message hidden" id="surveyEndDate-error"></p>
+                    </div>
+                </div>
+                <p class="error-message hidden" id="surveyPeriod-error"></p>
+            </div>
+            <div class="flex justify-end gap-3 pt-4">
+                <button class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors" id="cancelNewSurveyModalBtn" class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors" type="button" aria-label="キャンセル">キャンセル</button>
+                <button id="createSurveyFromModalBtn" class="button-primary text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors" type="submit" aria-label="アンケートを作成">
+                    作成する
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

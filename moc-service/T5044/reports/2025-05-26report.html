@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEBアンケート送信エラー対策計画</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Base Styles (for screen display) */
+        body {
+            font-family: 'Noto Sans JP', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.8; /* Increased line-height for readability */
+            color: #444; /* Darker gray for main text */
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7; /* Very light gray background */
+        }
+        .container {
+            max-width: 960px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            padding: 60px 70px; /* More padding for spacious feel */
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+        }
+
+        /* Headings */
+        h1 {
+            color: #2c3e50; /* Deep charcoal */
+            text-align: center;
+            font-size: 2.8em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -0.8px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 50px; /* More margin */
+            padding-bottom: 25px;
+            border-bottom: 1px solid #e0e0e0; /* Thin, elegant line */
+        }
+        h2 {
+            color: #34495e; /* Darker blue-gray */
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-top: 60px; /* More margin */
+            margin-bottom: 30px;
+            position: relative;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ccc; /* Simple, clean line */
+        }
+         /* Styles for h2 within .card-section (promoted from h3) */
+        .card-section > h2 {
+            margin-top: 0; /* Override default h2 margin-top */
+            padding-left: 0;
+            border-left: none;
+            border-bottom: none; /* Remove border-bottom for this h2 */
+            color: #34495e;
+            font-size: 1.8em; /* Slightly smaller than main h2 */
+            text-align: center;
+            margin-bottom: 40px;
+            font-weight: 700; /* Keep bold */
+        }
+
+        h3 { /* Original h3 style - remains for sub-sub-headings if needed */
+            color: #4a627f; /* Muted blue-gray */
+            font-size: 1.7em;
+            font-weight: 400;
+            margin-top: 45px;
+            margin-bottom: 20px;
+            border-left: 4px solid #aebac9; /* Softer border color */
+            padding-left: 18px;
+        }
+        h4 {
+            color: #555;
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
+        }
+
+        /* List Styles */
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin-left: 0;
+        }
+        li {
+            position: relative;
+            padding-left: 28px; /* Adjusted padding */
+            margin-bottom: 10px;
+        }
+        li::before {
+            content: '–'; /* Simple dash bullet */
+            color: #78909c; /* Muted gray for bullets */
+            font-weight: normal;
+            font-size: 1em;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        ul ul {
+            padding-left: 20px;
+        }
+        ul ul li::before {
+            content: '•'; /* Simple dot for sub-bullets */
+            color: #90a4ae; /* Even more muted */
+        }
+
+        /* Emphasized Text */
+        strong {
+            color: #4a627f; /* Deeper color for emphasis */
+            font-weight: 700;
+        }
+        .highlight {
+            background-color: #f0f4f7; /* Very subtle background highlight */
+            padding: 1px 4px;
+            border-radius: 2px;
+            color: #333;
+        }
+        .priority-label, .important-label { /* Unified style for labels, toned down */
+            background-color: #aebac9; /* Muted gray-blue */
+            color: #333;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 400;
+            font-size: 0.85em;
+            display: inline-block;
+            margin-left: 8px;
+            letter-spacing: 0;
+        }
+
+        /* Card-like sections for better visual separation */
+        .card-section {
+            background-color: #fcfcfc;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 40px;
+            margin-top: 40px;
+            box-shadow: none; /* No strong shadow, keep it flat */
+        }
+
+        /* Section specific styling */
+        .section-header {
+            text-align: center;
+            font-size: 1em;
+            color: #777;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        .column-layout {
+            display: flex;
+            gap: 40px; /* More space between columns */
+            margin-top: 30px;
+        }
+        .column-layout > div {
+            flex: 1;
+            padding: 30px;
+            background-color: #fdfdfd;
+            border: 1px solid #eceff1; /* Very light border */
+            border-radius: 6px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.03); /* Extremely subtle shadow */
+        }
+        .column-layout h4 {
+            margin-top: 0;
+            font-size: 1.25em;
+            color: #475a72; /* Muted blue for column titles */
+            border-bottom: 1px solid #d3dce3;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        .column-layout p {
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        .footer { /* Keep style but display none on print */
+            text-align: center;
+            margin-top: 70px;
+            font-size: 0.8em;
+            color: #999;
+            border-top: 1px solid #f0f0f0;
+            padding-top: 30px;
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px auto;
+                padding: 30px 20px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            h2 {
+                font-size: 1.8em;
+            }
+             .card-section > h2 {
+                font-size: 1.5em;
+            }
+            h3 {
+                font-size: 1.5em;
+            }
+            .column-layout {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .card-section {
+                padding: 20px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                font-size: 10pt; /* Smaller base font size for printing */
+                line-height: 1.4; /* Tighter line-height for printing */
+                color: #000; /* Ensure black text for clarity */
+                background-color: #fff; /* White background for printing */
+                -webkit-print-color-adjust: exact; /* For background colors on print */
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                width: 100%;
+                max-width: none;
+                margin: 0;
+                padding: 1.5cm; /* Standard print margin */
+                box-shadow: none; /* No shadow on print */
+                border-radius: 0; /* No border-radius on print */
+                background-color: #fff;
+            }
+            h1 {
+                font-size: 24pt;
+                margin-bottom: 10pt;
+                color: #000;
+            }
+            .subtitle {
+                font-size: 11pt;
+                margin-bottom: 20pt;
+                padding-bottom: 10pt;
+                border-bottom: 1px solid #ccc;
+                color: #333;
+            }
+            h2 {
+                font-size: 18pt;
+                margin-top: 25pt;
+                margin-bottom: 15pt;
+                padding-bottom: 5pt;
+                border-bottom: 1px solid #666; /* Simpler border for print */
+                color: #000;
+            }
+             .card-section > h2 { /* Print styles for h2 within card-section */
+                font-size: 16pt; /* Adjusted size */
+                margin-top: 15pt; /* Adjust margin */
+                margin-bottom: 15pt;
+                padding-left: 0;
+                border: none; /* No border on print */
+                text-align: center;
+                color: #000;
+            }
+            h3 { /* Original h3 style - kept for potential sub-sub-headings */
+                font-size: 14pt;
+                margin-top: 20pt;
+                margin-bottom: 10pt;
+                padding-left: 10pt;
+                border-left: 3px solid #999; /* Simpler border for print */
+                color: #000;
+            }
+            h4 {
+                font-size: 12pt;
+                margin-top: 15pt;
+                margin-bottom: 8pt;
+                padding-bottom: 5pt;
+                border-bottom: 1px dashed #bbb;
+                color: #000;
+            }
+            ul {
+                margin-left: 0;
+                padding-left: 0;
+            }
+            li {
+                padding-left: 18pt; /* Adjusted padding for print */
+                margin-bottom: 5pt; /* Reduced spacing */
+            }
+            li::before {
+                font-size: 0.9em;
+                color: #444; /* Darker bullet for print */
+            }
+            ul ul {
+                padding-left: 15pt;
+            }
+            ul ul li::before {
+                color: #666;
+            }
+
+            .highlight {
+                background-color: transparent; /* No background highlight on print */
+                color: #000;
+                text-decoration: underline; /* Use underline for emphasis on print */
+                padding: 0;
+                border-radius: 0;
+            }
+            .priority-label, .important-label {
+                background-color: transparent; /* No background on print */
+                color: #000; /* Black text */
+                font-weight: 700; /* Bold for emphasis */
+                text-decoration: underline; /* Underline for emphasis */
+                padding: 0;
+                border-radius: 0;
+                margin-left: 5pt;
+                font-size: 0.8em;
+            }
+
+            .card-section {
+                background-color: #fff; /* No background color on print */
+                border: none; /* No border on print */
+                box-shadow: none; /* No shadow on print */
+                padding: 20pt; /* Reduced padding */
+                margin-top: 20pt;
+            }
+
+            .section-header {
+                font-size: 10pt;
+                margin-bottom: 20pt;
+                color: #333;
+            }
+            .column-layout {
+                flex-direction: column; /* Force columns to stack vertically */
+                gap: 15pt; /* Reduced gap */
+                margin-top: 15pt;
+            }
+            .column-layout > div {
+                padding: 15pt; /* Reduced padding */
+                border: 1px solid #eee; /* Very subtle border */
+                box-shadow: none;
+                background-color: #fcfcfc; /* Slight background for visual separation */
+            }
+            .column-layout h4 {
+                font-size: 11pt;
+                padding-bottom: 8pt;
+                margin-bottom: 10pt;
+            }
+            .column-layout p {
+                line-height: 1.5;
+            }
+
+            .footer {
+                display: none; /* Hide footer on print */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WEBアンケート送信エラー対策計画</h1>
+        <p class="subtitle">お客様に安心してご利用いただくためのシステムと運用の改善</p>
+
+        <section class="card-section">
+            <h2>1. システム改善について（弊社の主な取り組み）</h2>
+            <p class="section-header">弊社では、お客様が安心してアンケートを送信できるよう、以下のシステム改善を進めてまいります。</p>
+
+            <h4>確実な送信処理の強化</h4>
+            <ul>
+                <li>通信が一時的に途切れても自動で再送される機能を強化し、データの送信失敗を減らします。</li>
+                <li>データの重複登録を防ぐ仕組みも強化し、正確なデータ登録を実現します。</li>
+            </ul>
+
+            <h4>操作中の安定性向上 <span class="priority-label">最優先</span></h4>
+            <ul>
+                <li>アンケートのデータ処理をシステムの裏側で行うよう変更します。これにより、送信中に誤って画面を閉じたり、他の画面に移動したりしても、データが失われる心配がなくなり、より安定してアンケートを完了できるようになります。</li>
+            </ul>
+
+            <h4>携帯回線環境への最適化</h4>
+            <ul>
+                <li>携帯電話の電波状況が不安定な場所でも、データが確実に送信されるよう、通信方式の設計を見直します。</li>
+                <li>データ容量が大きい場合でも、携帯回線への負荷を軽減するための工夫（データの圧縮や分割など）を検討し、スムーズな送信を目指します。</li>
+            </ul>
+
+            <h4>エラーの早期発見と回復</h4>
+            <ul>
+                <li>万一エラーが発生しても、システムが自動的に検知・修正し、データが正常に処理されるよう努めます。将来的に、画面のリフレッシュ操作にも対応できるよう準備を進めてまいります。</li>
+                <li>エラーに関する詳細な記録を自動で収集・分析することで、問題の原因を素早く特定し、迅速な改善につなげます。</li>
+            </ul>
+
+            <h4>適用範囲の拡大</h4>
+            <ul>
+                <li>上記対策（送信処理の確実性向上、重複データ防止、バックグラウンド化など）を、アンケート回答送信以外の主要なデータ送信・更新機能にも順次適用し、サービス全体の信頼性を高めてまいります。</li>
+            </ul>
+
+            <h4>サービス特性（携帯回線利用前提）を考慮した追加提案</h4>
+            <ul>
+                <li><strong>携帯回線特有の通信断・不安定性への耐性強化:</strong>
+                    <ul>
+                        <li>自動再送機能やタイムアウト設定を、特に携帯回線ご利用時の通信断、不安定な電波状況、遅延などを想定した設計とパラメータ調整に最適化します。</li>
+                    </ul>
+                </li>
+                <li><strong>携帯回線の帯域幅を考慮した最適化:</strong>
+                    <ul>
+                        <li>大容量データ送信時には、携帯回線の帯域幅の限界を考慮したデータ圧縮、分割送信、または優先度付けなどの最適化を行い、通信負荷をさらに軽減します。</li>
+                    </ul>
+                </li>
+                <li><strong>モバイル環境でのエラーパターン特定と対策:</strong>
+                    <ul>
+                        <li>継続的なエラー傾向分析において、スマートフォンの機種、OSバージョン、特定の通信キャリア、ご利用地域など、モバイル環境に特有のエラーパターンを詳細に分析し、個別対策を検討します。</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section class="card-section">
+            <h2>2. お客様へのお願い（アンケートご利用時のポイント）</h2>
+            <p class="section-header">お客様に快適にご利用いただくために、以下の点についてご協力をお願いいたします。</p>
+
+            <h4>アンケートご利用前の準備</h4>
+            <div class="column-layout">
+                <div>
+                    <h5>端末環境の確認</h5>
+                    <ul>
+                        <li>お使いのスマートフォンのOSやブラウザが最新バージョンであることをご確認ください。</li>
+                        <li>ご利用前に不要なアプリを終了し、ブラウザのタブを最小限にするなど、端末の動作環境を整えてください。</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5>通信環境の確認（特に携帯回線）</h5>
+                    <ul>
+                        <li>アンケート回答前には、<strong class="highlight">電波状況が良好な場所</strong>（4G/5Gのアンテナマークが安定している場所）でご利用ください。電波が弱い場所ではエラーのリスクが高まります。</li>
+                        <li>データ通信量の上限や速度制限がかかっていないか、事前にご確認ください。</li>
+                        <li>携帯回線が不安定な場合や、大容量のデータを送信する際は、可能であれば<strong class="highlight">安定したWi-Fi環境</strong>のご利用もご検討ください。</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h4>アンケート回答中の注意点 <span class="important-label">最重要</span></h4>
+            <ul>
+                <li>アンケート回答の「送信中」は、<strong class="highlight">ページの更新（リロード）を絶対に行わないでください。</strong></li>
+                <li>「送信中」は、<strong class="highlight">ブラウザを閉じたり、他のアプリに切り替えたりしないでください。</strong></li>
+                <li>焦って送信ボタンを複数回クリックするなどの重複操作も避けてください。</li>
+            </ul>
+
+            <h4>万一エラーが発生した場合の初動対応</h4>
+            <ul>
+                <li><strong>まずはそのままお待ちください:</strong>
+                    <ul>
+                        <li>「送信中」の表示がある場合は、まずはその画面のまま1〜2分程度お待ちください。システム側で自動再送などの処理が行われている可能性があります。</li>
+                    </ul>
+                </li>
+                <li><strong>状況の確認とご連絡:</strong>
+                    <ul>
+                        <li>2分以上待っても画面が変わらない場合は、以下の情報を記録し、担当者にご連絡ください。
+                            <ul>
+                                <li>使用端末: スマートフォンの機種名、OSバージョン。</li>
+                                <li>エラー発生日時: サーバー負荷や同時送信による競合などを確認するため、詳細な送信時間（〇月〇日〇時〇分頃）の記載にご協力ください。</li>
+                                <li>通信状況: 携帯回線のキャリア名と電波状況（アンテナマークの数など）、可能であれば回線速度もご確認ください。</li>
+                                <li>直前の操作: 最後に何を入力し、どのボタンを押したか、送信ボタンを押した後にどのような操作を行ったかなど、具体的な状況をお知らせください。</li>
+                                <li>画面の状態: 表示されているメッセージや画面全体のキャプチャ（スクリーンショット）をご提供ください。</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><strong>担当者への連絡と指示待ち:</strong>
+                    <ul>
+                        <li>ご連絡後、担当者からの指示があるまで、可能な限り画面を維持し、端末の操作（画面更新、ブラウザ終了など）は控えてください。これにより、データ確認や復旧の可能性が高まります。</li>
+                        <li>担当者がシステム側でデータの有無や処理状況を確認し、重複入力の回避策や再入力の要否について指示いたします。</li>
+                    </ul>
+                </li>
+                <li><strong>識別情報の活用（もし可能であれば）:</strong>
+                    <ul>
+                        <li>アンケートの内容にもよりますが、お客様に回答の一部（例：お名前や最初の質問の回答など、個人を特定しすぎない範囲で）を控えてご報告いただくことで、システム側でのデータ照合がスムーズになります。ご協力いただけますと幸いです。</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Footer removed as per instructions -->
+    </div>
+</body>
+</html>

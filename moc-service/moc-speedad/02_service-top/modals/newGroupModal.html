@@ -1,0 +1,72 @@
+<div id="newGroupModal" class="modal-overlay hidden" aria-labelledby="newGroupModalTitle" aria-modal="true" role="dialog">
+    <div class="modal-content-transition relative w-full max-w-3xl p-6 rounded-xl shadow-lg bg-surface transform transition-all duration-300 ease-out">
+        <div class="flex justify-between items-center mb-6">
+            <h2 id="newGroupModalTitle" class="text-on-surface text-xl font-bold">グループ新規作成</h2>
+            <button class="text-on-surface-variant hover:text-on-surface" id="closeNewGroupModalBtn" aria-label="モーダルを閉じる">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <form id="groupForm">
+            <!-- グループ情報セクション -->
+            <div class="mb-6">
+                <h3 class="text-on-surface text-lg font-semibold mb-4">グループ情報</h3>
+                <div class="input-group mb-4">
+                    <label for="groupName" class="input-label">グループ名</label>
+                    <input type="text" id="groupName" class="input-field" placeholder=" " required>
+                </div>
+                <div class="input-group mb-4">
+                    <label for="groupDescription" class="input-label">説明（任意）</label>
+                    <textarea id="groupDescription" class="input-field" rows="3" placeholder=" "></textarea>
+                </div>
+            </div>
+
+            <!-- メンバー管理セクション -->
+            <div class="mb-6">
+                <h3 class="text-on-surface text-lg font-semibold mb-4">メンバー管理</h3>
+                <div class="flex gap-2 mb-4 items-end">
+                    <div class="input-group w-3/5 mt-0 mb-0">
+                        <label for="memberEmail" class="input-label">メンバーメールアドレス</label>
+                        <input type="email" id="memberEmail" class="input-field h-10" placeholder=" " autocomplete="off">
+                    </div>
+                    <div class="input-group w-48 mt-0 mb-0">
+                        <label for="memberRole" class="input-label">役割</label>
+                        <select id="memberRole" class="input-field appearance-none">
+                            <option value="member">一般メンバー</option>
+                            <option value="admin">管理者</option>
+                        </select>
+                    </div>
+                    <button type="button" id="addMemberBtn" class="button-primary text-on-primary px-6 py-2 rounded-md shadow-sm font-semibold text-sm">
+                        追加
+                    </button>
+                </div>
+                
+                <div id="memberList" class="border border-outline-variant rounded-md p-4 bg-surface-bright min-h-[100px]">
+                    <p class="text-on-surface-variant text-sm text-center" id="noMembersMessage">現在メンバーはいません。</p>
+                    <!-- メンバーはJSで動的に追加されます -->
+                </div>
+            </div>
+
+            
+
+            <!-- グループ削除セクション (編集時のみ表示) -->
+            <div id="groupDeleteSection" class="mb-6 hidden">
+                <h3 class="text-on-surface text-lg font-semibold mb-4">グループの削除</h3>
+                <button type="button" id="deleteGroupBtn" class="bg-error text-on-error px-4 py-2 rounded-md shadow-sm font-semibold text-sm">
+                    このグループを削除する
+                </button>
+                <p class="text-on-surface-variant text-xs mt-2">この操作は元に戻せません。</p>
+            </div>
+
+            <!-- フッターボタン -->
+            <div class="flex justify-end gap-3 mt-6">
+                <button type="button" class="text-on-surface-variant px-4 py-2 rounded-md hover:bg-surface-variant transition-colors" id="cancelNewGroupModalBtn" class="text-on-surface-variant px-4 py-2 rounded-md hover:bg-surface-variant transition-colors">
+                    キャンセル
+                </button>
+                <button type="submit" class="button-primary text-on-primary px-4 py-2 rounded-md shadow-sm font-semibold text-sm">
+                    作成する
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

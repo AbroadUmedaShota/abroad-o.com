@@ -1,0 +1,20 @@
+<div id="surveyPreviewModal" class="modal-overlay" data-state="closed">
+    <div class="modal-content-transition modal-content w-full max-w-3xl p-6 rounded-xl bg-surface shadow-lg relative">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-on-surface text-2xl font-bold">アンケートプレビュー</h2>
+            <button class="text-on-surface-variant hover:text-on-surface" onclick="handleCloseModal('surveyPreviewModal')">
+                <span class="material-icons text-3xl">close</span>
+            </button>
+        </div>
+        <div class="modal-body max-h-[70vh] overflow-y-auto space-y-4">
+            <div id="modalSurveyPreviewContainer" class="bg-surface-variant p-6 rounded-lg border border-outline-variant min-h-[200px]">
+                <p class="text-on-surface-variant">プレビューコンテンツがここに表示されます。</p>
+            </div>
+        </div>
+        <div class="modal-footer flex justify-end gap-4 mt-6">
+            <button class="min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors" onclick="handleCloseModal('surveyPreviewModal')">
+                閉じる
+            </button>
+        </div>
+    </div>
+</div>
