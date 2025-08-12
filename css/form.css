@@ -1,0 +1,141 @@
+/*========================================================
+form.html
+========================================================*/
+#form {
+    border-collapse: collapse;
+    margin: 1em 0;
+}
+#form th, #form td {
+    border: 1px solid #808080;
+    padding: 8px;
+    font-size: 14px;
+}
+#form th {
+    white-space: nowrap;
+    background: #EEEEEE;
+    font-size: 14px;
+}
+#form td {
+    background: #fff;
+}
+#form th .must {
+    width: 100px;
+}
+
+/* for message */
+p.msg {
+    color: #dd0000;
+    margin: 2em;
+}
+span.msg {
+    color: #dd0000;
+}
+.scroll-spy {
+    width: 100%;
+    height: 200px;
+    font-size: 11px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    border: solid 1px #C0C0C0;
+    margin-bottom: 15px;
+}
+.scroll-spy p {
+    margin-left: 0px;
+    font-weight: bold;
+    font-size: 13px;
+    padding-left: 0px;
+}
+.scroll-spy ul {
+    list-style: none;
+    padding-left: 10px;
+}
+.scroll-spy li {
+    padding-left: 3.3rem;
+    list-style-position: outside;
+}
+.table_agree {
+    margin: 10px 10px;
+}
+.table_agree th {
+    font-size: 11px!important;
+}
+.table_agree td {
+    padding-bottom: 0px!important;
+    font-size: 11px!important;
+}
+.table_agree ul {
+    padding-left: 0px;
+}
+.table_agree li {
+    font-size: 11px;
+    padding-left: 0px;
+    padding-right: 50px;
+}
+
+/* form-top */
+section#form-top h2 {
+    background-color: #082E5D;
+    color: #fff;
+    font-size: 18px;
+    padding:10px 20px 10px 20px;
+    margin-top: 30px;
+    text-align: center;
+}
+section#form-top th.must {
+    background-image:url(/image/must_ic.png);
+    background-repeat:no-repeat;
+    background-position:95% 50%;
+    text-align:left;
+    padding-right: 40px;
+    color: #ff0000;
+}
+.badge-danger {
+    color: white !important;
+    background-color: red !important;
+}
+section#form-top th.nomust {
+    background-image:url(/image/nomust_ic.png);
+    background-repeat:no-repeat;
+    background-position:95% 50%;
+    padding-right:40px;
+    text-align:left;
+}
+
+.btn-submit {
+    width: 150px;
+}
+
+.message-box {
+    text-align: center;
+    margin: 20px auto;
+    max-width: 100%;
+}
+
+.consent-container {
+    margin-top: 1rem;
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    width: 100%;
+    max-width: 100%;
+}
+
+.consent-container label {
+    display: inline-flex; 
+    align-items: center; 
+}
+
+.required-label::after {
+    content: " *";
+    color: #f00;
+}
+.form-control.invalid {
+    border-color: #f00;
+}
+.error-message {
+    color: #f00;
+    display: none; 
+}
+.error-message.error-visible {
+     display: block; 
+}

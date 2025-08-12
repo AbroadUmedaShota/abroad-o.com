@@ -1,0 +1,56 @@
+/*========================================================
+edit.html 
+========================================================*/
+#title_top {
+    height: 200px;
+    background-image: url(/image/top1.png);
+    background-attachment: fixed;
+}
+#title_top h2 {
+    margin-top: 0px;
+    padding-top: 90px;
+}
+section#photo_top .col-md-7 {
+    margin-bottom: 20px;
+}
+section#photo_top .col-md-7 a img{
+    width: 99%;
+    margin-left: 50px;
+}
+section#photo_top .col-md-5 {
+    border-top:dotted 2px #000;
+    border-bottom:dotted 2px #000;
+    margin-bottom: 20px;
+}
+section#photo_top .col-md-5 img {
+    width: 70px;
+    margin: 10px 10px 20px 0px;
+}
+section#photo_top h6 {
+    font-size: 23px;
+    font-weight: 700;
+    line-height: 50px;
+    margin:50px 0px;
+}
+.top-img-margin {
+    margin:30px 0px 30px;
+    text-align: center;
+}
+.top-img-margin img {
+    width: 99%;
+    margin-left: -30px;
+}
+#photo_top table {
+    font-size: 12px;
+    width: 99%;
+    margin-bottom: 20px;
+}
+#photo_top table .active th,
+#photo_top table .active td {
+    background-color: #CCCCCC;
+}
+#photo_top table th, 
+#photo_top table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+}

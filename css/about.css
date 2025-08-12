@@ -1,0 +1,259 @@
+/*========================================================
+本体（about.html）
+========================================================*/
+#title_top {
+  height: 150px;
+  background-image: url(/image/top1.png);    
+  background-attachment: fixed;     
+  margin-bottom: 40px;
+}
+#title_top h2 {
+  margin-top: 0px;
+  padding-top: 50px;
+}
+@media screen and (max-width: 991px) {
+  #title_top {
+    height: 100px;    
+  }  
+  #title_top h2 {
+    font-size: 25px;
+    padding-top: 35px;
+  }
+}
+@media screen and (max-width: 575px) {
+  #title_top h2 {
+    font-size: 20px;
+    padding-top: 35px;
+  }
+}
+@media screen and (max-width: 470px) {
+  #title_top {
+    height: 80px;    
+  }  
+  #title_top h2 {
+    padding-top: 25px;
+  }
+}
+
+#contact_top .btn_center {
+  text-align: center;
+}
+#contact_top .btn_center .btn p {
+  margin: 0;
+}
+
+
+
+#about_top .container {
+  /* Add any specific styles for about_top container here if needed */
+}
+
+#about_top .panel-body {
+  /* Add any specific styles for about_top panel-body here if needed */
+}
+
+/* Tabs styling */
+#about_top .nav-tabs {
+  display: flex;
+  border-bottom: none; /* Remove default Bootstrap border */
+  margin-bottom: 20px;
+}
+
+#about_top .nav-tabs .nav-item {
+  flex-grow: 1;
+  text-align: center;
+}
+
+#about_top .nav-tabs .nav-link {
+  border: 1px solid #ddd;
+  border-bottom: none;
+  padding: 15px 0; /* Adjust padding for height */
+  font-size: 18px; /* Larger font size */
+  font-weight: bold;
+  color: #333;
+  background-color: #f8f8f8;
+  border-radius: 5px 5px 0 0;
+  margin-right: 5px; /* Space between tabs */
+  transition: all 0.3s ease;
+}
+
+#about_top .nav-tabs .nav-link:hover {
+  background-color: #eee;
+  border-color: #ccc;
+}
+
+#about_top .nav-tabs .nav-item.active .nav-link {
+  color: #fff;
+  background-color: #007bff; /* Bootstrap primary blue */
+  border-color: #007bff;
+  cursor: default;
+}
+
+#about_top .tab-content {
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 0 0 5px 5px;
+}
+
+/* Responsive adjustments for tabs */
+@media (max-width: 768px) {
+  #about_top .nav-tabs {
+    flex-direction: column;
+  }
+  #about_top .nav-tabs .nav-link {
+    margin-right: 0;
+    margin-bottom: 5px;
+    border-radius: 5px;
+  }
+  #about_top .nav-tabs .nav-item.active .nav-link {
+    border-radius: 5px;
+  }
+}
+
+/* Corporate Philosophy Redesign */
+#tabref-ContentB .philosophy-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+#tabref-ContentB .philosophy-section h3 {
+  font-size: 20px;
+  color: #082E5D;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+#tabref-ContentB .philosophy-section p {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #333;
+}
+
+#tabref-ContentB .philosophy-key-points {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+  gap: 10px;
+}
+
+#tabref-ContentB .philosophy-key-points p {
+  background-color: #082E5D; /* Corporate blue */
+  color: #fff;
+  padding: 20px 30px;
+  border-radius: 5px;
+  font-weight: bold;
+  flex-grow: 1;
+  text-align: center;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  font-size: 18px;
+}
+
+#tabref-ContentB .philosophy-section h4 {
+  font-size: 18px;
+  color: #082E5D;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+#tabref-ContentB .philosophy-section ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+#tabref-ContentB .philosophy-section ul li {
+  margin-bottom: 10px;
+  padding-left: 20px;
+  position: relative;
+}
+
+#tabref-ContentB .philosophy-section ul li::before {
+  content: '—'; /* Em dash icon */
+  color: #082E5D; /* Corporate blue */
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+@media (max-width: 768px) {
+  #tabref-ContentB .philosophy-key-points {
+    flex-direction: column;
+    align-items: center;
+  }
+  #tabref-ContentB .philosophy-key-points p {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+#about_top .tab-content {
+  /* Add any specific styles for about_top tab-content here if needed */
+}
+
+#about_top .tab-pane {
+  /* Add any specific styles for about_top tab-pane here if needed */
+}
+
+#about_top table {
+  /* Add any specific styles for about_top table here if needed */
+}
+
+#about_top th,
+#about_top td {
+  /* Add any specific styles for about_top table cells here if needed */
+}
+
+#about_top {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+#about_top p {
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+#about_top .fontsize-12 {
+  /* Add any specific styles for about_top fontsize-12 here if needed */
+}
+
+
+
+#about_top .image-back {
+  background-image: url(/image/Profile-2.png);
+  background-size: cover;
+  background-position: center;
+  padding: 40px 20px;
+  margin-bottom: 20px;
+}
+
+#about_top .image-back h4 {
+  color: #fff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+#about_top .image-back p {
+  color: #fff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+#about_top .row {
+  /* Add any specific styles for about_top row here if needed */
+}
+
+#about_top img {
+  max-width: 75%;
+  display: block;
+  margin: 0 auto;
+}
+
+#contact_top {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+#contact_top .btn_center {
+  text-align: center;
+}

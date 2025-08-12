@@ -1,0 +1,104 @@
+/*========================================================
+header
+========================================================*/
+#header_top {
+  background-image: url(/image/top1.png);    
+  background-attachment: fixed;
+  background-position: middle;
+}
+#header_top img {
+  width: 65%;
+  margin-top: 20px;
+  margin-bottom: 7px;
+}
+#header_top .top_right{
+  margin-top: 15px;
+  margin-bottom: -15px;  
+}
+#header_top .btn_top {
+  margin-left: 200px;
+}
+#header_top .btn_top .btn {
+  background-color: #4CAF50;
+  color: #fff;
+  border-color: #fff;
+}
+#header_top .btn_top .btn:hover {
+  transition: 0.7s;
+  background-color:#fff;
+  color: #5CB85C;
+}
+#header_top center i{
+  padding: 0px 0px 50px 0px;
+  margin-left: -40px;
+}
+#header_top .btn_top strong{
+  font-size: 15px;
+  white-space: nowrap;
+}
+#header_top .btn_top button {
+  margin-bottom: 5px;
+}
+#header_top center {
+  white-space: nowrap;
+}
+@media screen and (max-width: 1200px) {
+  #header_top center i{
+    margin-left: 10px;
+  } 
+}
+@media screen and (max-width: 1100px) {
+  #header_top .btn_top {
+    margin-left: 100px;
+  }
+  #header_top center i{
+    margin-left: -50px;
+  } 
+}
+@media screen and (max-width: 991px) {
+  #header_top .btn_top {
+    margin-left: 0px;
+  }
+  #header_top center i{
+    margin-left: -30px;
+  } 
+  #header_top img {
+    width: 100%;
+  } 
+}
+@media screen and (max-width: 940px) {
+  #header_top .btn_top {
+    margin-left: 0px;
+  }  
+}
+@media screen and (max-width: 767px) {
+  #header_top center i{
+    margin-left: 10px;
+  }   
+  #header_top img {
+    padding-top: 10px;
+    margin-left:-20px;
+  }  
+}
+@media screen and (max-width: 627px) {
+  #header_top .btn_top {
+    margin-left: -30px;
+  }  
+}
+@media screen and (max-width: 575px) {
+  #header_top .col-sm-6 {
+    text-align: center;
+  }
+  #header_top img {
+    width: 60%;
+  }  
+}
+@media screen and (max-width: 481px) {
+  #header_top img {
+    width: 70%;
+    padding-left: 10px;
+  }  
+  #header_top .btn_top {
+    margin-left: 0px;
+  }  
+}

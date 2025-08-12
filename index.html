@@ -1,8 +1,6 @@
 <!DOCTYPE html>
-<!NAME_index.html>
 <html lang="ja">
-<!DOCTYPE html>
-<html lang="ja">
+
 <head>
     <!-- メタタグ設定 -->
     <meta charset="utf-8">
@@ -28,10 +26,24 @@
         gtag('js', new Date());
         gtag('config', 'UA-51168812-1');
     </script>
+    <script>
+      function loadComponent(elementId, componentPath) {
+        fetch(componentPath)
+          .then(response => response.text())
+          .then(html => {
+            document.getElementById(elementId).innerHTML = html;
+          })
+          .catch(error => console.error(`Error loading component ${componentPath}:`, error));
+      }
+    </script>
 
     <!-- CSSファイルの読み込み -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-    <link rel="stylesheet" href="style3.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="slick/slick.css">
     <link rel="stylesheet" href="slick/slick-theme.css">
     
@@ -41,73 +53,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Text&display=swap" rel="stylesheet">
 </head>
 <body>
-<header>
-    <!-- ヘッダー上部 -->
-    <section id="header_top">
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-6 col-md-6">
-                    <a href="/index.html"><img src="/image/rogo.png" alt="アブロードアウトソーシング株式会社のロゴ"></a>
-                </div>
-                <div class="col-sm-6 col-md-6 top_right">
-                    <div class="btn_center btn_top">
-                        <button type="button" class="btn btn-danger btn-lg" onclick="location.href='form.html'" tabindex="1" accesskey="U">
-                            <strong>無料お見積り・お問合せはコチラ</strong>
-                        </button>
-                        <center><i class="fas fa-phone-square-alt"></i> 03-5835-0250（平日10時~19時）</center>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- ナビゲーションメニュー部分 -->
-    <section id="header_nav">
-        <nav class="navbar navbar-expand-sm justify-content-center">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"><i class="fas fa-toggle-on fa-2x"></i></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav mx-auto">
-                    <!-- カスタムナビゲーション -->
-                    <!-- HOME -->
-                    <li class="nav-item active">
-                        <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
-                    </li>
-                    <!-- SERVICE -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="service.html" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">SERVICE</a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="input.html">データ入力サービス</a>
-                            <a class="dropdown-item" href="aggregate.html">データ集計・分析サービス</a>
-                            <a class="dropdown-item" href="scan.html">スキャニングサービス</a>
-                            <a class="dropdown-item" href="edit.html">画像編集・加工サービス</a>
-                        </div>
-                    </li>
-                    <!-- NEWS -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="news.html">NEWS</a>
-                    </li>
-                    <!-- ABOUT -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="about.html" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">ABOUT</a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="rule.html">プライバシーポリシー</a>
-                            <a class="dropdown-item" href="recruit.html">リクルート</a>
-                        </ul>
-                    </li>
-                    <!-- CONTACT -->
-                    <li class="nav-item">
-                        <a class="nav-link page-scroll" href="about.html#contact_up">CONTACT</a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-    </section>
-</header>
-<!-- ここに他のコンテンツが続く -->
+  <header id="header-placeholder"></header>
+  <script>
+    loadComponent('header-placeholder', 'components/header.html');
+  </script>
 
-  </header>
-  <!-- メインコンテンツ -->
+  <nav id="nav-placeholder"></nav>
+  <script>
+    loadComponent('nav-placeholder', 'components/nav.html');
+  </script>
+<!-- メインコンテンツ -->
   <main>
     <!-- トップセクション -->
     <section id="top">
@@ -144,14 +99,14 @@
             <img src="/image/top1_1.png" alt="データ入力サービス">
             <p>専属データ入力センターにより、活字入力＠0.25円～の業界最安値で、最高水準の入力精度をご提供します。アンケート、申込書、応募ハガキ、名簿、書籍の入力など、様々な原稿からの入力が可能です。</p>
             <!-- Default button -->
-            <button type="button" class="btn btn-default" onclick="location.href='input.html'" value="詳しくはこちら" tabindex="1" accesskey="U">詳しくはこちら</button>
+            <a class="btn btn-default" href="input.html" role="button">詳しくはこちら</a>
           </div>
           <div class="col-sm-12 col-md-6 orange">
             <h1>データ集計・分析</h1>
             <img src="/image/top1_2.png" alt="スキャニングサービス">
             <p>アンケートの集計作業、名簿やデータベースのクリーニング・コンバート作業など、プラスαの付加価値をご提供します。</p><br>
             <!-- Default button -->
-            <button type="button" class="btn btn-default" onclick="location.href='aggregate.html'" value="詳しくはこちら" tabindex="1" accesskey="U">詳しくはこちら</button>
+            <a class="btn btn-default" href="aggregate.html" role="button">詳しくはこちら</a>
           </div>
         </div>
         <div class="row">
@@ -160,20 +115,18 @@
             <img src="/image/top1_3.png" alt="スキャニングサービス">
             <p>独自の作業スキームとPDF分割法により、高精度で低価格なスキャニングを提供します。書類、契約書、書籍、図面、写真など、様々な原稿のスキャニングが可能です。</p>
             <!-- Default button -->
-            <button type="button" class="btn btn-default" onclick="location.href='scan.html'" value="詳しくはこちら" tabindex="1" accesskey="U">詳しくはこちら</button>
+            <a class="btn btn-default" href="scan.html" role="button">詳しくはこちら</a>
           </div>
           <div class="col-sm-12 col-md-6 green">
             <h1>画像編集・加工</h1>
             <img src="/image/top1_4.png" alt="画像編集サービス">
             <p>細かいご要望にも対応可能な社内編集チームと、同一の加工作業を大量且つスピーディーに施工可能な海外チームの組み合わせにより、お求めのクオリティやご予算に合わせたサービスを提供します。</p>
             <!-- Default button -->
-            <button type="button" class="btn btn-default" onclick="location.href='edit.html'" value="詳しくはこちら" tabindex="1" accesskey="U">詳しくはこちら</button>
+            <a class="btn btn-default" href="edit.html" role="button">詳しくはこちら</a>
           </div>
         </div>
         <div class="btn_center_margin">
-          <button type="button" class="btn btn-danger btn-lg" onclick="location.href='form.html'"  tabindex="1" accesskey="U">
-            <strong>≪　お問合わせはこちら　≫</strong>
-          </button>
+          <a class="btn btn-contact btn-lg" href="form.html" role="button"><strong>≪　お問合わせはこちら　≫</strong></a>
         </div>
       </div> <!--container-->
     </section>
@@ -232,6 +185,11 @@
         <p><img src="/image/c-008.png" alt="三省堂書店"></p>
         <p><img src="/image/c-009.png" alt="CTC"></p>
       </div>
+      <div class="slick-controls" style="text-align: center; margin-top: 20px;">
+        <button type="button" id="slick-pause-play" aria-label="スライドショーを一時停止" aria-live="polite" style="background-color: #082E5D; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px;">
+          <span class="play-icon">&#9658;</span> <span class="pause-icon" style="display: none;">&#10074;&#10074;</span> <span class="status-text">再生</span>
+        </button>
+      </div>
     </section>
 
     <!-- 資格紹介セクション -->
@@ -258,30 +216,27 @@
     </section>
   </main>
 
-    <footer>
-      <div class="container">
-        <p class="last">Copyright (C) Abroad Outsourcing Co.,Inc. All rights reserved.</p>
-      </div><!--container-->
-      <!---スクロールボタン-->
-      <p id="page-top" aria-label="ページトップへ戻る">
-      <i class="fa fa-arrow-circle-up fa-3x" aria-hidden="true"></i></a></p>
-    </footer>
+    <footer id="footer-placeholder"></footer>
+    <script>
+      loadComponent('footer-placeholder', 'components/footer.html');
+    </script>
 
     <!-- スクリプト -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/1z2BjnM9ua1qZswl4uxMv3z3Q/pU2z2l4a6" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gybBud7TlRbs/ic4AwGcFZOxg5DpPt8EgeUIgIwzjWfXQKWA3" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
     <!-- FontAwesome6 CDN -->
       <script src="https://kit.fontawesome.com/ac3b49c4bc.js" crossorigin="anonymous"></script>
     <!-- Plugin JavaScript -->
-      <script src="js/jquery.easing.min.js"></script>
+      <!-- Plugin JavaScript -->
+      <!-- <script src="js/jquery.easing.min.js"></script> -->
     <!-- Custom JS -->
-      <script src="js/script.js"></script>
+      <!-- <script src="js/script.js"></script> -->
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="js/bootsnav.js"></script>
+    
+    <!-- <script type="text/javascript" src="js/bootsnav.js"></script> -->
     <script src="js/jquery.smooth-scroll.min.js"></script>
     <script>
          $('a').smoothScroll();
@@ -318,8 +273,8 @@
     <!-- スクロールボタン表示jQuery end-->
 
     <!-- Slick　スクロール-->
-    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-    <script type="text/javascript" src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    
+    
     <script type="text/javascript" src="slick/slick.min.js"></script>
     <script type="text/javascript">
     $(document).ready(function(){
@@ -333,6 +288,24 @@
         autoplay: true,
         speed: 5000,
         autoplaySpeed: 0
+      });
+
+      var isPlaying = true;
+      $('#slick-pause-play').click(function() {
+        if (isPlaying) {
+          $('.autoplay').slick('slickPause');
+          $(this).attr('aria-label', 'スライドショーを再生');
+          $(this).find('.play-icon').show();
+          $(this).find('.pause-icon').hide();
+          $(this).find('.status-text').text('再生');
+        } else {
+          $('.autoplay').slick('slickPlay');
+          $(this).attr('aria-label', 'スライドショーを一時停止');
+          $(this).find('.play-icon').hide();
+          $(this).find('.pause-icon').show();
+          $(this).find('.status-text').text('一時停止');
+        }
+        isPlaying = !isPlaying;
       });
     });
     </script>

@@ -1,0 +1,29 @@
+/*========================================================
+sample2.html 
+========================================================*/
+section#sample h3 {
+    margin:70px 0px 50px 0px;
+    border-bottom: solid 1px #000;
+}
+section#sample h4 {
+    font-size: 20px;
+    margin:30px 0px 30px 0px;
+    background-color: #000099;    
+    color: #fff;    
+    padding: 10px 5px;    
+}
+section#sample span {
+    display: block;
+    border:dotted 1px #808080;
+    padding: 5px 15px 5px 15px;
+}
+section#sample .right {
+    text-align: right;
+}
+section#sample u {
+    text-decoration: none;
+}
+
+.pdfjs-view {
+    margin-bottom: 50px;
+}

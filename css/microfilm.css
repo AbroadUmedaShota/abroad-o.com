@@ -1,0 +1,114 @@
+/*========================================================
+microfilm.html 
+========================================================*/
+#title_top {
+    height: 200px;
+    background-image: url(/image/top1.png);
+    background-attachment: fixed;
+}
+#title_top h2 {
+    margin-top: 0px;
+    padding-top: 90px;
+}
+
+section#micro_top h2 {
+    font-size: 20px;
+    margin:30px 0px 30px 0px;
+    background-color: #000099;    
+    color: #fff;    
+    padding: 10px 5px;    
+}
+section#micro_top h3 {
+    text-align: center;
+    background-color: #000099;
+    color: #fff;
+    font-size: 18px;
+    padding: 5px 0px;
+}
+
+#film_top .line_orange {
+    border-bottom: solid 2px #FF8C00;
+    margin: 30px 0;
+}
+#film_top .line_orange h3 {
+    margin-left: 10px;
+    font-size: 20px;
+    background-color: #FF8C00;
+    display: inline-block;
+    color: #fff;
+    padding: 5px 10px;
+}
+
+#film_top .row-box .box {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+#film_top .row-box .box h5 {
+    font-size: 16px;
+    font-weight: bold;
+}
+#film_top .row-box .box img {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    max-width: 100%;
+}
+
+#film_top .box-large {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.micro_box .box {
+    height: 300px;
+}
+
+.micro_box1 h5 {
+    font-size: 16px;
+    font-weight: bold;
+}
+.micro_box1 p {
+    font-size: 13px;
+}
+.middle1 img {
+    width: 80%;
+    display: block;
+    margin: 0 auto;
+}
+
+#film_table {
+    font-size: 13px;
+}
+#film_table .active {
+    background-color: #CCCCCC;
+}
+#film_table th, #film_table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+#film_table th {
+    background-color: #f2f2f2;
+}
+
+.film_price {
+    font-size: 12px;
+    color: #555;
+    line-height: 1.8;
+    border: 1px solid #eee;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+section#tele_mid5_orange ul li{
+  border-left: solid 6px #BBBBBB;
+  background: #EEEEEE;
+}
+
+section#tele_mid6 .col-md-3 {
+  border:solid 1px #000;
+  margin-bottom: 50px;
+}

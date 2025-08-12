@@ -1,0 +1,17 @@
+/*========================================================
+recruit.html 
+========================================================*/
+#title_top {
+    height: 200px;
+    background-image: url(/image/top1.png);
+    background-attachment: fixed;
+}
+#title_top h2 {
+    margin-top: 0px;
+    padding-top: 90px;
+}
+
+section#recruit_top {
+    padding: 50px 0;
+    text-align: center;
+}

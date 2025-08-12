@@ -1,0 +1,34 @@
+/*========================================================
+rule.html 
+========================================================*/
+#title_top {
+    height: 200px;
+    background-image: url(/image/top1.png);
+    background-attachment: fixed;
+}
+#title_top h2 {
+    margin-top: 0px;
+    padding-top: 90px;
+}
+
+section#rule ol{
+    padding-left: 15px;
+}
+section#rule ol li {
+    padding-bottom: 5px;
+}
+#rule h4 {
+    margin: 20px 0px;
+    padding-top: 20px;
+}
+
+.fontsize-12 p,
+.fontsize-12 li,
+.fontsize-12 b,
+.fontsize-12 a {
+    font-size: 12px;
+}
+.fontsize-12 h4 {
+    font-size: 16px;
+    font-weight: bold;
+}

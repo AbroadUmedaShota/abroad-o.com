@@ -1,0 +1,182 @@
+
+/*========================================================
+largeformat.html
+========================================================*/
+#title_top {
+    height: 200px;
+    background-image: url(/image/top1.png);
+    background-attachment: fixed;
+}
+#title_top h2 {
+    margin-top: 0px;
+    padding-top: 90px;
+}
+
+section#tele_mid5_orange h3{
+  text-align: center;
+  font-size: 35px;
+  font-weight: 700;
+  margin-top: -130px;
+  margin-bottom: 100px;
+}
+section#tele_mid5_orange h5 {
+  font-size: 18px;
+  font-weight: 700;
+}
+section#tele_mid5_orange ul{
+  padding: 0;
+  position: relative;
+}
+section#tele_mid5_orange ul li{
+  color: #4472C4;
+  border-left: solid 6px #FF8C00;/*左側の線*/
+  background: #FFFFEE;/*背景色*/
+  margin-bottom: 3px;/*下のバーとの余白*/
+   line-height: 1.5;
+  padding: 0.5em;
+  list-style-type: none!important;/*ポチ消す*/
+}
+section#tele_mid5_orange i {
+  color: #4472C4;
+}
+section#tele_mid5_orange a {
+  font-size: 15px!important;
+  font-weight: 100!important;
+  text-decoration: none;
+}
+
+section#tele_mid6 h3{
+  text-align: center;
+  font-size: 35px;
+  font-weight: 700;
+  margin-top: -130px;
+  margin-bottom: 100px;
+}
+section#tele_mid6 .col-md-3 {
+  border:solid 1px #000;
+  margin-bottom: 50px;
+}
+section#tele_mid6 .col-md-3 h4 {
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  margin-top: 15px;
+}
+section#tele_mid6 .col-md-3 img {
+  width: 100px;
+}
+section#tele_mid6 .col-md-3 p {
+  font-size: 13px;
+}
+
+section#tele_mid4 .cover-btn {
+  background-image: url(image/big-btn1.jpg);
+  background-size:cover;
+}
+section#tele_mid4 .btn_wrap {
+  background-color: rgba(0,0,0,0.2);
+}
+section#tele_mid4 p {
+  padding: 30px 0px 10px 0px;
+  font-size: 20px;
+}
+section#tele_mid4 .btn_center .btn {
+  padding: 20px 10px;
+  background-color: #5CB85C;
+  border:solid 0px #fff;
+}
+section#tele_mid4 .btn_center .btn:hover {
+  background-color: #fff;
+  border:solid 2px #5CB85C;
+  color: #5CB85C;
+}
+section#tele_mid4 p.tel_p {
+  padding: 10px 0px 30px 0px;
+  margin: 0 auto;
+}
+
+.big-btn p {
+  margin: 30px 0px 0px 0px!important;
+  font-size: 25px!important;
+  text-align: center;
+}
+.big-btn center {
+  font-size: 30px;
+}
+
+#film_top .line_orange {
+    border-bottom: solid 2px #FF8C00;
+    margin: 30px 0;
+}
+#film_top .line_orange h3 {
+    margin-left: 10px;
+    font-size: 20px;
+    background-color: #FF8C00;
+    display: inline-block;
+    color: #fff;
+    padding: 5px 10px;
+}
+
+#film_table {
+    font-size: 13px;
+}
+#film_table .active {
+    background-color: #CCCCCC;
+}
+#film_table th, #film_table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+#film_table th {
+    background-color: #f2f2f2;
+}
+
+.largepaper h4 {
+    font-size: 20px;
+    font-weight: bold;
+}
+.largepaper h5 {
+    font-size: 16px;
+    line-height: 1.6;
+}
+.largepaper h6 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #d9534f;
+}
+
+.largepaper1 .box {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.largepaper1 .box h5 {
+    font-size: 16px;
+    font-weight: bold;
+}
+.largepaper1 .box img {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.box-large {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.largepaper2 .back-g {
+    background-color: #f9f9f9;
+    padding: 15px;
+}
+
+.film_price {
+    font-size: 12px;
+    color: #555;
+    line-height: 1.8;
+    border: 1px solid #eee;
+    padding: 15px;
+    margin-top: 20px;
+}

@@ -1,0 +1,152 @@
+/*========================================================
+input.html
+========================================================*/
+#title_top {
+    height: 200px;
+    background-image: url(/image/top1.png);
+    background-attachment: fixed;
+}
+#title_top h2 {
+    margin-top: 0px;
+    padding-top: 90px;
+}
+
+.menu-box {
+    border:solid 1px #000;
+    margin: 10px 10px 10px 10px;
+    width: 400px;
+}
+#menu-left {
+    margin-top: 50px;
+}
+#menu-left .back-color {
+    background-color: #000;
+}
+#menu-left .back-color h4 {
+    margin-left: -30px;
+    color: #fff;
+}
+#menu-left li h3 {
+    text-align: center;
+    font-size: 18px;
+}
+#menu-left li {
+    border:solid 1px #000;
+    list-style-type: none;
+}
+#menu-left .media-left {
+    padding: 12px 0px 0px 10px;
+}
+#menu-left .media-body {
+    padding: 10px 0px 0px 30px;
+}
+#menu-left h4 {
+    font-size: 15px;
+    font-weight: 700;
+}
+#menu-left p {
+    text-align: left;
+}
+#menu-right {
+    margin-top: 50px;
+}
+#menu-right .carousel-control.right {
+    background-image: none!important;
+}
+#menu-right .carousel-control.left {
+    background-image: none!important;
+}
+#menu-right .carousel-inner img {
+    width: 95%;
+}
+.mini-box .col-xs-3 {
+    width: 255px;
+    height: 200px;
+    border:solid 1px #C0C0C0;
+    margin: 20px 5px 20px 15px;
+    text-align: center;
+}
+.mini-box .col-xs-3:hover {
+    color: #fff;
+    background-color: #BBBBBB;
+    transition: 1.2s;
+}
+.mini-box .col-xs-3 img {
+    width: 100px;
+    padding: 20px 0px 20px 0px;
+}
+.box-left {
+    text-align: center;
+    padding-top: 20px;
+}
+#text-price {
+    margin-bottom: 50px;
+}
+#text-price h3 {
+    text-align: center;
+    background-color: #000099;
+    color: #fff;
+    font-size: 18px;
+    padding: 5px 0px;
+}
+#text-price table {
+    font-size: 12px;
+    width: 99%;
+}
+#text-price table .active th {
+    background-color: #CCCCCC;
+}
+#text-price table .active td {
+    background-color: #CCCCCC;
+}
+#text-price table b {
+    background-color: #FF8C00;
+    color: #fff;
+    padding: 5px 0px;
+}
+#text-how h3 {
+    text-align: center;
+    background-color: #000099;
+    color: #fff;
+    font-size: 18px;
+    padding: 5px 0px;
+}
+#text-how h4 {
+    margin-top: 30px;
+}
+#text-how .col-md-2 {
+    border:1px solid #C0C0C0;
+    margin: 20px 5px 20px 15px;
+    height: 240px;
+}
+#text-how .col-md-2 .fa {
+    margin: 10px 0px 10px 30px;
+}
+#text-how .col-md-2 p {
+    font-size: 12px;
+}
+p.red {
+    color: #f00;
+}
+#text-quality h3 {
+    text-align: center;
+    background-color: #000099;
+    color: #fff;
+    font-size: 18px;
+    padding: 5px 0px;
+    margin: 30px 0px;
+}
+#text-quality p {
+    padding-top: 15px;
+}
+#text-quality img {
+    width: 50px;
+}
+.no-border img {
+  width: 65px;
+}
+.no-border p {
+    margin: 0px 0px 0px -25px;
+    font-size: 12px;
+    line-height: 20px;
+}

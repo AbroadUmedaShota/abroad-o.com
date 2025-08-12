@@ -4,84 +4,49 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" itemprop="description" content="" />
-    <meta name="keywords" content="スキャニング,データ入力,画像編集,集計,スキャニング依頼,コスト削減">       
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>アブロードアウトソーシング株式会社│ データ入力、スキャニング、画像加工ならお任せ！</title>
+    <meta name="keywords" content="スキャニング,データ入力,画像編集,集計,スキャニング依頼,コスト削減">
+    <title>アブロードアウトソーシング株式会社│ データ入力、スキャニング、画像加工ならお任se！</title>
     <meta property="og:title" content="アブロードアウトソーシング株式会社│ データ入力、スキャニング、画像加工ならお任せ！">
     <meta property="og:description" content="編集プロダクション様専用活字入力をはじめ、アンケートや名簿入力に対応。また、スキャニングによるデータ化や画像編集も行っております。" />
-    <!-- Bootstrap -->
     <meta name="google-site-verification" content="Nqa719cJbf2AfjLk6kCgmpJHM73egoAodcPCb-cdyyc" />
-    <link href="css/bootstrap.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
-    <!--[if lt IE 9]>
-    <script src="http://css3-mediaqueries-js.googlecode.com/
-    svn/trunk/css3-mediaqueries.js"></script>
-    <![endif]-->
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-    <!--カノニカルタグ-->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-51168812-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-51168812-1');
+    </script>
+    <script>
+      function loadComponent(elementId, componentPath) {
+        fetch(componentPath)
+          .then(response => response.text())
+          .then(html => {
+            document.getElementById(elementId).innerHTML = html;
+          })
+          .catch(error => console.error(`Error loading component ${componentPath}:`, error));
+      }
+    </script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/map.css">
     <link rel="canonical" href="http://on-ze.com">
-    <!--favicon-->
     <link rel="shortcut icon" href="/image/fabicon.png" >
-    <!-- Google Web Fonts-->
     <link href="https://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet">
   </head>
   <body>
-    
-  <header> 
-    <section id="header_top">
-      <div class="container">
-        <div class="row">
-          <div class="col-xs-8 col-md-6">
-            <h1>バックオフィス</h1>
-          </div>  
-          <div class="col-md-6 right">  
-            <a href="" target="_blank"><img src="/image/rogo.png"></a>
-          </div>
-        </div>
-      </div><!--container -->
-    </section>
-    
-    <section id="header_nav">
-      <!-- Navigation -->
-      <nav class="navbar navbar-custom navbar-fixed-top" role="navigation">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
-            <i class="fa fa-bars"></i>
-          </button>
-        <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
-        <!-- カスタムナビゲーション -->
-          <ul class="nav navbar-nav shade">
-            <li class="top_down"><a class="page-scroll" href="index.html">HOME</a></li>
-            <li class="dropdown">
-              <a href="service.html" class="button" aria-expanded="false">SERVICE<b class="caret"></b></a>
-              <ul class="dropdown-menu" role="menu">
-                <li class="not_top"><a href="input.html">データ入力サービス</a></li>
-                <li><a href="aggregate.html">データ集計・分析サービス</a></li>
-                <li><a href="scan.html">スキャニングサービス</a></li>
-                <li class="not_border"><a href="edit.html">画像編集・加工サービス</a></li>                
-              </ul>
-            </li>              
-            <li><a class="page-scroll" href="news.html">NEWS</a></li>            
-            <li class="dropdown">
-              <a href="about.html" class="button" aria-expanded="false">ABOUT<b class="caret"></b></a>
-              <ul class="dropdown-menu" role="menu">
-                <li class="not_top not_border"><a href="rule.html">プライバシーポリシー</a></li>  
-                <li class="not_top not_border"><a href="recruit.html">リクルート</a></li>                  
-              </ul>  
-            </li>                 
-            <li><a class="page-scroll" href="about.html#contact_up">CONTACT</a></li>
-          </ul>
-          </div>
-        </div> 
-      </div>  
-    </section>
-  </header>
+
+  <header id="header-placeholder"></header>
+  <script>
+    loadComponent('header-placeholder', 'components/header.html');
+  </script>
+
+  <nav id="nav-placeholder"></nav>
+  <script>
+    loadComponent('nav-placeholder', 'components/nav.html');
+  </script>
 
   <main>
     <section id="title_top">
@@ -117,14 +82,11 @@
 
   </main>  
  
-    <footer>
-      <div class="container">
-        <p class="last">Copyright (C)2014-2018 Abroad Outsourcing Co.,Inc. All rights reserved.</p>
-      </div><!--container-->  
-      <!---スクロールボタン-->  
-      <p id="page-top"><a href="#header_top"><i class="fa fa-arrow-circle-up fa-3x" aria-hidden="true"></i></a></p>  
-    </footer>
-  <!-- Modal -->
+  <footer id="footer-placeholder"></footer>
+  <script>
+    loadComponent('footer-placeholder', 'components/footer.html');
+  </script>
+
   <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -140,17 +102,10 @@
     </div>
   </div>
 
-    <!-- FontAwesome CDN -->
-    <script src="https://use.fontawesome.com/297671da61.js"></script>
-    <!-- Plugin JavaScript -->
-    <script src="js/jquery.easing.min.js"></script>
-    <!-- Custom JS -->
-    <script src="js/script.js"></script>
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="js/bootsnav.js"></script>
+    <script src="https://kit.fontawesome.com/ac3b49c4bc.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
     <script src="js/jquery.smooth-scroll.min.js"></script>
     <script>
          $('a').smoothScroll();

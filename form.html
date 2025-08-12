@@ -13,328 +13,37 @@
         gtag('js', new Date());
         gtag('config', 'UA-51168812-1');
     </script>
-    <link href="css/bootstrap.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
+    <script>
+      function loadComponent(elementId, componentPath) {
+        fetch(componentPath)
+          .then(response => response.text())
+          .then(html => {
+            document.getElementById(elementId).innerHTML = html;
+          })
+          .catch(error => console.error(`Error loading component ${componentPath}:`, error));
+      }
+    </script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/form.css">
     <link rel="canonical" href="https://www.abroad-o.com/form.html">
     <link rel="shortcut icon" href="/image/fabicon.png" >
     <link href="https://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <style>
-        /* form.html 専用のスタイル */
-        #form {
-            border-collapse: collapse;
-            margin: 1em 0;
-        }
-        #form th, #form td {
-            border: 1px solid #808080;
-            padding: 8px;
-            font-size: 14px;
-        }
-        #form th {
-            background: #EEEEEE;
-            font-size: 14px;
-        }
-        #form td {
-            background: #fff;
-        }
-        #form th .must {
-            width: 100px;
-        }
-
-        /* for message */
-        p.msg {
-            color: #dd0000;
-            margin: 2em;
-        }
-        span.msg {
-            color: #dd0000;
-        }
-        .scroll-spy p {
-            margin-left: 0px;
-            font-weight: bold;
-            font-size: 13px;
-            padding-left: 0px;
-        }
-        .scroll-spy ul {
-            list-style: none;
-            padding-left: 10px;
-        }
-        .scroll-spy li {
-            padding-left: 3.3rem;
-            list-style-position: outside;
-        }
-        .table_agree {
-            margin: 10px 10px;
-        }
-        .table_agree th {
-            font-size: 11px!important;
-        }
-        .table_agree td {
-            padding-bottom: 0px!important;
-            font-size: 11px!important;
-        }
-        .table_agree ul {
-            padding-left: 0px;
-        }
-        .table_agree li {
-            font-size: 11px;
-            padding-left: 0px;
-            padding-right: 50px;
-        }
-
-        /* form-top */
-        section#form-top h2 {
-            background-color: #082E5D;
-            color: #fff;
-            font-size: 18px;
-            padding:10px 20px 10px 20px;
-            margin-top: 30px;
-            text-align: center;
-        }
-
-        /* 必須アイコンは画像ではなくCSSで対応 */
-        section#form-top th.must {
-            color: #ff0000;  /*必須アイコンの色を #ff0000 に変更 */
-        }
-        .badge-danger {
-            color: white !important;
-            background-color: red !important;
-        }
-
-        .scroll-spy {
-            width: 100%;
-            height: 200px;
-            font-size: 11px;
-            overflow-x: hidden;
-            overflow-y: scroll;
-            border: solid 1px #C0C0C0;
-            margin-bottom: 15px;
-        }
-        .scroll-spy p {
-            padding: 10px 10px 10px 10px;
-        }
-        .svg-inline--fa.fa-w-18 {
-            margin-top: 15px;
-        }
-        .Error {
-            padding-top: 30px;
-            padding-bottom: 100px;
-        }
-
-        .btn-submit {
-            width: 150px;
-        }
-
-        /* 個人情報の取り扱いに関するテキストとチェックボックスを中央に配置 */
-        .message-box {
-            text-align: center;
-            margin: 20px auto;
-            max-width: 100%; /* 必要に応じて調整 */
-        }
-
-
-        .no-link-style {
-            color: inherit;
-            text-decoration: none;
-        }
-        .no-link-style:hover,
-        .no-link-style:active,
-        .no-link-style:visited {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        .required-label::after {
-            content: " *";
-            color: #f00;
-        }
-        /* エラー表示のスタイル */
-        .form-control.invalid {
-            border-color: #f00;
-        }
-        .error-message {
-            color: #f00;
-            display: none; /* 初期状態では非表示 */
-        }
-        .error-message.error-visible {
-            display: block; /* エラー時に表示 */
-        }
-
-        .scroll-spy table {
-            width: 100%;
-            table-layout: fixed;
-        }
-        .scroll-spy th, .scroll-spy td {
-            word-break: break-word;
-        }
-        .scroll-spy th {
-            font-weight: bold;
-        }
-        .scroll-spy table {
-            width: 98%; /* 幅を98%に調整 */
-            margin: 0 auto; /* 中央寄せ */
-        }
-
-
-        /* テーブル内のカラム幅調整 */
-        .table_agree th:nth-child(1),
-        .table_agree td:nth-child(1) {
-            width: 25%; /* 左カラムの幅を25%に設定 (調整可能) */
-        }
-
-        .table_agree th:nth-child(2),
-        .table_agree td:nth-child(2) {
-            width: 75%; /* 右カラムの幅を75%に設定 (調整可能) */
-        }
-
-        /* ラベルを左寄せにする */
-        .form-group label {
-            text-align: left;
-            display: block; /* ブロック要素にして幅を確保 */
-            margin-bottom: 0.5rem; /* 下に少し余白 */
-        }
-
-
-        /* 入力フィールドの幅を100%にする */
-        #form input[type="text"],
-        #form input[type="email"],
-        #form input[type="tel"],
-        #form textarea {
-            width: 100%;
-            box-sizing: border-box; /* paddingとborderをwidthに含める */
-        }
-
-    /* 同意チェックボックスとラベルを中央揃え */
-    .consent-container {
-        margin-top: 1rem;
-        /* text-align: center; /*コンテナ全体を中央揃え*/ /* この行を削除またはコメントアウト */
-        display: flex; /* Flexboxコンテナにする */
-        justify-content: center; /* 子要素を水平方向に中央揃え */
-        align-items: center; /* 子要素を垂直方向に中央揃え（必要であれば） */
-        width: 100%;
-        max-width: 100%;
-    }
-
-    /* .consent-container label のスタイルは変更なしでOKですが、念のため確認 */
-    .consent-container label {
-        display: inline-block; /* インラインブロック要素 */
-        vertical-align: middle; /* 必要に応じて、チェックボックスとテキストの垂直方向の揃えを維持 */
-
-
-        .consent-container input[type="checkbox"] {
-            margin: 0;
-            vertical-align: middle;
-            appearance: none; /* ブラウザのデフォルトスタイルを無効化 */
-            -webkit-appearance: none;
-            width: 16px; /* サイズを固定 */
-            height: 16px;
-            border: 1px solid #999; /* 枠線 */
-            border-radius: 3px; /* 角丸 */
-            background-color: #fff; /* 背景色 */
-            margin-right: 8px; /* テキストとの間隔 */
-            cursor: pointer; /* カーソルをポインターに */
-        }
-        /* チェックされたときのスタイル */
-        .consent-container input[type="checkbox"]:checked {
-            background-color: #007bff; /* 背景色 */
-            border-color: #007bff; /* 枠線 */
-        }
-
-        .consent-container input[type="checkbox"]:checked::after {
-            content: '\2713'; /* チェックマークを表示 */
-            display: block;
-            text-align: center;
-            color: #fff; /* チェックマークの色 */
-            font-size: 14px;
-            line-height: 14px; /* チェックマークの位置調整 */
-        }
-
-
-        .consent-container span {
-            /* display: inline-block; 削除*/
-            vertical-align: middle;
-            /* margin-left: 0.5em; 削除*/
-        }
-
-        /* より小さい画面用のスタイル */
-        @media screen and (max-width: 480px) {
-            section#form-top h2 {
-                font-size: 16px;
-            }
-            #form th {
-                padding-right: 10px; /* 必須アイコンのスペースを減らす */
-            }
-            .scroll-spy {
-              font-size: 10px;
-            }
-        }
-
-        /* ハニーポットフィールド用スタイル */
-        .honeypot {
-            display: none !important; /* 絶対に表示させない */
-            visibility: hidden !important; /* さらに見えないように */
-            opacity: 0 !important; /* 透明度も0に */
-            position: absolute !important; /* 位置も絶対位置で画面外に */
-            left: -9999px !important;
-            top: -9999px !important;
-            height: 0 !important;
-            width: 0 !important;
-            z-index: -1 !important;
-        }
-    </style>
 </head>
 <body>
-    <header>
-        <section id="header_top">
-            <div class="container">
-                <div class="row">
-                    <div class="col-sm-4 col-md-6">
-                        <a href="/index.html" alt="アブロードアウトソーシング株式会社ロゴ"><img src="/image/rogo.png" alt="アブロードアウトソーシング株式会社ロゴ"></a>
-                    </div>
-                    <div class="col-sm-8 col-md-6 right">
-                        <ul>
-                            <li><i class="fa fa-phone-square" aria-hidden="true"></i> 03-5835-0250（平日10時~19時）</li>
-                            <li><i class="fa fa-wpforms" aria-hidden="true"></i> <a href="form.html" class="no-link-style">お問い合わせフォーム</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section id="header_nav">
-            <nav class="navbar navbar-custom navbar-fixed-top" role="navigation">
-                <div class="container">
-                    <div class="navbar-header">
-                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
-                            <i class="fa fa-bars"></i>
-                        </button>
-                        <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
-                            <ul class="nav navbar-nav shade">
-                                <li class="top_down"><a class="page-scroll" href="index.html">HOME</a></li>
-                                <li class="dropdown">
-                                    <a href="service.html" class="button" aria-expanded="false">SERVICE<b class="caret"></b></a>
-                                    <ul class="dropdown-menu" role="menu">
-                                        <li class="not_top"><a href="input.html">データ入力サービス</a></li>
-                                        <li><a href="aggregate.html">データ集計・分析サービス</a></li>
-                                        <li><a href="scan.html">スキャニングサービス</a></li>
-                                        <li class="not_border"><a href="edit.html">画像編集・加工サービス</a></li>
-                                    </ul>
-                                </li>
-                                <li><a class="page-scroll" href="news.html">NEWS</a></li>
-                                <li class="dropdown">
-                                    <a href="about.html" class="button" aria-expanded="false">ABOUT<b class="caret"></b></a>
-                                    <ul class="dropdown-menu" role="menu">
-                                        <li class="not_top not_border"><a href="rule.html">プライバシーポリシー</a></li>
-                                        <li class="not_top not_border"><a href="recruit.html">リクルート</a></li>
-                                    </ul>
-                                </li>
-                                <li><a class="page-scroll" href="about.html#contact_up">CONTACT</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-        </section>
-    </header>
+    <header id="header-placeholder"></header>
+    <script>
+        loadComponent('header-placeholder', 'components/header.html');
+    </script>
+
+    <nav id="nav-placeholder"></nav>
+    <script>
+        loadComponent('nav-placeholder', 'components/nav.html');
+    </script>
+
     <main>
         <section id="form-top">
             <div class="container">
@@ -380,7 +89,7 @@
                             <div class="form-group">
                                 <label for="phone" class="must"><span class="badge badge-danger">必須</span> 電話番号</label>
                                 <input type="tel" id="phone" name="entry.1000004" class="form-control" required pattern="^(?:\+81|0)(?:\d{1,4})[-\s]?\d{1,4}[-\s]?\d{4}$" placeholder="例：03-5835-0250" title="電話番号の形式が正しくありません。例：03-5835-0250">
-                                <span class="error-message">電話番号の形式が正しくありません。例：03-5835-0250</span>
+                                <span class="error-message" id="phone-error-message">電話番号の形式が正しくありません。例：03-5835-0250</span>
                             </div>
 
                             <div class="form-group">
@@ -503,16 +212,14 @@
             </div>
         </section>
     </main>
-    <footer>
-        <div class="container">
-            <p class="last">Copyright (C) Abroad Outsourcing Co.,Inc. All rights reserved.</p>
-        </div>
-        <p id="page-top"><a href="#header_top"><i class="fa fa-arrow-circle-up fa-3x" aria-hidden="true"></i></a></p>
-    </footer>
+    <footer id="footer-placeholder"></footer>
+    <script>
+        loadComponent('footer-placeholder', 'components/footer.html');
+    </script>
+    <script src="https://kit.fontawesome.com/ac3b49c4bc.js" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-smooth-scroll/2.2.0/jquery.smoothscroll.min.js"></script> jQueryスムーズスクロールは後でプレーンJSに置き換え -->
 
     <script>
         const form = document.getElementById('contactForm');

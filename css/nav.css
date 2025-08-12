@@ -1,0 +1,132 @@
+/*========================================================
+navbar
+=======================================================*/
+#header_nav {
+  background-color: #082E5D;
+  text-align: center;
+  height: 50px;
+  margin-top: -25px;
+}
+li.dropdown:hover > .dropdown-menu{
+  display: block;
+}
+#header_nav li a{
+  color: #fff;
+  width: 230px;
+  height: 50px;
+  margin-top: -8px;
+  line-height: 30px;
+}
+#header_nav li a:hover{
+  transition: 1.0s;  
+  background-color: #fff;
+  color: #000099;
+  font-size: 20px;
+}
+#header_nav .dropdown-item {
+  background-color: #082E5D;
+  font-size: 13px;
+  text-align: left;
+  padding-top: 7px;
+}
+#header_nav .dropdown-item:hover {
+  font-size: 14px!important;
+  padding-left: 15px;
+}
+#header_nav .dropdown-menu {
+  background-color: #082E5D;  
+}
+#header_nav .dropdown-toggle:hover{
+  transition: 1.0s;
+}
+#header_nav .navbar-toggler-icon i{
+  color: aliceblue;
+}
+@media screen and (max-width: 1199px) {
+  #header_nav li a {
+    width: 190px;
+  }    
+}
+@media screen and (max-width: 991px) {
+  #header_nav li a {
+    width: 180px;
+    font-size: 13px;
+  } 
+  #header_nav .navbar-toggle {
+    color: #fff;
+  }
+}
+@media screen and (max-width: 928px) {
+  #header_nav li a {
+    width: 170px;
+  }
+  #header_nav .dropdown-item {
+    font-size: 11px;
+  }
+}
+@media screen and (max-width: 880px) {
+  #header_nav li a {
+    width: 160px;
+  }  
+}
+@media screen and (max-width: 830px) {
+  #header_nav li a {
+    width: 150px;
+  }  
+}
+@media screen and (max-width: 780px) {
+  #header_nav li a {
+    width: 140px;
+  }  
+}
+@media screen and (max-width: 730px) {
+  #header_nav li a {
+    width: 130px;
+  } 
+  #header_nav .dropdown-item {
+    font-size: 10px;
+  }
+}
+@media screen and (max-width: 680px) {
+  #header_nav li a {
+    width: 120px;
+  }  
+}
+@media screen and (max-width: 630px) {
+  #header_nav li a {
+    width: 110px;
+  }  
+}
+
+/*-----トグル-----*/
+@media screen and (max-width: 575px) {
+  button.navbar-toggler {
+    text-align: right;
+  }
+  #header_nav .navbar {
+    padding: 0px;
+    position:relative;
+    z-index:9998;
+  }
+  #header_nav .navbar-nav {
+    background-color: #082E5D;
+    text-align: left;
+  }
+  #header_nav li.nav-item {
+    border-bottom: 1px dotted #fff;
+  }
+  #header_nav .dropdown-item {
+    font-size: 13px;
+  }
+  #header_nav li a {
+    height: auto;
+    padding-left: 20px;
+  }
+  #header_nav li a {
+    width: 100%;
+    text-align: left!important;
+  }
+  #header_nav .dropdown-menu {
+    padding-left: 20px;
+  }
+}

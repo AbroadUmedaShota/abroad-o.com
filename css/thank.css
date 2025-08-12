@@ -1,0 +1,31 @@
+/*========================================================
+thank.html 
+========================================================*/
+#title_top {
+    height: 200px;
+    background-image: url(/image/top1.png);
+    background-attachment: fixed;
+}
+#title_top h2 {
+    margin-top: 0px;
+    padding-top: 90px;
+}
+
+section#thank_top .thank {
+    border:solid 3px #000099; 
+    margin: 80px 50px 80px 50px;
+    padding: 40px 80px 60px 80px;
+       
+}
+section#thank_top .thank h4{
+    padding: 10px 0px 20px 0px;
+    font-size: 23px;
+}
+section#thank_top .thank p{
+    font-weight: 600;
+    font-size: 15px;    
+    line-height: 25px;
+}
+section#thank_top .thank hr {
+    border-top:dashed 2px #000099; 
+}

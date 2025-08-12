@@ -1,0 +1,116 @@
+/*========================================================
+共通　カスタムボタン設定（上に戻るボタン）
+========================================================*/
+.no-link-style {
+  color: inherit; /* 親要素の色を継承する */
+  text-decoration: none; /* 下線を削除する */
+}
+
+.no-link-style:hover,
+.no-link-style:active,
+.no-link-style:visited {
+  color: inherit; /* 親要素の色を継承する */
+  text-decoration: none; /* 下線を削除する */
+}
+#page-top {
+  position: fixed;    
+  bottom: 20px;
+  right: 20px;
+}
+#page-top a {
+  background: #fff;
+  text-decoration: none;
+  color: #000099;
+  width: 48px;
+  height: 49px;
+  text-align: center;
+  display: block;
+  border-radius: 100px 100px 100px 100px;
+}
+#page-top a:hover {
+  text-decoration: none;
+  background: #6495ED;
+}
+.modal-body {
+  padding: 0px 0px 0px 7px;
+}
+/*=======フェードイン==========*/
+.fade-in {
+  transition: opacity 3.0s;
+  -moz-transition: opacity 3.0s;
+  -webkit-transition: opacity 3.0s;
+  -o-transition: opacity 3.0s;
+}
+/*========================================================
+共通
+========================================================*/
+/*----------中央寄せ----------*/
+.center {
+  text-align: center;
+}
+
+/*----------題目の区切り線----------*/
+.max-width-line {
+  text-align: center;
+  margin: 10px 0px 10px 0px;
+  /*background-image: url(image/top1.png);透過セット
+  background-attachment: fixed;
+  background-color:rgba(255,255,255,0.5);
+  background-blend-mode:lighten;*/
+}
+.max-width-line h3 {
+  padding: 5px 0px 5px 0px;
+  color: #fff;
+}
+
+/*----------三角矢印----------*/
+.triangle_orange {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  width: 0;
+  height: 0;
+  border-right: 100px solid transparent;
+  border-left: 100px solid transparent;
+  border-top: 100px solid #FFDAB9;
+}
+.triangle_blue {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  width: 0;
+  height: 0;
+  border-right: 100px solid transparent;
+  border-left: 100px solid transparent;
+  border-top: 100px solid #005FFF;
+}
+.triangle_font h3{
+  text-align: center;
+  font-size: 35px;
+  font-weight: 700;
+  margin-top: -130px;
+  margin-bottom: 100px;
+}
+@media screen and (max-width: 575px) {
+    .triangle_font h3 {
+       font-size: 25px; 
+    }
+}
+
+/*========================================================
+共通ボタン スタイル
+========================================================*/
+.btn-contact {
+  padding: 20px 10px;
+  background-color: #5CB85C;
+  border:solid 0px #fff;
+  color: #fff !important; 
+  text-decoration: none !important;
+}
+.btn-contact:hover {
+  background-color: #4cae4c;
+  color: #fff !important;
+  text-decoration: none !important;
+}

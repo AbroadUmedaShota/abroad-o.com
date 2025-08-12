@@ -1,0 +1,66 @@
+/*========================================================
+aggregate.html 
+========================================================*/
+#title_top {
+    height: 200px;
+    background-image: url(/image/top1.png);
+    background-attachment: fixed;
+}
+#title_top h2 {
+    margin-top: 0px;
+    padding-top: 90px;
+}
+.data-top p {
+    margin: 30px 0px 10px 0px;
+    font-size: 18px;
+}
+#data .col-md-4 {
+    width: 360px;
+    border:solid 1px #808080;
+    margin: 50px 0px 50px 20px;
+    text-align: center;
+}
+#data .col-md-4 img {
+    width: 100px;
+    margin:20px 0px;
+}
+#data .col-md-4 p {
+    padding: 20px 0px;
+}
+#data table {
+    margin-bottom: 50px;
+}
+#data-img img {
+    width: 450px;
+}
+#text-price h4 {
+    font-size: 20px;
+    margin:30px 0px 30px 0px;
+    background-color: #000099;    
+    color: #fff;    
+    padding: 10px 5px;    
+}
+#text-price table {
+    font-size: 12px;
+    width: 99%;
+}
+#text-price table .active th {
+    background-color: #CCCCCC;
+}
+#text-price table .active td {
+    background-color: #CCCCCC;
+}
+#bottom_img2 {
+    background-image: url(/image/cover1.jpg);
+    background-repeat: no-repeat;
+    background-position: bottom;
+    -moz-background-size: cover;
+    background-size: cover;
+    background-attachment: fixed;
+    text-align: center;
+    height: 300px;
+}
+#bottom_img2 .cover {
+    background-color: rgba(255,255,255,0);
+    padding-bottom: 70px;
+}

@@ -1,0 +1,37 @@
+/*========================================================
+footer
+========================================================*/
+footer {
+  background-color: #082E5D;
+  color: #fff;
+  text-align: center;
+}
+footer p.last {
+  padding:15px 0px 15px 0px;
+  margin: 0 auto;
+}
+@media screen and (max-width: 767px) {
+  footer p.last {
+    font-size: 15px;
+  }  
+}
+@media screen and (max-width: 567px) {
+  footer p.last {
+    font-size: 12px;
+  }  
+}
+@media screen and (max-width: 538px) { 
+    footer p {
+        font-size: 11px;
+    }
+}
+@media screen and (max-width: 467px) {
+  footer p.last {
+    font-size: 10px;
+  }  
+}
+@media screen and (max-width: 407px) {
+  footer p.last {
+    font-size: 8px;
+  }  
+}

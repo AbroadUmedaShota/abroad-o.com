@@ -1,0 +1,217 @@
+/*========================================================
+telework.html 
+========================================================*/
+#title_top {
+    height: 200px;
+    background-image: url(/image/top1.png);
+    background-attachment: fixed;
+}
+#title_top h2 {
+    margin-top: 0px;
+    padding-top: 90px;
+}
+
+section#tele_top h3 {
+  font-size: 35px;
+  margin: 50px 0px 30px 0px;
+}
+section#tele_top p {
+  font-size: 18px;
+  margin: 30px 0xp;
+}
+section#tele_top img {
+  width: 400px;
+}
+center {
+  margin: 30px 0px;
+}
+section#tele_mid1 {
+  background-position: center;
+  background-size: cover;
+  background-image: url(../image/tele_back.jpg);
+  background-attachment: fixed;
+}
+.tele_wrap {
+  background-color: rgba(0,0,0,0.5);
+}
+.tele-box1 h3{
+  color: #fff;
+  font-size: 35px;
+  margin: 50px 0px 30px 0px;
+}
+.tele-box1 h4{
+  color: #fff;
+  font-size: 15px;
+  text-align: center;
+}
+.tele-box1 span {
+  color: #f00;
+  background-color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+}
+.tele-box1 p{
+  color: #fff;
+  font-size: 18px;
+  margin: 30px 0px;
+  line-height: 1.5em;
+}
+.tele-box1 img {
+  width: 400px;
+}
+.tele-box1 small {
+  display: block;
+  color: #fff;
+  text-align: right;
+  margin-bottom: 15px;
+}
+.triangle {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  width: 0;
+  height: 0;
+  border-right: 100px solid transparent;
+  border-left: 100px solid transparent;
+  border-top: 100px solid #4472C4;
+}
+section#tele_mid2 h3{
+  text-align: center;
+  font-size: 40px;
+  font-weight: 700;
+  color: #f00;
+  margin-top: -130px;
+  margin-bottom: 100px;
+}
+.border_no {
+  margin: 15px 0px;
+}
+.border_left {
+  border-left: dotted 2px #fff; 
+  margin: 15px 0px;
+}
+section#tele_mid2 img {
+  width: 400px;
+}
+section#tele_mid2 p {
+  font-size: 18px;
+  font-weight: 700;
+}
+section#tele_mid2 ul {
+  padding-left:55px;
+}
+section#tele_mid3 h3{
+  text-align: center;
+  font-size: 35px;
+  font-weight: 700;
+  margin-top: -130px;
+  margin-bottom: 100px;
+}
+section#tele_mid3 .box {
+  margin: 20px 0px;
+  background: #4472C4;
+  border-radius: 5px 5px 5px 5px;
+  color: #fff;
+  padding: 10px 5px;
+}
+section#tele_mid3 .box h5{
+  font-weight: 700;
+  font-size: 20px;
+}
+section#tele_mid3 .col-md-9 {
+  border-right: dotted 1px #fff;
+}
+section#tele_mid3 .col-md-3 ul {
+  padding-top: 15px;;
+  padding-left: 10px;
+  margin-bottom: 0px;
+  list-style-type: none;
+}
+section#tele_mid3 .col-md-3 ul li {
+  margin: 0px 0px 10px 0px;
+  padding: 10px 0px 10px 5px;
+  background-color: #fff;
+  color:  #4472C4;
+}
+.big-btn .btn_center .btn {
+  padding: 30px 10px;
+  background-color: #5CB85C;
+  border:solid 0px #fff;
+}
+.cover-btn {
+  background-image: url(../image/big-btn1.jpg);
+  background-position: top;
+  background-size:cover;
+}
+.big-btn .btn_center .btn:hover {
+  background-color: #fff;
+  border:solid 2px #5CB85C;
+  color: #5CB85C;
+}
+.big-btn p {
+  margin: 30px 0px 0px 0px!important;
+  font-size: 25px!important;
+  text-align: center;
+}
+.big-btn center {
+  font-size: 30px;
+}
+.btn_wrap {
+  background-color: rgba(0,0,0,0.2);
+}
+section#tele_mid5 h3{
+  text-align: center;
+  font-size: 35px;
+  font-weight: 700;
+  margin-top: -130px;
+  margin-bottom: 100px;
+}
+section#tele_mid5 h5 {
+  font-size: 18px;
+  font-weight: 700;
+}
+section#tele_mid5 ul{
+  padding: 0;
+  position: relative;
+}
+section#tele_mid5 ul li{
+  color: #4472C4;
+  border-left: solid 6px #4472C4;
+  background: #f1f8ff;
+  margin-bottom: 3px;
+   line-height: 1.5;
+  padding: 0.5em;
+  list-style-type: none!important;
+}
+section#tele_mid5 i {
+  color: #4472C4;
+}
+section#tele_mid5 a {
+  font-size: 15px!important;
+  font-weight: 100!important;
+  text-decoration: none;
+}
+section#tele_mid6 h3{
+  text-align: center;
+  font-size: 35px;
+  font-weight: 700;
+  margin-top: -130px;
+  margin-bottom: 100px;
+}
+section#tele_mid6 .col-md-3 {
+  border:solid 1px #000;
+  margin-bottom: 50px;
+}
+section#tele_mid6 .col-md-3 h4 {
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  margin-top: 15px;
+}
+section#tele_mid6 .col-md-3 img {
+  width: 100px;
+}
+section#tele_mid6 .col-md-3 p {
+  font-size: 13px;
+}

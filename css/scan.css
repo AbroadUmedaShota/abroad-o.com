@@ -1,0 +1,127 @@
+/*========================================================
+scan.html
+========================================================*/
+#title_section {
+  height: 150px;
+  background-image: url(/image/top1.png);
+  background-attachment: fixed;     
+}
+#title_section h2 {
+  margin-top: 0px;
+  padding-top: 50px;
+}
+
+#scan_carousel .col-md-5 img{
+  height: 280px;
+  margin: 30px 0px 30px 30px;
+}
+#scan_carousel .col-md-7 h4 {
+  font-size: 28px;
+  padding: 50px 0px 30px 0px;
+  font-weight: 700;
+}
+#scan_carousel .col-md-7 h5 {
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 15px 0px 15px 0px;
+}
+#scan_carousel .col-md-7 h6 {
+  font-size: 23px;
+  padding: 15px 0px 0px 0px;
+  font-weight: 700;
+}
+
+.col-box {
+  border: 1px solid #000;
+  margin: 5px 0px;
+}
+.col-box h5 {
+  font-size: 15px;
+  padding-top: 10px;
+  font-weight: 700;
+}
+.col-box p {
+  font-size: 13px;
+  margin-bottom: 0px;
+}
+.col-box h6 {
+  font-size: 15px;  
+  margin: 10px 0px 10px 0px;
+}
+
+.col-box2 {
+  border: 1px solid #000;
+  margin: 5px 0px;
+}
+.col-box2 h5 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+.col-box2 p {
+  font-size: 13px;
+  margin-bottom: 0px;
+}
+.col-box2 img{
+  width: 55%;
+  padding-top: 10px;
+}
+
+#scan-third table tr.active {
+  background-color: #cccccc;
+}
+#scan-third table th, #scan-third table td {
+  padding: 7px 0px 7px 0px;
+  font-size: 13px;  
+}
+.price_caution {
+  font-size: 13px;    
+}
+
+#feature_section .col-md-3 {
+  border:solid 1px #000;
+  margin-bottom: 50px;
+}
+#feature_section .col-md-3 h4 {
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  margin-top: 15px;
+}
+#feature_section .col-md-3 img {
+  width: 100px;
+}
+#feature_section .col-md-3 p {
+  font-size: 13px;
+}
+
+#flow_section h3{
+  text-align: center;
+  font-size: 35px;
+  font-weight: 700;
+  margin-top: -130px;
+  margin-bottom: 100px;
+}
+#flow_section ul li{
+  border-left: solid 6px #005FFF;
+  background: #D9E5FF;
+  margin-bottom: 3px;
+  line-height: 1.5;
+  padding: 0.5em;
+  list-style-type: none!important;
+}
+
+#inquiry_section {
+  text-align: center;
+}
+#inquiry_section .cover-btn {
+  background-image: url(image/big-btn1.jpg);
+  background-size:cover;
+}
+#inquiry_section .btn_wrap {
+  background-color: rgba(0,0,0,0.2);
+}
+#inquiry_section p {
+  padding: 30px 0px 10px 0px;
+  font-size: 20px;
+}
