@@ -1,6 +1,17 @@
 /*========================================================
 共通　カスタムボタン設定（上に戻るボタン）
 ========================================================*/
+.no-link-style {
+  color: inherit; /* 親要素の色を継承する */
+  text-decoration: none; /* 下線を削除する */
+}
+
+.no-link-style:hover,
+.no-link-style:active,
+.no-link-style:visited {
+  color: inherit; /* 親要素の色を継承する */
+  text-decoration: none; /* 下線を削除する */
+}
 #page-top {
   position: fixed;    
   bottom: 20px;

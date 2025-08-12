@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" itemprop="description" content="" />
+    <meta name="description" itemprop="description" content="アブロードアウトソーシング株式会社の会社概要、企業理念、役員紹介ページです。データ入力、スキャニング、画像加工などのBPOサービスを提供しています。" />
     <meta name="keywords" content="スキャニング,データ入力,画像編集,集計,スキャニング依頼,コスト削減">       
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>アブロードアウトソーシング株式会社│ データ入力、スキャニング、画像加工ならお任せ！</title>
@@ -20,8 +20,19 @@
     
       gtag('config', 'UA-51168812-1');
     </script>    
-    <link href="css/bootstrap.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
+    <script>
+      function loadComponent(elementId, componentPath) {
+        fetch(componentPath)
+          .then(response => response.text())
+          .then(html => {
+            document.getElementById(elementId).innerHTML = html;
+          })
+          .catch(error => console.error(`Error loading component ${componentPath}:`, error));
+      }
+    </script>    
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+        <link rel="stylesheet" href="style3.css">
+    
     <!--[if lt IE 9]>
     <script src="http://css3-mediaqueries-js.googlecode.com/
     svn/trunk/css3-mediaqueries.js"></script>
@@ -33,82 +44,19 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     <!--カノニカルタグ-->
-    <link rel="canonical" href="http://on-ze.com">
+    <link rel="canonical" href="http://abroad-o.com/about.html">
     <!--favicon-->
     <link rel="shortcut icon" href="/image/fabicon.png" >
     <!-- Google Web Fonts-->
     <link href="https://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet">
-    <!-- 追加CSS -->
-    <style>
-      .no-link-style {
-        color: inherit; /* 親要素の色を継承する */
-        text-decoration: none; /* 下線を削除する */
-      }
-
-      .no-link-style:hover,
-      .no-link-style:active,
-      .no-link-style:visited {
-        color: inherit; /* 親要素の色を継承する */
-        text-decoration: none; /* 下線を削除する */
-      }
-    </style>
+    
   </head>
   <body>
     
-  <header> 
-    <section id="header_top">
-      <div class="container">
-        <div class="row">
-          <div class="col-sm-4 col-md-6">  
-            <a href="" target="_blank"><img src="/image/rogo.png" alt="ロゴ"></a>
-          </div>
-          <div class="col-sm-8 col-md-6 right">
-            <ul>
-              <li><i class="fa fa-phone-square" aria-hidden="true"></i>　03-5835-0250（平日10時~19時）</li>
-              <li><i class="fa fa-wpforms" aria-hidden="true"></i>　<a href="form.html" class="no-link-style">フォームでのお問合わせ</a></li>              
-            </ul>
-          </div>          
-        </div>
-      </div><!--container -->
-    </section>
-    
-    <section id="header_nav">
-      <!-- Navigation -->
-      <nav class="navbar navbar-custom navbar-fixed-top" role="navigation">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
-            <i class="fa fa-bars"></i>
-          </button>
-        <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
-        <!-- カスタムナビゲーション -->
-          <ul class="nav navbar-nav shade">
-            <li class="top_down"><a class="page-scroll" href="index.html">HOME</a></li>
-            <li class="dropdown">
-              <a href="service.html" class="button" aria-expanded="false">SERVICE<b class="caret"></b></a>
-              <ul class="dropdown-menu" role="menu">
-                <li class="not_top"><a href="input.html">データ入力サービス</a></li>
-                <li><a href="aggregate.html">データ集計・分析サービス</a></li>
-                <li><a href="scan.html">スキャニングサービス</a></li>
-                <li class="not_border"><a href="edit.html">画像編集・加工サービス</a></li>                
-              </ul>
-            </li>              
-            <li><a class="page-scroll" href="news.html">NEWS</a></li>            
-            <li class="dropdown">
-              <a href="about.html" class="button" aria-expanded="false">ABOUT<b class="caret"></b></a>
-              <ul class="dropdown-menu" role="menu">
-                <li class="not_top not_border"><a href="rule.html">プライバシーポリシー</a></li>  
-                <li class="not_top not_border"><a href="recruit.html">リクルート</a></li>                  
-              </ul>  
-            </li>      
-            <li><a class="page-scroll" href="about.html#contact_up">CONTACT</a></li>
-          </ul>
-          </div>
-        </div><!--nav-->
-      </div><!--container--> 
-      </nav>
-    </section>
-  </header>
+  <header id="header-placeholder"></header>
+  <script>
+    loadComponent('header-placeholder', 'components/header.html');
+  </script>
 
   <main>
     <section id="title_top">
@@ -145,7 +93,7 @@
                </tr>
                <tr>
                  <th>本社所在地</th>
-                 <td>〒101-0031<br>東京都千代田区東神田2-1-8　秋葉原クロスサイド4階（2019年12月27日　現在）</td>
+                 <td>〒101-0031<br>東京都千代田区東神田2-1-8　秋葉原クロスサイド4階</td>
                </tr>    
                <tr class="active">
                  <th>電話番号</th>
@@ -215,16 +163,10 @@
               </div>
               </div>  
             </div>               
-              <div class="fontsize-12" id="hidden-p">
-                <img src="/image/Profile-2.png" alt="林剛之">
-                <p>弊社は、データ入力サービスやスキャニングサービスを中心に、お客様の業務をサポートしてまいりました。一方でお客様から様々なご要望を頂き、各種施工サービスに留まらず、BPOサービスへとサービスを拡大致しました。
-                <br>当社はこれからも事業を通じて御社のビジネスの合理化・効率化を実現することをミッションとして、よりご満足いただけるサービスをご提供出来るように社員一同より一層の精進をして参ります。
-                <br>アブロードアウトソーシング株式会社を引き続き、ご支援賜りたく宜しくお願い申し上げます。<br>
-                <br>平成29年10月1日<br>アブロードアウトソーシング株式会社　代表取締役　林 剛之</p>   
-              </div>                
+                              
     			  <div class="row fade-in">
     			  <div class="col-md-6">    
-    			    <img src="/image/Profile-1.png" alt="写真">
+    			    <img src="/image/Profile-1.png" alt="林剛之のプロフィール写真">
     			  </div>      			    
     			    <div class="col-md-6">
               <h4>プロフィール</h4> 
@@ -288,13 +230,10 @@
     </section>
   </main>  
  
-    <footer>
-      <div class="container">
-        <p class="last">Copyright (C) Abroad Outsourcing Co.,Inc. All rights reserved.</p>
-      </div><!--container-->  
-      <!---スクロールボタン-->  
-      <p id="page-top"><a href="#header_top"><i class="fa fa-arrow-circle-up fa-3x" aria-hidden="true"></i></a></p>  
-    </footer>
+    <footer id="footer-placeholder"></footer>
+    <script>
+      loadComponent('footer-placeholder', 'components/footer.html');
+    </script>
   <!-- Modal -->
   <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -311,17 +250,15 @@
     </div>
   </div>
 
-    <!-- FontAwesome CDN -->
-    <script src="https://use.fontawesome.com/297671da61.js"></script>
-    <!-- Plugin JavaScript -->
-    <script src="js/jquery.easing.min.js"></script>
-    <!-- Custom JS -->
-    <script src="js/script.js"></script>
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="js/bootsnav.js"></script>
+    <!-- FontAwesome6 CDN -->
+      <script src="https://kit.fontawesome.com/ac3b49c4bc.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/1z2BjnM9ua1qZswl4uxMv3z3Q/pU2z2l4a6" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gybBud7TlRbs/ic4AwGcFZOxg5DpPt8EgeUIgIwzjWfXQKWA3" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    
+    
+    
+    
     <script src="js/jquery.smooth-scroll.min.js"></script>
     <script>
          $('a').smoothScroll();
