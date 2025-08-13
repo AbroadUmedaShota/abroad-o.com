@@ -39,27 +39,18 @@
     - `https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js`: Popper.js (Bootstrapの依存)。
     - `https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js`: Bootstrap JavaScript。
     - `https://kit.fontawesome.com/ac3b49c4bc.js`: Font Awesomeアイコン。
-    - `js/jquery.easing.min.js`: jQuery Easingプラグイン。
-    - `js/script.js`: カスタムJavaScript。
-    - `https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js`: 別のjQuery読み込み（重複）。
-    - `js/bootstrap.min.js`: 別のBootstrap JavaScript読み込み（重複）。
-    - `js/bootsnav.js`: ナビゲーション関連JavaScript。
     - `js/jquery.smooth-scroll.min.js`: スムーズスクロールプラグイン。
     - ページトップスクロールボタンのJavaScript。
-    - `//code.jquery.com/jquery-1.11.0.min.js`: 別のjQuery読み込み（重複）。
-    - `//code.jquery.com/jquery-migrate-1.2.1.min.js`: jQuery Migrateプラグイン。
     - `slick/slick.min.js`: Slick Carousel JavaScript。
     - Slick Carouselの初期化スクリプト。
 
 ## 5. 依存関係
 - **Bootstrap**: レイアウト、レスポンシブデザイン、ナビゲーション、ボタンなどに使用。
-- **jQuery**: DOM操作、イベント処理、各種プラグインの基盤。複数のバージョンが読み込まれており、整理が必要。
+- **jQuery**: DOM操作、イベント処理、各種プラグインの基盤。
 - **Font Awesome**: アイコン表示に使用。
 - **Slick Carousel**: 顧客ロゴのスライダー機能に使用。
 - **Google Analytics**: アクセス解析。
 
 ## 6. 備考
-- 現在、jQueryおよびBootstrapのJavaScriptファイルが複数回読み込まれており、パフォーマンスや競合の問題を引き起こす可能性がある。リファクタリングの際に整理が必要。
-- ファビコンのパスが`favicon.png`と`fabicon.png`で混在している可能性がある。
-- PHPの`include`は使用されていないため、静的なHTMLファイルとして機能している。
+
 
