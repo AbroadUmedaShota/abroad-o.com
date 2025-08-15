@@ -65,17 +65,13 @@ This is the main landing page for Abroad Outsourcing Co., Inc., serving as a com
     *   `slick/slick-theme.css`
 *   **JavaScript:**
     *   Google Analytics (`https://www.googletagmanager.com/gtag/js?id=UA-51168812-1`)
-    *   jQuery (`https://code.jquery.com/jquery-3.6.0.min.js`, `https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js`, `//code.jquery.com/jquery-1.11.0.min.js`, `//code.jquery.com/jquery-migrate-1.2.1.min.js`) - *Note: This page has multiple, highly redundant, and inconsistent jQuery imports from various versions and sources. This is a critical issue that will negatively impact performance, potentially cause JavaScript conflicts, and should be immediately consolidated to a single, consistent, and up-to-date version.*
+    *   jQuery (`https://code.jquery.com/jquery-3.6.0.min.js`) - *Note: The page now consistently uses a single version of jQuery.*
     *   Popper.js (`https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js`)
-    *   Bootstrap 4.5.2 JS (`https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js`) - *Note: This page uses Bootstrap 4 JavaScript, which is a different major version from Bootstrap 3 JavaScript (`js/bootstrap.min.js`) used on some other pages. This is a significant framework version inconsistency.*
-    *   FontAwesome 6 (`https://kit.fontawesome.com/ac3b49c4bc.js`) - *Note: Consistent FontAwesome 6 usage across `aggregate.html`, `edit.html`, `film.html`, and `index.html`. However, `about.html` and `form.html` still use older FontAwesome versions.*
-    *   `js/jquery.easing.min.js`
-    *   `js/script.js`
-    *   `js/bootstrap.min.js` (This local Bootstrap JS is redundant if Bootstrap 4 CDN is used.)
-    *   `js/bootsnav.js`
+    *   Bootstrap 4.5.2 JS (`https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js`) - *Note: This page uses Bootstrap 4, which is inconsistent with other pages on the site using Bootstrap 3.*
+    *   FontAwesome 6 (`https://kit.fontawesome.com/ac3b49c4bc.js`) - *Note: This is inconsistent with other pages on the site using older versions of FontAwesome.*
     *   `js/jquery.smooth-scroll.min.js`
     *   `slick/slick.min.js`
-    *   Inline JavaScript for scroll-to-top button functionality and Slick carousel initialization.
+    *   `js/custom.js` (Contains all custom logic for scroll-to-top, dropdowns, and the Slick carousel initialization, formerly inline JS).
 *   **External Resources:**
     *   Google Fonts (`https://fonts.googleapis.com/css2?family=Crimson+Text&display=swap`)
     *   OG Image (`https://www.abroad-o.com/image/og-image.jpg`)
