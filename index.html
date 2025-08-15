@@ -62,9 +62,9 @@
     </section>
     <!-- ナビゲーションメニュー部分 -->
     <section id="header_nav">
-        <nav class="navbar navbar-expand-sm justify-content-center">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"><i class="fas fa-toggle-on fa-2x"></i></span>
+        <nav class="navbar navbar-expand-sm justify-content-end">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mx-auto">
@@ -315,6 +315,36 @@
       });
       </script>
     <!-- スクロールボタン表示jQuery end-->
+
+    <script>
+    $(document).ready(function() {
+        // Function to handle dropdown behavior
+        function handleDropdowns() {
+            if ($(window).width() >= 768) { // Apply hover for screens larger than or equal to md breakpoint (768px)
+                $('.navbar .dropdown').hover(function() {
+                    $(this).find('.dropdown-menu').first().stop(true, true).delay(100).slideDown();
+                }, function() {
+                    $(this).find('.dropdown-menu').first().stop(true, true).delay(100).slideUp();
+                });
+
+                $('.navbar .dropdown > a').click(function() {
+                    location.href = this.href; // Allow click to navigate on desktop
+                });
+            } else {
+                // Ensure dropdowns are hidden on smaller screens when not toggled
+                $('.navbar .dropdown-menu').hide();
+            }
+        }
+
+        // Initial call
+        handleDropdowns();
+
+        // Re-evaluate on window resize
+        $(window).resize(function() {
+            handleDropdowns();
+        });
+    });
+    </script>
 
     <!-- Slick　スクロール-->
     
