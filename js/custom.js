@@ -62,4 +62,7 @@ $(document).ready(function() {
         cssEase: 'linear'
     });
 
+    // Set current year in footer
+    $('#current-year').text(new Date().getFullYear());
+
 });
