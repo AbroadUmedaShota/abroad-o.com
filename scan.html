@@ -38,63 +38,69 @@
   </head>
 
   <body>
-    <header> 
-      <section id="header_top">
+    <header>
+    <!-- ヘッダー上部 -->
+    <section id="header_top">
         <div class="container">
-          <div class="row">
-            <div class="col-sm-6 col-md-6">
-              
-
-            </div>
-            <div class="col-sm-6 col-md-6 top_right">
-              <div class="btn_center btn_top">
-                <button type="button" class="btn btn-danger btn-lg" onclick="location.href='form.html'"  tabindex="1" accesskey="U">
-                  <strong>　無料お見積り・お問合せはコチラ　</strong>
-                </button> 
-                <center><i class="fas fa-phone-square-alt"></i>　03-5835-0250（平日10時~19時）</center>
-              </div> 
-            </div>
-          </div><!--row-->
-        </div><!--container -->
-      </section>
-
-      <section id="header_nav">
-        <nav class="navbar navbar-expand-sm">
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"><i class="fas fa-toggle-on fa-2x"></i></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-              <li class="nav-item active">
-                <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="service.html" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">SERVICE</a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="input.html">データ入力サービス</a>
-                  <a class="dropdown-item" href="aggregate.html">データ集計・分析サービス</a>
-                  <a class="dropdown-item" href="scan.html">スキャニングサービス</a> 
-                  <a class="dropdown-item" href="edit.html">画像編集・加工サービス</a>
+            <div class="row">
+                <div class="col-sm-6 col-md-6">
+                    <a href="/index.html"><img src="/image/rogo.png" alt="アブロードアウトソーシング株式会社のロゴ"></a>
                 </div>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="news.html">NEWS</a>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="about.html" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">ABOUT</a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="rule.html">プライバシーポリシー</a>
-                  <a class="dropdown-item" href="recruit.html">リクルート</a>
+                <div class="col-sm-6 col-md-6 top_right">
+                    <div class="btn_center btn_top">
+                        <button type="button" class="btn btn-danger btn-lg" onclick="location.href='form.html'" tabindex="1" >
+                            <strong>無料お見積り・お問合せはコチラ</strong>
+                        </button>
+                        <center><i class="fas fa-phone-square-alt"></i> 03-5835-0250（平日10時~19時）</center>
+                    </div>
                 </div>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="about.html#contact_up">CONTACT</a>
-              </li>
-            </ul>
-          </div>
+            </div>
+        </div>
+    </section>
+    <!-- ナビゲーションメニュー部分 -->
+    <section id="header_nav">
+        <nav class="navbar navbar-expand-sm justify-content-end">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mx-auto">
+                    <!-- カスタムナビゲーション -->
+                    <!-- HOME -->
+                    <li class="nav-item active">
+                        <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <!-- SERVICE -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="service.html" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">SERVICE</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="input.html">データ入力サービス</a>
+                            <a class="dropdown-item" href="aggregate.html">データ集計・分析サービス</a>
+                            <a class="dropdown-item" href="scan.html">スキャニングサービス</a>
+                            <a class="dropdown-item" href="edit.html">画像編集・加工サービス</a>
+                        </div>
+                    </li>
+                    <!-- NEWS -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="news.html">NEWS</a>
+                    </li>
+                    <!-- ABOUT -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="about.html" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">ABOUT</a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="rule.html">プライバシーポリシー</a>
+                            <a class="dropdown-item" href="recruit.html">リクルート</a>
+                        </ul>
+                    </li>
+                    <!-- CONTACT -->
+                    <li class="nav-item">
+                        <a class="nav-link page-scroll" href="about.html#contact_up">CONTACT</a>
+                    </li>
+                </ul>
+            </div>
         </nav>
-      </section>
-    </header>
+    </section>
+</header>
 
     <main>
       <section id="title_section">
@@ -835,60 +841,20 @@
         <p class="last">Copyright (C) 2014-<span id="current-year"></span> Abroad Outsourcing Co.,Inc. All rights reserved.</p>
       </div><!--container-->
       <!---スクロールボタン-->
-      <p id="page-top"><a href="#header_top"><i class="fa fa-arrow-circle-up fa-3x" aria-hidden="true"></i></a></p>
+      <p id="page-top" aria-label="ページトップへ戻る">
+      <i class="fa fa-arrow-circle-up fa-3x" aria-hidden="true"></i></a></p>
     </footer>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS v4.5.2-->
-      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <!-- スクリプト -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <!-- FontAwesome6 CDN -->
-      <script src="https://kit.fontawesome.com/ac3b49c4bc.js" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/ac3b49c4bc.js" crossorigin="anonymous"></script>
     <!-- Plugin JavaScript -->
-      <script src="js/jquery.easing.min.js"></script>
+    <script src="js/jquery.smooth-scroll.min.js"></script>
+    <script type="text/javascript" src="slick/slick.min.js"></script>
     <!-- Custom JS -->
-      <script src="js/script.js"></script>
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-      <script src="js/bootstrap.min.js"></script>
-      <script type="text/javascript" src="js/bootsnav.js"></script>
-      <script src="js/jquery.smooth-scroll.min.js"></script>
-      <script>
-           $('a').smoothScroll();
-      </script>
-    <!-- ふわっと表示jQuery --> 
-      <script src="js/box-fadeup.js"></script>
-    <!-- スクロールボタン表示jQuery -->
-      <script>
-      $(function() {
-          var showFlag = false;
-          var topBtn = $('#page-top'); 
-          topBtn.css('bottom', '-150px');
-          var showFlag = false;
-          $(window).scroll(function () {
-              if ($(this).scrollTop() > 300) {//スクロールが300に達したらボタン表示
-                  if (showFlag == false) {
-                      showFlag = true;
-                      topBtn.stop().animate({'bottom' : '20px'}, 300); //スクロールボタンのmargin-bottm
-                  }
-              } else {
-                  if (showFlag) {
-                      showFlag = false;
-                      topBtn.stop().animate({'bottom' : '-200px'}, 300); //上に-200pxスクロールしたら消える 
-                  }
-              }
-      });
-      //スクロールしてトップ
-      topBtn.click(function () {
-          $('body,html').animate({
-              scrollTop: 0
-          }, 500);
-          return false;
-      });
-      });
-      </script>
-    <!-- スクロールボタン表示jQuery end-->
+    <script src="js/custom.js"></script>
   </body>
 </html>
