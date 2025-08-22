@@ -1,0 +1,305 @@
+/*========================================================
+共通　カスタムボタン設定（上に戻るボタン）
+========================================================*/
+#page-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+#page-top a {
+    background: #fff;
+    text-decoration: none;
+    color: #000099;
+    width: 40px;
+    height: 40px;
+    padding: 0px 0px;
+    text-align: center;
+    display: block;
+    border-radius: 100px;
+}
+#page-top a:hover {
+    text-decoration: none;
+    background: #6495ED;
+}
+.modal-body {
+    padding: 0px 0px 0px 7px;
+}
+/*=======フェードイン==========*/
+.fade-in {
+    opacity: 0; /* 初期状態は非表示 */
+    transition: opacity 3s ease-in-out;
+}
+.fade-in.is-visible {
+    opacity: 1;
+}
+/*========================================================
+iframe
+========================================================*/
+iframe {
+    border:solid 0px #fff;
+}
+/*========================================================
+header
+========================================================*/
+.navbar-fixed-top, .navbar-fixed-bottom {
+    position: static!important;
+}
+#header_top {
+    background-image: url(/image/top1.png);
+    background-attachment: fixed;
+    background-position: middle;
+    padding: 10px 0;
+}
+#header_top img {
+    width: 300px;
+    margin-top: 7px;
+    margin-bottom: 5px;
+}
+#header_top .right ul{
+    margin: 15px 0px 0px 150px;
+    font-size: 16px;
+    list-style-type: none;
+}
+@media screen and (max-width: 1199px) {
+    #header_top .right ul {
+        font-size: 15px;
+    }
+}
+@media screen and (max-width: 991px) {
+    #header_top h1 {
+        font-size: 13px;
+    }
+    #header_top img {
+        width: 220px;
+    }
+    #header_top .right ul {
+        margin-top: 5px;
+    }
+}
+@media screen and (max-width: 767px) {
+    #header_top .right ul {
+        margin: 0px 0px 10px -30px;
+    }
+}
+@media screen and (max-width: 704px) {
+    #header_top {
+        height: auto; /* 高さ自動調整に変更 */
+        padding: 5px 0;
+    }
+    #header_top h1 {
+        font-size: 11px;
+    }
+    .right {
+        text-align: left;
+    }
+}
+/*========================================================
+navbar
+========================================================*/
+#header_nav {
+    height: 50px;
+    background-color: #082E5D;
+}
+li.dropdown:hover > .dropdown-menu{
+  display: block;
+}
+#header_nav li {
+    background-color: #082E5D;
+    text-align: center;
+}
+#header_nav li a{
+    color: #fff;
+    width: 230px;
+
+}
+#header_nav li a:hover{
+    background-color: #fff;
+    color: #000099;
+    padding-left: 50px;
+    transition: 1.0s;
+}
+#header_nav li a:active{
+    background-color: #000;
+}
+ul.dropdown-menu {
+    background-color: #000099;
+}
+.dropdown-menu li a{
+    border-bottom: dotted 0.5px #fff;
+    height: 30px;
+}
+li.not_top a {
+    margin-top: -5px;
+}
+li.not_border a{
+    border-bottom: dotted 0px #fff!important;
+    margin-bottom: -5px;
+}
+@media screen and (max-width: 1199px) {
+    #header_nav li a{
+        width: 190px;
+    }
+}
+@media screen and (max-width: 991px) {
+    #header_nav li a{
+        width: 140px;
+        font-size: 13px;
+    }
+.navbar-toggle {
+    color: #fff;
+}
+}
+@media screen and (max-width: 704px) {
+    .navbar-toggle {
+        background-color: #082E5D;
+    }
+    li.top_down {
+        margin-top: 30px;
+    }
+}
+/*========================================================
+footer
+========================================================*/
+footer {
+    height: 50px;
+    background-color: #082E5D;
+    color: #fff;
+    text-align: center;
+}
+footer p {
+    margin-top: 15px;
+
+}
+/* @media */
+@media screen and (max-width: 767px) {
+    .container {
+       max-width: 99%;
+    }
+}
+@media screen and (max-width: 678px) {
+    textarea {
+        width: 99%;
+    }
+    input {
+        width: 99%;
+    }
+}
+@media screen and (max-width: 577px) {
+    .col-sm-4 {
+        width: 50%;
+    }
+    .home {
+       width: 50%;
+    }
+}
+.btn-submit {
+    width: 150px;
+}
+
+/* 個人情報の取り扱いに関するテキストとチェックボックスを中央に配置 */
+.message-box {
+    text-align: center;
+    margin: 20px auto;
+    max-width: 100%; /* 必要に応じて調整 */
+}
+
+/* 以前の誤ったセレクタを削除またはコメントアウト */
+/*
+.form-group.mt-3.d-flex.align-items-center.justify-content-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+*/
+
+/* 同意チェックボックスとラベルを中央揃え */
+.consent-container {
+    margin-top: 1rem;
+    /* text-align: center; /* この行はFlexboxを使用するため不要 */
+    display: flex; /* Flexboxコンテナにする */
+    justify-content: center; /* 子要素を水平方向に中央揃え */
+    align-items: center; /* 子要素を垂直方向に中央揃え（必要であれば） */
+    width: 100%;
+    max-width: 100%;
+}
+
+/* consent-container 内のラベルのスタイル調整 */
+.consent-container label {
+    display: inline-flex; /* label自体もflexにして内部のcheckboxとspanを揃える */
+    align-items: center; /* checkboxとspanを垂直中央揃え */
+    /* vertical-align: middle; はinline-flexの場合も効果がありますが、align-itemsがより正確です */
+}
+
+
+  .no-link-style {
+    color: inherit;
+    text-decoration: none;
+  }
+  .no-link-style:hover,
+  .no-link-style:active,
+  .no-link-style:visited {
+    color: inherit;
+    text-decoration: none;
+  }
+  .scroll-spy {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+  .message-box {
+    background-color: #f0f0f0;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  .required-label::after {
+    content: " *";
+    color: #f00;
+  }
+  /* エラー表示のスタイル */
+  .form-control.invalid {
+    border-color: #f00;
+  }
+  .error-message {
+    color: #f00;
+    display: none; /* 初期状態では非表示 */
+  }
+  .error-message.error-visible {
+     display: block; /* エラー時に表示 */
+  }
+
+.scroll-spy table {
+    width: 100%;
+    table-layout: fixed;
+}
+.scroll-spy th, .scroll-spy td {
+    word-break: break-word;
+}
+.scroll-spy th {
+    font-weight: bold;
+}
+.scroll-spy table {
+    width: 98%; /* 幅を98%に調整 */
+    /* table-layout: fixed; を削除 */
+    margin: 0 auto; /* 中央寄せ */
+}
+.scroll-spy th, .scroll-spy td {
+    word-break: break-word;
+}
+.scroll-spy th {
+    font-weight: bold;
+}
+
+/* テーブル内のカラム幅調整 */
+.table_agree th:nth-child(1),
+.table_agree td:nth-child(1) {
+    width: 25%; /* 左カラムの幅を25%に設定 (調整可能) */
+}
+
+.table_agree th:nth-child(2),
+.table_agree td:nth-child(2) {
+    width: 75%; /* 右カラムの幅を75%に設定 (調整可能) */
+}
