@@ -7,10 +7,14 @@
     right: 20px;
     z-index: 1000;
 }
-#page-top a {
-    background: #fff;
+#page-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: #000099;
     text-decoration: none;
-    color: #000099;
+    color: #fff;
     width: 40px;
     height: 40px;
     padding: 0px 0px;
@@ -18,7 +22,7 @@
     display: block;
     border-radius: 100px;
 }
-#page-top a:hover {
+#page-top:hover {
     text-decoration: none;
     background: #6495ED;
 }
