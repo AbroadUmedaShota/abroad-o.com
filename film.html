@@ -416,23 +416,21 @@
     </div>
   </div>
 
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="js/bootstrap.min.js"></script>
     <!-- FontAwesome5 CDN -->
     <script src="https://kit.fontawesome.com/ac3b49c4bc.js" crossorigin="anonymous"></script>
     <!-- Plugin JavaScript -->
-    <script src="js/jquery.easing.min.js"></script>
-    <!-- Custom JS -->
-    <script src="js/script.js"></script>
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="js/bootsnav.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootsnav/1.2.0/js/bootsnav.min.js"></script>
     <script src="js/jquery.smooth-scroll.min.js"></script>
+    <!-- ふわっと表示jQuery -->
+    <script src="js/box-fadeup.js"></script>
     <script>
          $('a').smoothScroll();
     </script>
-    <!-- ふわっと表示jQuery -->
-    <script src="js/box-fadeup.js"></script>
     <!-- スクロールボタン表示jQuery -->
     <script>
     $(function() {
@@ -461,6 +459,10 @@
         return false;
     });
     });
+    </script>
+    <!-- Footer Year Update -->
+    <script>
+      document.getElementById('current-year').textContent = new Date().getFullYear();
     </script>
   </body>
 </html>
