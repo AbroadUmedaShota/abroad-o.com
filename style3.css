@@ -91,7 +91,7 @@
 header
 ========================================================*/
 #header_top {
-  background-image: url(/image/top1.png);    
+  background-image: url(image/top1.png);    
   background-attachment: fixed;
   background-position: middle;
 }
@@ -398,7 +398,7 @@ footer p.last {
 
 /*----------トップ画----------*/
 section#top {
-  background-image: url(/image/top1.png);
+  background-image: url(image/top1.png);
   background-repeat: no-repeat;
   background-position: top;
   -moz-background-size: cover;
@@ -684,7 +684,7 @@ section#service2 .container {
 }
 /*----------中間背景----------*/
 .bottom_img {
-  background-image: url(/image/top1.png);    
+  background-image: url(image/top1.png);    
   background-repeat: no-repeat;
   background-position: bottom;
   -moz-background-size: cover;
@@ -839,7 +839,7 @@ section#pre_footer .col-md-5 img {
 /*----------題名----------*/
 #title_section {
   height: 150px;
-  background-image: url(/image/top1.png);
+  background-image: url(image/top1.png);
   background-attachment: fixed;     
 }
 #title_section h2 {
@@ -1344,4 +1344,5 @@ section#pre_footer .col-md-5 img {
 }
 .disabled-link {
     pointer-events: none;
+};
 }

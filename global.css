@@ -50,7 +50,7 @@ header
     position: static!important;
 }
 #header_top {
-    background-image: url(/image/top1.png);
+    background-image: url(image/top1.png);
     background-attachment: fixed;
     background-position: middle;
     padding: 10px 0;
