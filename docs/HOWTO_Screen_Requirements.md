@@ -49,7 +49,6 @@ Below is a list of all screen requirements definition documents that have been g
 *   [news.md](screen_requirements/news.md)
 *   [recruit.md](screen_requirements/recruit.md)
 *   [rule.md](screen_requirements/rule.md)
-*   [sample.md](screen_requirements/sample.md)
 *   [sample2.md](screen_requirements/sample2.md)
 *   [scan.md](screen_requirements/scan.md)
 *   [service-pack.md](screen_requirements/service-pack.md)
