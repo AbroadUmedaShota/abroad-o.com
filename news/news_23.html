@@ -24,141 +24,58 @@
     <link rel="icon" href="../image/favicon.png" type="image/png">
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700|Crimson+Text" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Roboto', 'Crimson Text', sans-serif;
-            background-color: #f5f5f5;
-        }
         #news_top .container {
             padding-top: 30px;
             padding-bottom: 30px;
         }
-        .greeting-card {
-            background-color: #ffffff;
-            border-radius: 6px;
-            padding: 28px 32px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        .greeting-block {
+            background: #fff;
+            padding: 22px 24px;
             margin-top: 12px;
-            line-height: 1.8;
+            border: 1px solid #e5e5e5;
+            line-height: 1.75;
+        }
+        .greeting-block h1 {
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 8px;
+            color: #0f2f59;
         }
         .greeting-meta {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 10px;
-            color: #5a5a5a;
+            color: #666;
             margin-bottom: 12px;
             font-size: 14px;
         }
-        .meta-badge {
-            display: inline-block;
-            background: #082E5D;
-            color: #fff;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            letter-spacing: 0.4px;
-        }
-        .greeting-card h1 {
-            font-size: 26px;
-            color: #082E5D;
-            font-weight: 700;
-            margin-top: 0;
-            margin-bottom: 12px;
-        }
-        .greeting-card .lead {
-            font-size: 16px;
-            color: #333;
-            margin-bottom: 12px;
-        }
-        .greeting-card .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #082E5D;
-            margin-top: 18px;
-            margin-bottom: 10px;
-        }
-        .highlight-box {
-            background: #f0f6ff;
-            border-left: 4px solid #082E5D;
-            padding: 14px 16px;
-            border-radius: 4px;
+        .greeting-block p {
             margin-bottom: 14px;
-        }
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 12px;
-            margin: 4px 0 16px;
-        }
-        .info-item {
-            background: #f9fbff;
-            border: 1px solid #e1ecff;
-            border-radius: 6px;
-            padding: 14px 16px;
-            height: 100%;
-        }
-        .info-item .label {
-            font-size: 13px;
-            color: #6b7a90;
-            letter-spacing: 0.4px;
-            text-transform: uppercase;
-            margin-bottom: 4px;
-        }
-        .info-item .value {
-            font-size: 17px;
-            color: #082E5D;
-            font-weight: 700;
-            line-height: 1.6;
-        }
-        .info-item .note-text {
-            font-size: 14px;
-            color: #4a4a4a;
-            margin: 8px 0 0;
-        }
-        .highlight-box p {
-            margin: 0;
-            color: #193b6b;
-            font-weight: 500;
-        }
-        .list-unstyled {
-            padding-left: 0;
-            list-style: none;
-            margin-bottom: 0;
-        }
-        .list-unstyled li {
-            margin-bottom: 8px;
             color: #222;
         }
-        .list-unstyled li span {
+        .info-list {
+            padding-left: 0;
+            list-style: none;
+            margin: 0 0 12px;
+        }
+        .info-list li {
+            margin-bottom: 6px;
+        }
+        .info-term {
             display: inline-block;
             min-width: 7em;
             color: #555;
             font-weight: 600;
         }
-        .note {
-            font-size: 14px;
-            color: #777;
-            margin-top: 6px;
-            margin-bottom: 0;
-        }
-        .contact-cta {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 12px;
-            padding: 10px 16px;
-            border-radius: 6px;
-            border: 1px solid #082E5D;
-            color: #082E5D;
-            font-weight: 600;
+        .contact-link {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 8px 14px;
+            border: 1px solid #0f2f59;
+            color: #0f2f59;
             text-decoration: none;
-            transition: all 0.2s ease;
         }
-        .contact-cta:hover {
-            background: #082E5D;
+        .contact-link:hover {
+            background: #0f2f59;
             color: #fff;
             text-decoration: none;
-            box-shadow: 0 2px 10px rgba(8, 46, 93, 0.15);
         }
         .news-detail-back-link {
             margin-top: 20px;
@@ -234,42 +151,24 @@
       <div class="row">
         <div class="col-xs-12 col-md-8 col-md-offset-2">
           <p class="news-detail-back-link"><a href="../news.html" class="btn btn-default">&laquo; ニュース一覧に戻る</a></p>
-          <div class="greeting-card" id="news_23">
+          <div class="greeting-block" id="news_23">
             <h1>年末年始のご挨拶</h1>
-            <div class="greeting-meta">
-              <span class="meta-badge">Seasonal</span>
-              <span>公開日：2025年12月20日</span>
-            </div>
-            <p class="lead">平素は格別のご愛顧を賜り、誠にありがとうございます。本年も皆様のご支援により、多くのプロジェクトを無事に完遂することができました。スタッフ一同、心より御礼申し上げます。</p>
+            <div class="greeting-meta">公開日：2025年12月20日</div>
+            <p>平素は格別のご愛顧を賜り、誠にありがとうございます。本年も皆様のご支援により、多くのプロジェクトを無事に完遂することができました。スタッフ一同、心より御礼申し上げます。</p>
 
-            <p class="lead">年末年始に際し、皆様のご健康とご多幸をお祈りするとともに、来る年も変わらぬご厚情を賜りますようお願い申し上げます。下記の通り、休業期間とお問い合わせ対応についてご案内いたします。</p>
+            <p>年末年始に際し、皆様のご健康とご多幸をお祈りするとともに、来る年も変わらぬご厚情を賜りますようお願い申し上げます。下記の通り、休業期間とお問い合わせ対応についてご案内いたします。</p>
 
-            <div class="highlight-box">
-              <p>年末年始休業期間：<strong>2025年12月28日（日）～2026年1月5日（月）</strong></p>
-            </div>
+            <p><strong>年末年始休業期間：</strong>2025年12月28日（日）～2026年1月5日（月）</p>
 
-            <div class="info-grid">
-              <div class="info-item">
-                <div class="label">休業期間中</div>
-                <div class="value">お問い合わせ・ご入稿は受付のみ</div>
-                <p class="note-text">いただいた内容は、営業開始日に順次対応いたします。</p>
-              </div>
-              <div class="info-item">
-                <div class="label">対応開始日</div>
-                <div class="value">2026年1月6日（火）より再開</div>
-                <p class="note-text">通常営業に戻り次第、最短でご連絡を差し上げます。</p>
-              </div>
-            </div>
-
-            <div class="section-title">お問い合わせ・ご入稿対応</div>
-            <ul class="list-unstyled">
-              <li><span>休業期間中</span>いただいたお問い合わせ・ご入稿は受付のみとなります。</li>
-              <li><span>対応開始</span>2026年1月6日（火）より順次対応いたします。</li>
+            <p>お問い合わせ・ご入稿について</p>
+            <ul class="info-list">
+              <li><span class="info-term">休業期間中</span>いただいたお問い合わせ・ご入稿は受付のみとなります。</li>
+              <li><span class="info-term">対応開始</span>2026年1月6日（火）より順次対応いたします。</li>
             </ul>
 
-            <p class="lead" style="margin-top: 18px;">2026年も、より一層皆様のお役に立てるようサービス向上に努めてまいります。引き続きご愛顧のほどよろしくお願い申し上げます。どうぞ良いお年をお迎えください。</p>
-            <p class="note">作成日：2025/12/20</p>
-            <a class="contact-cta" href="../about.html#contact_up"><i class="fa fa-envelope" aria-hidden="true"></i>お問い合わせフォームへ</a>
+            <p>2026年も、より一層皆様のお役に立てるようサービス向上に努めてまいります。引き続きご愛顧のほどよろしくお願い申し上げます。どうぞ良いお年をお迎えください。</p>
+            <p style="margin-bottom: 8px;">作成日：2025/12/20</p>
+            <a class="contact-link" href="../about.html#contact_up">お問い合わせフォームへ</a>
           </div>
         </div>
       </div>
