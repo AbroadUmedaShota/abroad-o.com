@@ -374,7 +374,7 @@ index.html
     padding-bottom: 70px;
 }
 #bottom_img2 {
-    background-image: url(/image/cover1.jpg);
+    background-image: url(image/cover1.jpg);
     background-repeat: no-repeat;
     background-position: bottom;
     -moz-background-size: cover;
@@ -1137,7 +1137,7 @@ section#about_top a:hover{
 }
 section#title_top2 {
     height: 200px;
-    background-image: url(/image/top1.jpg);
+    background-image: url(image/top1.jpg);
     background-attachment: fixed;    
     background-position: bottom;
 }
@@ -1163,7 +1163,7 @@ section#title_top2 h2 {
     margin-left: 100px;
 }
 #tabref-ContentC .image-back {
-    background-image: url(/image/Profile-2.png);
+    background-image: url(image/Profile-2.png);
     background-size: contain;
     background-repeat: no-repeat;
     color: #fff;
@@ -1569,7 +1569,7 @@ section#form-top th.must {
     background-color: red !important;
 }
 section#form-top th.nomust {
-    background-image:url(/image/nomust_ic.png);
+    background-image:url(image/nomust_ic.png);
     background-repeat:no-repeat;
     background-position:95% 50%;
     padding-right:40px;

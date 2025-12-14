@@ -703,7 +703,7 @@ section#service2 .container {
   padding-bottom: 70px;
 }
 section#bottom_img2 {
-  background-image: url(/image/cover1.jpg);         
+  background-image: url(image/cover1.jpg);         
   background-repeat: no-repeat;
   background-position: bottom;
   -moz-background-size: cover;

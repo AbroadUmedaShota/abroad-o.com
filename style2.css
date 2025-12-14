@@ -70,7 +70,7 @@ section#main_box .btn-primary a {
 header_top
 ========================================================*/
 section#header_top {
-    background-image: url(/image/top1.png);    
+    background-image: url(image/top1.png);    
     background-attachment: fixed;    
 }
 section#header_top img {
@@ -258,7 +258,7 @@ li.not_border a{
 title_header
 ==================================*/
 section#title_header {
-    background-image: url(/image/background2.png);
+    background-image: url(image/background2.png);
     background-repeat: no-repeat; 
     text-align: center;
     background-position: center;
@@ -328,7 +328,7 @@ section#title_header .col-md-6 b {
 }
 @media screen and (max-width: 767px) {
     section#title_header {
-        background-image: url(/image/background2-1.jpg);
+        background-image: url(image/background2-1.jpg);
         background-repeat: no-repeat; 
         text-align: center;
         background-position: center;
@@ -535,7 +535,7 @@ section#main_box .hover-color {
 price
 ==================================*/
 section#price {
-    background-image: url(/image/price-back.jpg);
+    background-image: url(image/price-back.jpg);
     background-position: left;
     background-size: cover;
 }
@@ -732,7 +732,7 @@ section#flow .hover-color {
 example
 ==================================*/
 section#example {
-    background-image: url(/image/background-example.jpg);
+    background-image: url(image/background-example.jpg);
     background-position: left;
     background-size: cover;
 }
@@ -887,7 +887,7 @@ section#form-box {
   margin: 30px 0px 30px 0px;
 }
 section#form-box .title_height {
-    background-image: url(/image/background2.jpg);  
+    background-image: url(image/background2.jpg);  
     background-size: cover;
 }
 section#form-box .title_height h2 {
@@ -908,7 +908,7 @@ section#thank_top {
   margin: 30px 0px 30px 0px;
 }
 section#thank_top .back-wrap {
-    background-image: url(/image/background-example.jpg);  
+    background-image: url(image/background-example.jpg);  
     background-size: cover;
     background-position: center;
 }
