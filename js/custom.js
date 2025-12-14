@@ -51,16 +51,18 @@ $(document).ready(function() {
     })();
 
     // Slick Slider Initialization (Revised for continuous scroll)
-    $('.autoplay').slick({
-        dots: true,
-        infinite: true,
-        slidesToShow: 3,
-        slidesToScroll: 1,
-        autoplay: true,
-        autoplaySpeed: 0, // Set to 0 for continuous scroll
-        speed: 5000,      // This now controls the duration of the scroll animation
-        cssEase: 'linear'
-    });
+    if ($.fn.slick) {
+        $('.autoplay').slick({
+            dots: true,
+            infinite: true,
+            slidesToShow: 3,
+            slidesToScroll: 1,
+            autoplay: true,
+            autoplaySpeed: 0, // Set to 0 for continuous scroll
+            speed: 5000,      // This now controls the duration of the scroll animation
+            cssEase: 'linear'
+        });
+    }
 
     // Set current year in footer
     $('#current-year').text(new Date().getFullYear());
