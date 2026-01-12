@@ -30,6 +30,10 @@
             border-color: #007bff;
             outline: none;
         }
+        #input-area:empty:before {
+            content: attr(data-placeholder);
+            color: #6c757d;
+        }
         .output-area {
             font-family: monospace;
             background: #e9ecef;
@@ -58,7 +62,7 @@
         <div class="row">
             <div class="col-md-12">
                 <h5>1. 入力 (ここにペースト)</h5>
-                <div id="input-area" contenteditable="true" placeholder="ここに貼り付けてください..."></div>
+                <div id="input-area" contenteditable="true" data-placeholder="ここに貼り付けてください..."></div>
             </div>
         </div>
 
@@ -127,7 +131,7 @@
         if (wrapOption === 'p') {
             // Pタグで囲む処理
             // 不要なdivやpを一旦正規化
-            let content = tempDiv.innerHTML.replace(/<\/p>|<\/div>/gi, '\n').replace(/<p>|<div>|<br>/gi, '');
+            let content = tempDiv.innerHTML.replace(/<\/p>|<\/div>/gi, '\n').replace(/<p>|<div>|<br\s*\/?>/gi, '');
             const lines = content.split('\n');
             
             lines.forEach(line => {
@@ -140,6 +144,7 @@
             // BRタグに変換する処理
             let content = tempDiv.innerHTML;
             content = content.replace(/<div>|<p>/gi, '').replace(/<\/div>|<\/p>/gi, '<br>');
+            content = content.replace(/<br\s*\/?>/gi, '<br>');
             if (ignoreEmpty) {
                 content = content.replace(/(<br>\s*){2,}/gi, '<br>');
             }
@@ -234,10 +239,16 @@
         setTimeout(convert, 10);
     });
 
-    copyBtn.addEventListener('click', () => {
-        outputSource.select();
-        document.execCommand('copy');
-        alert('クリップボードにコピーしました');
+    copyBtn.addEventListener('click', async () => {
+        const text = outputSource.value;
+        try {
+            await navigator.clipboard.writeText(text);
+            alert('クリップボードにコピーしました');
+        } catch {
+            outputSource.select();
+            document.execCommand('copy');
+            alert('クリップボードにコピーしました');
+        }
     });
 
     clearBtn.addEventListener('click', () => {
