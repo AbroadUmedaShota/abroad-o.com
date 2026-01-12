@@ -31,7 +31,8 @@ ExcelやWordからコピーした装飾付きテキストを、ウェブサイ�
 
 ## 3. 変換ルール
 - **太字**: `font-weight: bold` または `<b>`, `<strong>` などを `<strong>` に変換。
-- **文字色**: インラインスタイルの `color` を抽出し、`<span style="color: #xxxxxx">` に変換。
+- **文字色**: インラインスタイルの `color` を抽出し、`<span style="color: #xxxxxx">` に変換。ただし、黒色（rgb(0,0,0)等）は省略する。
+- **URL**: `http` または `https` で始まる文字列を自動的に `<a href="..." target="_blank" rel="noopener noreferrer">...</a>` に変換する。
 - **クリーニング**:
   - `style` 属性のうち `color` 以外のすべてを除去。
   - `class`, `id`, `onclick` などのイベント属性をすべて除去。

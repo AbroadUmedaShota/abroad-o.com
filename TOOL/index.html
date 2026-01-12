@@ -148,6 +148,12 @@
             if (resultHtml.endsWith('<br>')) resultHtml = resultHtml.slice(0, -4);
         }
 
+        // URLをリンクに変換
+        const urlRegex = /(https?:\/\/[^\s<]+)/g;
+        resultHtml = resultHtml.replace(urlRegex, (url) => {
+            return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+        });
+
         outputSource.value = resultHtml.trim();
         previewArea.innerHTML = resultHtml.trim();
     }
