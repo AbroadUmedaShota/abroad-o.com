@@ -90,8 +90,33 @@ document.addEventListener('DOMContentLoaded', () => {
         linkifyTextNodes(finalDiv, urlRegex);
         resultHtml = finalDiv.innerHTML;
         
-        outputSource.value = resultHtml.trim();
+        outputSource.value = formatHtml(resultHtml);
         previewArea.innerHTML = resultHtml.trim();
+    }
+
+    function formatHtml(html) {
+        if (!html) return "";
+        
+        // 1. Basic cleaning
+        let formatted = html.trim();
+        
+        // 2. Add newlines before/after block elements
+        // This regex adds a newline after closing tags and before opening tags of block elements
+        const blockElements = 'p|div|ul|ol|li|table|thead|tbody|tr|td|th|h[1-6]|br|hr|header|section|article';
+        
+        // Add newline after these tags
+        formatted = formatted.replace(new RegExp(`(</(?:${blockElements})>|<br\\s*/?>)`, 'gi'), '$1\n');
+        
+        // Add newline before these tags (if not already preceded by one)
+        formatted = formatted.replace(new RegExp(`(<(?:${blockElements})[ >])`, 'gi'), '\n$1');
+        
+        // 3. Cleanup: Remove multiple newlines and leading/trailing whitespace per line
+        formatted = formatted.split('\n')
+            .map(line => line.trim())
+            .filter(line => line.length > 0)
+            .join('\n');
+            
+        return formatted;
     }
 
     function linkifyTextNodes(node, regex) {
