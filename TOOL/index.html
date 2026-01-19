@@ -1,262 +1,159 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+    <!-- メタタグ設定 -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ExcelテキストHTML変換ツール | アブロードアウトソーシング</title>
+    <title>社内ツールポータル │ アブロードアウトソーシング株式会社</title>
+    
+    <!-- CSSファイルの読み込み -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <link rel="stylesheet" href="../style3.css">
+    
     <style>
-        body {
-            background-color: #f8f9fa;
-            padding-top: 20px;
+        .tool-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        .tool-container {
-            background: #fff;
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .tool-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #003366;
+        }
+        .card-body {
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .card-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .card-text {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+        #portal-hero {
+            background: linear-gradient(135deg, #003366 0%, #001a33 100%);
+            color: white;
+            padding: 60px 0;
             margin-bottom: 50px;
+            text-align: center;
         }
-        #input-area {
-            min-height: 200px;
-            border: 2px dashed #ccc;
-            padding: 15px;
+        #portal-hero h1 {
+            font-weight: bold;
             margin-bottom: 20px;
-            background: #fff;
-            overflow-y: auto;
         }
-        #input-area:focus {
-            border-color: #007bff;
-            outline: none;
+        .btn-tool {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: background 0.2s;
         }
-        #input-area:empty:before {
-            content: attr(data-placeholder);
-            color: #6c757d;
+        .btn-tool:hover {
+            background-color: #0056b3;
+            color: white;
         }
-        .output-area {
-            font-family: monospace;
-            background: #e9ecef;
-        }
-        #preview-area {
-            border: 1px solid #dee2e6;
-            padding: 15px;
-            background: #fff;
-            min-height: 100px;
-        }
-        .option-group {
-            background: #f1f3f5;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+        footer {
+            margin-top: 80px;
+            padding: 40px 0;
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+            color: #666;
         }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <div class="tool-container">
-        <h2 class="text-center mb-4">ExcelテキストHTML変換ツール</h2>
-        <p class="text-muted small text-center">ExcelやWordからコピーした文章を貼り付けてください。太字と文字色を維持してHTML化します。</p>
-
-        <div class="row">
-            <div class="col-md-12">
-                <h5>1. 入力 (ここにペースト)</h5>
-                <div id="input-area" contenteditable="true" data-placeholder="ここに貼り付けてください..."></div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-12">
-                <div class="option-group">
-                    <h5>2. 変換オプション</h5>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="wrapOption" id="wrapP" value="p" checked>
-                        <label class="form-check-label" for="wrapP">各行を &lt;p&gt; で囲む</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="wrapOption" id="wrapBr" value="br">
-                        <label class="form-check-label" for="wrapBr">改行を &lt;br&gt; に変換</label>
-                    </div>
-                    <hr>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ignoreEmpty" checked>
-                        <label class="form-check-label" for="ignoreEmpty">連続する空行を無視する</label>
-                    </div>
+<header>
+    <!-- ヘッダー上部 -->
+    <section id="header_top">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6 col-md-6">
+                    <a href="../index.html"><img src="../image/rogo.png" alt="アブロードアウトソーシング株式会社のロゴ"></a>
                 </div>
             </div>
         </div>
+    </section>
+</header>
 
+<main>
+    <section id="portal-hero">
+        <div class="container">
+            <h1>Linste Production Tools</h1>
+            <p>制作支援・業務効率化のための社内ツールポータル</p>
+        </div>
+    </section>
+
+    <div class="container">
         <div class="row">
-            <div class="col-md-12">
-                <h5>3. 出力 (HTMLソース)</h5>
-                <textarea id="output-source" class="form-control output-area" rows="8" readonly></textarea>
-                <div class="text-right mt-2">
-                    <button id="copy-btn" class="btn btn-primary">ソースをコピー</button>
-                    <button id="clear-btn" class="btn btn-secondary">クリア</button>
+            <!-- HTML変換ツール（トリプルビュー） -->
+            <div class="col-md-4 mb-4">
+                <div class="card tool-card">
+                    <div class="card-body">
+                        <div class="tool-icon">
+                            <i class="fas fa-file-code"></i>
+                        </div>
+                        <h5 class="card-title">トリプルHTML変換</h5>
+                        <p class="card-text">入力・プレビュー・ソースの3画面で効率的にHTML変換を行います（リンステ専用）。</p>
+                        <a href="convert.html" class="btn btn-tool">ツールを開く</a>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row mt-4">
-            <div class="col-md-12">
-                <h5>4. プレビュー</h5>
-                <div id="preview-area"></div>
+            <!-- ExcelテキストHTML変換ツール -->
+            <div class="col-md-4 mb-4">
+                <div class="card tool-card">
+                    <div class="card-body">
+                        <div class="tool-icon">
+                            <i class="fas fa-file-excel"></i>
+                        </div>
+                        <h5 class="card-title">Excel HTML変換</h5>
+                        <p class="card-text">ExcelやWordからコピーした文章のスタイルを維持したまま、簡単なHTMLタグへ変換します。</p>
+                        <a href="excel_to_html.html" class="btn btn-tool">ツールを開く</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ローカルフォルダ作成支援ツール -->
+            <div class="col-md-4 mb-4">
+                <div class="card tool-card">
+                    <div class="card-body">
+                        <div class="tool-icon">
+                            <i class="fas fa-folder-plus"></i>
+                        </div>
+                        <h5 class="card-title">フォルダ作成支援</h5>
+                        <p class="card-text">フォルダ名のリストから、コマンドプロンプト用の一括作成コマンドを生成します。</p>
+                        <a href="mkfolder.html" class="btn btn-tool">ツールを開く</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</main>
 
-<script>
-    const inputArea = document.getElementById('input-area');
-    const outputSource = document.getElementById('output-source');
-    const previewArea = document.getElementById('preview-area');
-    const copyBtn = document.getElementById('copy-btn');
-    const clearBtn = document.getElementById('clear-btn');
+<footer>
+    <div class="container">
+        <p>&copy; Abroad Outsourcing Inc. All Rights Reserved.</p>
+        <p class="small"><a href="../index.html">ホームページへ戻る</a></p>
+    </div>
+</footer>
 
-    // 変換処理のメイン
-    function convert() {
-        // 入力エリアのクローンを作成して処理
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = inputArea.innerHTML;
-
-        // クリーニング処理（構造とスタイルを整理）
-        cleanElement(tempDiv);
-
-        const wrapOption = document.querySelector('input[name="wrapOption"]:checked').value;
-        const ignoreEmpty = document.getElementById('ignoreEmpty').checked;
-
-        let resultHtml = "";
-
-        if (wrapOption === 'p') {
-            // Pタグで囲む処理
-            // 不要なdivやpを一旦正規化
-            let content = tempDiv.innerHTML.replace(/<\/p>|<\/div>/gi, '\n').replace(/<p>|<div>|<br\s*\/?>/gi, '');
-            const lines = content.split('\n');
-            
-            lines.forEach(line => {
-                let cleanLine = line.trim();
-                if (cleanLine === "" && ignoreEmpty) return;
-                if (cleanLine === "") cleanLine = "&nbsp;";
-                resultHtml += `<p>${cleanLine}</p>\n`;
-            });
-        } else {
-            // BRタグに変換する処理
-            let content = tempDiv.innerHTML;
-            content = content.replace(/<div>|<p>/gi, '').replace(/<\/div>|<\/p>/gi, '<br>');
-            content = content.replace(/<br\s*\/?>/gi, '<br>');
-            if (ignoreEmpty) {
-                content = content.replace(/(<br>\s*){2,}/gi, '<br>');
-            }
-            resultHtml = content.trim();
-            // 文末の不要なbrを削除
-            if (resultHtml.endsWith('<br>')) resultHtml = resultHtml.slice(0, -4);
-        }
-
-        // URLをリンクに変換
-        const urlRegex = /(https?:\/\/[^\s<]+)/g;
-        resultHtml = resultHtml.replace(urlRegex, (url) => {
-            return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
-        });
-
-        outputSource.value = resultHtml.trim();
-        previewArea.innerHTML = resultHtml.trim();
-    }
-
-    // 要素のクリーニング（再帰的）
-    function cleanElement(parent) {
-        const children = Array.from(parent.childNodes);
-        
-        children.forEach(node => {
-            if (node.nodeType === 1) { // Element node
-                const tagName = node.tagName.toLowerCase();
-                
-                // 元のスタイル情報を取得
-                let color = node.style.color;
-                let fontWeight = node.style.fontWeight;
-
-                // 黒（rgb(0, 0, 0) または #000000）は省略する
-                if (color === 'rgb(0, 0, 0)' || color === '#000000' || color === 'black') {
-                    color = "";
-                }
-                
-                // 太字の判定 (Excelは b, strong, または style)
-                let isBold = (fontWeight === 'bold' || parseInt(fontWeight) >= 600 || tagName === 'b' || tagName === 'strong');
-
-                // 子要素を先に再帰的にクリーン（子要素のスタイルが消えるのを防ぐため）
-                cleanElement(node);
-
-                // 属性を全て削除（styleも一旦消える）
-                while (node.attributes.length > 0) {
-                    node.removeAttribute(node.attributes[0].name);
-                }
-
-                // タグの付け替え・正規化
-                let targetNode = node;
-                if (isBold && tagName !== 'strong') {
-                    const strong = document.createElement('strong');
-                    while (node.firstChild) strong.appendChild(node.firstChild);
-                    node.parentNode.replaceChild(strong, node);
-                    targetNode = strong;
-                }
-
-                // スタイルの再適用（色がある場合のみspanで囲むかスタイル付与）
-                if (color) {
-                    if (targetNode.tagName.toLowerCase() === 'span') {
-                        targetNode.style.color = color;
-                    } else {
-                        const span = document.createElement('span');
-                        span.style.color = color;
-                        while (targetNode.firstChild) span.appendChild(targetNode.firstChild);
-                        targetNode.appendChild(span);
-                    }
-                }
-
-                // 不要なタグの整理
-                const finalTagName = targetNode.tagName.toLowerCase();
-                if (finalTagName === 'span' && !targetNode.getAttribute('style')) {
-                    // スタイルのないspanは解除
-                    while (targetNode.firstChild) targetNode.parentNode.insertBefore(targetNode.firstChild, targetNode);
-                    targetNode.parentNode.removeChild(targetNode);
-                } else if (finalTagName !== 'span' && finalTagName !== 'strong' && finalTagName !== 'br' && finalTagName !== 'p' && finalTagName !== 'div') {
-                    // 許可されていないタグは中身だけ残す
-                    while (targetNode.firstChild) targetNode.parentNode.insertBefore(targetNode.firstChild, targetNode);
-                    targetNode.parentNode.removeChild(targetNode);
-                }
-            }
-        });
-    }
-
-    // イベントリスナー
-    inputArea.addEventListener('input', convert);
-    document.querySelectorAll('input').forEach(input => {
-        input.addEventListener('change', convert);
-    });
-
-    // ペースト時のプレーンテキスト化を防ぎつつ、HTML構造を維持
-    inputArea.addEventListener('paste', (e) => {
-        // 少し遅延させて実行することで、ブラウザのデフォルトペースト結果を処理対象にする
-        setTimeout(convert, 10);
-    });
-
-    copyBtn.addEventListener('click', async () => {
-        const text = outputSource.value;
-        try {
-            await navigator.clipboard.writeText(text);
-            alert('クリップボードにコピーしました');
-        } catch {
-            outputSource.select();
-            document.execCommand('copy');
-            alert('クリップボードにコピーしました');
-        }
-    });
-
-    clearBtn.addEventListener('click', () => {
-        inputArea.innerHTML = "";
-        outputSource.value = "";
-        previewArea.innerHTML = "";
-    });
-</script>
-
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

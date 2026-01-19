@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const STORAGE_KEY = 'linst_tool_settings';
+    const scrollTargets = [inputArea, previewArea, outputSource];
+    let isSyncingScroll = false;
 
     function loadSettings() {
         const settings = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -49,6 +51,22 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { toast.className = ""; }, 2500);
     }
 
+    function syncScroll(source) {
+        if (isSyncingScroll) return;
+        isSyncingScroll = true;
+
+        const sourceMax = source.scrollHeight - source.clientHeight;
+        const ratio = sourceMax > 0 ? source.scrollTop / sourceMax : 0;
+
+        scrollTargets.forEach(target => {
+            if (target === source) return;
+            const targetMax = target.scrollHeight - target.clientHeight;
+            target.scrollTop = targetMax > 0 ? ratio * targetMax : 0;
+        });
+
+        isSyncingScroll = false;
+    }
+
     function convert() {
         // const wrapOption = document.querySelector('input[name="wrapOption"]:checked').value; // No longer primary logic
         // const doConvertList = document.getElementById('convertList').checked; // Handled naturally by preserving UL/LI
@@ -72,11 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 3. Post-processing (Images, URLs)
         resultHtml = tempDiv.innerHTML;
-
-        // Image tag replacement (Text based)
-        resultHtml = resultHtml.replace(/\[画像[:：]\s*([^\]]+)\]/g, (match, filename) => {
-            return `<img src="image/${filename.trim()}" class="img-responsive" alt="">`;
-        });
 
         // URL linking
         // Only linkify text that isn't already inside an <a> tag
@@ -157,9 +170,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function isNonBlackColor(color) {
+        if (!color) return false;
+        const trimmed = color.trim();
+        if (!trimmed) return false;
+        if (/^transparent$/i.test(trimmed)) return false;
+        return !(/^(#000000|#000|rgb\(0,\s*0,\s*0\)|rgba\(0,\s*0,\s*0,\s*1\)|black)$/i.test(trimmed));
+    }
+
     function cleanNode(node) {
-        // Allowed tags list (Removed 'span')
-        const allowedTags = ['p', 'br', 'div', 'strong', 'b', 'em', 'i', 'u', 'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'td', 'th', 'a', 'img', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+        // Allowed tags list
+        const allowedTags = ['p', 'br', 'b', 'a'];
         
         // Remove comments
         if (node.nodeType === 8) {
@@ -170,11 +191,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (node.nodeType === 1) { // Element
             const tag = node.tagName.toLowerCase();
 
+            if (tag === 'strong') {
+                const bold = document.createElement('b');
+                while (node.firstChild) {
+                    bold.appendChild(node.firstChild);
+                }
+                node.parentNode.replaceChild(bold, node);
+                cleanNode(bold);
+                return;
+            }
+
             // Special handling for Style (Color and Bold)
-            const color = node.style.color;
+            const color = node.style.color || node.getAttribute('color');
             const fontWeight = node.style.fontWeight;
-            const hasColor = color && !(/rgb\(0, 0, 0\)|#000000|black/i.test(color));
-            const isBold = fontWeight === 'bold' || parseInt(fontWeight) >= 600;
+            const hasColor = isNonBlackColor(color);
+            const isBold = tag === 'strong' || (tag === 'b' && fontWeight !== 'normal') || fontWeight === 'bold' || parseInt(fontWeight) >= 600;
 
             // If it's bold but not a strong tag, wrap it or convert it later
             // But for simplicity, we can convert the current node if it's a span or similar
@@ -183,49 +214,60 @@ document.addEventListener('DOMContentLoaded', () => {
             const attrs = Array.from(node.attributes);
             attrs.forEach(attr => {
                 const name = attr.name.toLowerCase();
-                if (['href', 'src', 'alt', 'target', 'rel', 'colspan', 'rowspan', 'class'].includes(name)) {
-                    if (name === 'class') {
-                        const cls = attr.value;
-                        if (!cls.includes('table') && !cls.includes('img-responsive')) {
-                             node.removeAttribute('class');
-                        }
-                    }
-                    return;
-                }
+                if (tag === 'a' && ['href', 'target', 'rel'].includes(name)) return;
                 node.removeAttribute(name);
             });
 
             // Restore allowed styles
+            node.style.cssText = '';
             if (hasColor) {
                 node.style.color = color;
             }
             if (isBold) {
-                // If it's a block or important tag, keep style, otherwise we'll prefer strong
-                if (tag === 'p' || tag === 'div' || tag.startsWith('h')) {
+                if (tag === 'p') {
                     node.style.fontWeight = 'bold';
                 }
+            } else if (tag === 'b' && hasColor) {
+                node.style.fontWeight = 'normal';
             }
 
             // Unwrap disallowed tags
-            // Special exception: allow span IF it has color
             let shouldUnwrap = !allowedTags.includes(tag);
-            if (tag === 'span' && hasColor) {
-                shouldUnwrap = false;
-            }
 
             if (shouldUnwrap) {
                 if (['style', 'script', 'meta', 'link', 'title'].includes(tag)) {
                     node.parentNode.removeChild(node);
                     return;
                 }
+
+                if (!node.parentNode) {
+                    Array.from(node.childNodes).forEach(child => cleanNode(child));
+                    return;
+                }
                 
-                // If it was bold, wrap children in strong before unwrapping
+                // Preserve color and bold when unwrapping disallowed tags
+                let wrapper = null;
+                if (hasColor) {
+                    wrapper = document.createElement('b');
+                    wrapper.style.color = color;
+                    if (!isBold) wrapper.style.fontWeight = 'normal';
+                }
                 if (isBold && tag !== 'strong' && tag !== 'b') {
-                    const strong = document.createElement('strong');
+                    const strong = document.createElement('b');
                     while (node.firstChild) {
                         strong.appendChild(node.firstChild);
                     }
-                    node.appendChild(strong);
+                    if (wrapper) {
+                        wrapper.appendChild(strong);
+                        node.appendChild(wrapper);
+                    } else {
+                        node.appendChild(strong);
+                    }
+                } else if (wrapper) {
+                    while (node.firstChild) {
+                        wrapper.appendChild(node.firstChild);
+                    }
+                    node.appendChild(wrapper);
                 }
 
                 while (node.firstChild) {
@@ -235,14 +277,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Post-clean: if it's a bold tag (b/strong) and has bold style, remove style
-            if ((tag === 'strong' || tag === 'b') && node.style.fontWeight) {
-                node.style.fontWeight = '';
-                if (node.getAttribute('style') === '') node.removeAttribute('style');
-            }
+            // Post-clean: if bold tag has no styles, drop style attr
+            if (tag === 'b' && node.getAttribute('style') === '') node.removeAttribute('style');
             
-            // Empty P or DIV removal
-            if ((tag === 'p' || tag === 'div') && node.innerHTML.trim() === '' && node.querySelectorAll('br, img').length === 0) {
+            // Empty P removal
+            if (tag === 'p' && node.innerHTML.trim() === '' && node.querySelectorAll('br').length === 0) {
                  const br = document.createElement('br');
                  node.parentNode.replaceChild(br, node);
                  return;
@@ -254,6 +293,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event Listeners
     inputArea.addEventListener('input', convert);
+    scrollTargets.forEach(target => {
+        target.addEventListener('scroll', () => syncScroll(target));
+    });
     
     const normalizeCheck = document.getElementById('normalizeChars');
     if (normalizeCheck) {
