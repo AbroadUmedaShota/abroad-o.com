@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>アブロードアウトソーシング株式会社 | お問い合わせフォーム</title>
-    <meta name="description" content="アブロードアウトソーシング株式会社へのお問い合わせフォームです。データ入力、スキャニング、画像加工に関するご質問、お見積もりはこちらから。" />
+    <title>アブロードアウトソーシング株式会社│お問い合わせフォーム</title>
+    <meta name="description" content="アブロードアウトソーシング株式会社へのお問い合わせフォームです。データ入力、スキャニング、画像加工に関するご相談やお見積もりはこちらから。">
     <meta name="google-site-verification" content="Nqa719cJbf2AfjLk6kCgmpJHM73egoAodcPCb-cdyyc" />
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-51168812-1"></script>
     <script>
@@ -83,6 +83,7 @@
         }
 
         /* form-top */
+        section#form-top h1,
         section#form-top h2 {
             background-color: #082E5D;
             color: #fff;
@@ -204,60 +205,55 @@
             box-sizing: border-box; /* paddingとborderをwidthに含める */
         }
 
-    /* 同意チェックボックスとラベルを中央揃え */
-    .consent-container {
-        margin-top: 1rem;
-        /* text-align: center; /*コンテナ全体を中央揃え*/ /* この行を削除またはコメントアウト */
-        display: flex; /* Flexboxコンテナにする */
-        justify-content: center; /* 子要素を水平方向に中央揃え */
-        align-items: center; /* 子要素を垂直方向に中央揃え（必要であれば） */
-        width: 100%;
-        max-width: 100%;
-    }
+        /* 同意チェックボックスとラベルを中央揃え */
+        .consent-container {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 100%;
+        }
 
-    /* .consent-container label のスタイルは変更なしでOKですが、念のため確認 */
-    .consent-container label {
-        display: inline-block; /* インラインブロック要素 */
-        vertical-align: middle; /* 必要に応じて、チェックボックスとテキストの垂直方向の揃えを維持 */
-
+        .consent-container label {
+            display: inline-block;
+            vertical-align: middle;
+        }
 
         .consent-container input[type="checkbox"] {
-            margin: 0;
+            margin: 0 8px 0 0;
             vertical-align: middle;
-            appearance: none; /* ブラウザのデフォルトスタイルを無効化 */
+            appearance: none;
             -webkit-appearance: none;
-            width: 16px; /* サイズを固定 */
+            width: 16px;
             height: 16px;
-            border: 1px solid #999; /* 枠線 */
-            border-radius: 3px; /* 角丸 */
-            background-color: #fff; /* 背景色 */
-            margin-right: 8px; /* テキストとの間隔 */
-            cursor: pointer; /* カーソルをポインターに */
+            border: 1px solid #999;
+            border-radius: 3px;
+            background-color: #fff;
+            cursor: pointer;
         }
-        /* チェックされたときのスタイル */
+
         .consent-container input[type="checkbox"]:checked {
-            background-color: #007bff; /* 背景色 */
-            border-color: #007bff; /* 枠線 */
+            background-color: #007bff;
+            border-color: #007bff;
         }
 
         .consent-container input[type="checkbox"]:checked::after {
-            content: '\2713'; /* チェックマークを表示 */
+            content: '\2713';
             display: block;
             text-align: center;
-            color: #fff; /* チェックマークの色 */
+            color: #fff;
             font-size: 14px;
-            line-height: 14px; /* チェックマークの位置調整 */
+            line-height: 14px;
         }
 
-
         .consent-container span {
-            /* display: inline-block; 削除*/
             vertical-align: middle;
-            /* margin-left: 0.5em; 削除*/
         }
 
         /* より小さい画面用のスタイル */
         @media screen and (max-width: 480px) {
+            section#form-top h1,
             section#form-top h2 {
                 font-size: 16px;
             }
@@ -340,8 +336,9 @@
             <div class="container">
                 <!-- フォームヘッダー -->
                 <h1 style="text-align: center;">お問い合わせ・お見積もりフォーム</h1>
+                <iframe id="form-submit-frame" name="form-submit-frame" title="お問い合わせフォーム送信用" style="display: none;" aria-hidden="true"></iframe>
                 <!-- フォーム全体 -->
-                <form action="https://docs.google.com/forms/d/e/1FAIpQLSducG_PN_pRRvNlEyEjI8RRUJbhFLKXPr--iopScCsDZhkZ9A/formResponse" method="post" id="contactForm" target="_self">
+                <form action="https://docs.google.com/forms/d/e/1FAIpQLSducG_PN_pRRvNlEyEjI8RRUJbhFLKXPr--iopScCsDZhkZ9A/formResponse" method="post" id="contactForm" target="form-submit-frame">
                     <!-- フォームテーブル -->
                    <div id="form-tbl" class="form-group">
                         <table id="form" class="table" style="width: 100%;">
@@ -367,19 +364,19 @@
 
                             <div class="form-group">
                                 <label for="email" class="must"><span class="badge badge-danger">必須</span> メールアドレス</label>
-                                <input type="email" id="email" name="entry.1000003" class="form-control" required pattern="^[\w\.-]+@[\w\.-]+\.\w{2,}$" placeholder="例：info@abroad-o.com" title="正しいメールアドレスを入力してください。">
+                                <input type="email" id="email" name="entry.1000003" class="form-control" required pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$" placeholder="例：info@abroad-o.com" title="正しいメールアドレスを入力してください。">
                                 <span class="error-message">正しいメールアドレスを入力してください。</span>
                             </div>
 
                             <!-- ハニーポットフィールドの追加 -->
-                            <div class="form-group honeypot">
-                                <label for="honeypot_email">メールアドレス（入力しないでください）</label>
-                                <input type="text" id="honeypot_email" name="entry.1234567890" class="form-control" tabindex="-1" autocomplete="off">
+                            <div class="form-group honeypot" aria-hidden="true">
+                                <label for="honeypot_email" aria-hidden="true">メールアドレス（入力しないでください）</label>
+                                <input type="text" id="honeypot_email" name="entry.1234567890" class="form-control" tabindex="-1" autocomplete="off" aria-hidden="true">
                             </div>
 
                             <div class="form-group">
                                 <label for="phone" class="must"><span class="badge badge-danger">必須</span> 電話番号</label>
-                                <input type="tel" id="phone" name="entry.1000004" class="form-control" required pattern="^(?:\+81|0)(?:\d{1,4})[-\s]?\d{1,4}[-\s]?\d{4}$" placeholder="例：03-5835-0250" title="電話番号の形式が正しくありません。例：03-5835-0250">
+                                <input type="tel" id="phone" name="entry.1000004" class="form-control" required pattern="^(?:\+81|0)\d{1,4}[- ]?\d{1,4}[- ]?\d{4}$" placeholder="例：03-5835-0250" title="電話番号の形式が正しくありません。例：03-5835-0250">
                                 <span class="error-message">電話番号の形式が正しくありません。例：03-5835-0250</span>
                             </div>
 
@@ -517,79 +514,112 @@
     <script>
         const form = document.getElementById('contactForm');
         const formFeedback = document.getElementById('form-feedback');
-        const honeypotField = document.getElementById('honeypot_email'); // ハニーポットフィールドを取得
+        const honeypotField = document.getElementById('honeypot_email');
+        const emailField = document.getElementById('email');
+        const phoneField = document.getElementById('phone');
+        const emailError = emailField.nextElementSibling;
+        const phoneError = phoneField.nextElementSibling;
+        const submitButton = document.querySelector('.btn-submit');
+        const submitFrame = document.getElementById('form-submit-frame');
+        const emailPattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+        const phonePattern = /^(?:\+81|0)\d{1,4}[- ]?\d{1,4}[- ]?\d{4}$/;
+        let submitted = false;
+
+        function setFieldError(field, errorElement, hasError) {
+            field.classList.toggle('invalid', hasError);
+            errorElement.classList.toggle('error-visible', hasError);
+        }
+
+        [emailField, phoneField].forEach((field) => {
+            field.addEventListener('input', () => {
+                if (field === emailField) {
+                    setFieldError(emailField, emailError, !emailPattern.test(emailField.value.trim()));
+                } else {
+                    setFieldError(phoneField, phoneError, !phonePattern.test(phoneField.value.trim()));
+                }
+            });
+        });
 
         // フォーム表示時刻を記録（ページロード時）
         const formLoadTime = Date.now();
         const MIN_SUBMISSION_TIME_MS = 3000; // 最低送信時間（ミリ秒、例: 3秒）
 
-        form.addEventListener('submit', (event) => {
-            event.preventDefault();
+        submitFrame.addEventListener('load', () => {
+            if (!submitted) {
+                return;
+            }
 
-            // 1. ハニーポットチェック
+            submitted = false;
+            window.location.href = 'thank.html';
+        });
+
+        form.addEventListener('submit', (event) => {
+            formFeedback.textContent = '';
+            formFeedback.style.color = '';
+            setFieldError(emailField, emailError, false);
+            setFieldError(phoneField, phoneError, false);
+
             if (honeypotField.value !== '') {
-                // ハニーポットフィールドに値が入力されている場合はボットと判断し、サイレントに処理を終了
                 console.warn('Bot detected via honeypot.');
-                formFeedback.textContent = 'エラーが発生しました。再度お試しいただくか、別の方法でご連絡ください。'; // ユーザーには一般的なエラーを表示
+                event.preventDefault();
+                formFeedback.textContent = 'エラーが発生しました。再度お試しいただくか、別の方法でご連絡ください。';
                 formFeedback.style.color = 'red';
                 return;
             }
 
-            // 2. 時間ベースのチェック
             const submissionTime = Date.now();
             const elapsedTime = submissionTime - formLoadTime;
 
             if (elapsedTime < MIN_SUBMISSION_TIME_MS) {
-                // 送信時間が短すぎる場合はボットと判断し、サイレントに処理を終了
                 console.warn('Bot detected: Submission too fast.');
-                formFeedback.textContent = 'エラーが発生しました。再度お試しいただくか、別の方法でご連絡ください。'; // ユーザーには一般的なエラーを表示
+                event.preventDefault();
+                formFeedback.textContent = 'エラーが発生しました。再度お試しいただくか、別の方法でご連絡ください。';
                 formFeedback.style.color = 'red';
+                return;
+            }
+
+            if (!emailPattern.test(emailField.value.trim())) {
+                event.preventDefault();
+                setFieldError(emailField, emailError, true);
+                emailField.focus();
+                return;
+            }
+
+            if (!phonePattern.test(phoneField.value.trim())) {
+                event.preventDefault();
+                setFieldError(phoneField, phoneError, true);
+                phoneField.focus();
                 return;
             }
 
             const consentCheckbox = document.getElementById('consent');
             if (!consentCheckbox.checked) {
+                event.preventDefault();
                 alert('個人情報の取扱について同意をお願いします。');
                 return;
             }
 
-            const submitButton = document.querySelector('.btn-submit');
-            submitButton.disabled = true; // 送信ボタンを無効化
-
-            const formData = new FormData(form);
-
-            fetch(event.target.action, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: formData
-            })
-                .then(() => {
-                    formFeedback.innerHTML = 'お問い合わせありがとうございます。<br>送信が完了しました。';
-                    formFeedback.style.color = 'green';
-                    // form.reset(); // フォームをリセットしない（または必要に応じて後でリセット）
-
-                    // thanks.html へのリダイレクト
-                    setTimeout(() => {
-                        window.location.href = 'thank.html'; // ここを修正
-                    }, 5000); // 5秒後にリダイレクト
-                })
-                .catch((error) => {
-                    formFeedback.textContent = 'エラーが発生しました。再度お試しいただくか、別の方法でご連絡ください。';
-                    formFeedback.style.color = 'red';
-                    console.error('Error:', error);
-                })
-                .finally(() => {
-                    submitButton.disabled = false; // finally で無効化を解除
-                });
+            submitted = true;
+            submitButton.disabled = true;
+            formFeedback.textContent = '送信中です。';
         });
 
 
         // smoothScroll (jQuery 不要)
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
+            const targetSelector = anchor.getAttribute('href');
+            if (!targetSelector || targetSelector.length <= 1) {
+                return;
+            }
 
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
+            anchor.addEventListener('click', function (e) {
+                const target = document.querySelector(targetSelector);
+                if (!target) {
+                    return;
+                }
+
+                e.preventDefault();
+                target.scrollIntoView({
                     behavior: 'smooth'
                 });
             });
