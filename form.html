@@ -517,6 +517,7 @@
         const honeypotField = document.getElementById('honeypot_email');
         const emailField = document.getElementById('email');
         const phoneField = document.getElementById('phone');
+        const inquiryDetailsField = document.getElementById('inquiry_details');
         const emailError = emailField.nextElementSibling;
         const phoneError = phoneField.nextElementSibling;
         const submitButton = document.querySelector('.btn-submit');
@@ -524,6 +525,11 @@
         const emailPattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
         const phonePattern = /^(?:\+81|0)\d{1,4}[- ]?\d{1,4}[- ]?\d{4}$/;
         let submitted = false;
+
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('service') === 'speed-ad' && inquiryDetailsField && inquiryDetailsField.value.trim() === '') {
+            inquiryDetailsField.value = 'SPEED ADについて相談したいです。';
+        }
 
         function setFieldError(field, errorElement, hasError) {
             field.classList.toggle('invalid', hasError);

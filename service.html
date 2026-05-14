@@ -47,6 +47,66 @@
         color: inherit; /* 親要素の色を継承する */
         text-decoration: none; /* 下線を削除する */
       }
+
+      .speed-ad-service-card {
+        clear: both;
+        margin: 24px 0 12px;
+        padding: 28px;
+        border-left: 6px solid #5CB85C;
+        background: #f2f6f8;
+        text-align: left;
+      }
+
+      .speed-ad-service-card__inner {
+        display: table;
+        width: 100%;
+      }
+
+      .speed-ad-service-card__image,
+      .speed-ad-service-card__body {
+        display: table-cell;
+        vertical-align: middle;
+      }
+
+      .speed-ad-service-card__image {
+        width: 150px;
+        padding-right: 26px;
+      }
+
+      .speed-ad-service-card__image img {
+        width: 120px;
+      }
+
+      .speed-ad-service-card h2 {
+        margin-top: 0;
+        color: #082E5D;
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .speed-ad-service-card p {
+        line-height: 1.9;
+      }
+
+      .speed-ad-service-card .btn {
+        margin-top: 8px;
+        border-radius: 0;
+      }
+
+      @media screen and (max-width: 767px) {
+        .speed-ad-service-card__inner,
+        .speed-ad-service-card__image,
+        .speed-ad-service-card__body {
+          display: block;
+          width: 100%;
+        }
+
+        .speed-ad-service-card__image {
+          padding-right: 0;
+          text-align: center;
+          margin-bottom: 16px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -141,6 +201,20 @@
         <p>細かいご要望にも対応可能な社内編集チームと、同一の加工作業を大量且つスピーディーに施工可能な海外チームの組み合わせにより、お求めのクオリティやご予算に合わせたサービスを提供します。</p>
         <!-- Default button -->
         <a class="btn btn-default" href="edit.html">詳しくはこちら</a>
+      </div>
+      <div class="col-xs-12">
+        <div class="speed-ad-service-card">
+          <div class="speed-ad-service-card__inner">
+            <div class="speed-ad-service-card__image">
+              <img src="image/data-img2.png" alt="展示会・セミナー後フォロー支援イメージ">
+            </div>
+            <div class="speed-ad-service-card__body">
+              <h2>SPEED AD</h2>
+              <p>展示会・セミナー後のアンケート、名刺、御礼メールをひとつの流れに整えるイベント向け支援サービスです。WEBアンケート作成、名刺データ化、御礼メール送信支援に加え、アンケート集計や名簿整備など既存BPO業務とあわせて相談できます。</p>
+              <a class="btn btn-default" href="speed-ad.html">詳しくはこちら</a>
+            </div>
+          </div>
+        </div>
       </div>
       </div> <!--container-->
     </section>
