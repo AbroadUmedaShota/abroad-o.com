@@ -469,29 +469,55 @@
         line-height: 2;
       }
 
-      @media screen and (max-width: 767px) {
+      @media screen and (max-width: 991px) {
         .speed-ad-hero__inner {
           display: block;
           min-height: auto;
-          padding: 48px 15px;
+          padding: 58px 15px;
           text-align: center;
         }
 
         .speed-ad-hero__visual {
           min-width: 0;
-          margin-top: 34px;
+          max-width: 560px;
+          margin: 36px auto 0;
         }
 
         .speed-ad-hero h1 {
           margin-left: auto;
           margin-right: auto;
-          font-size: 26px;
         }
 
         .speed-ad-hero__lead {
           margin-left: auto;
           margin-right: auto;
+        }
+      }
+
+      @media screen and (max-width: 767px) {
+        .speed-ad-hero__inner {
+          padding: 44px 15px 34px;
+        }
+
+        .speed-ad-hero__visual {
+          max-width: 360px;
+          margin-top: 28px;
+        }
+
+        .speed-ad-hero h1 {
+          font-size: 26px;
+        }
+
+        .speed-ad-hero__lead {
           font-size: 15px;
+        }
+
+        .speed-ad-actions .btn {
+          margin-right: 0;
+        }
+
+        .speed-ad-product-mock::before {
+          display: none;
         }
 
         .speed-ad-product-mock__tabs {
@@ -499,17 +525,29 @@
         }
 
         .speed-ad-product-mock__body {
-          padding: 16px;
+          padding: 14px;
         }
 
-        .speed-ad-product-mock__grid,
-        .speed-ad-mock-summary {
+        .speed-ad-product-mock__grid {
           display: block;
         }
 
-        .speed-ad-mock-panel,
-        .speed-ad-mock-summary div {
-          margin-bottom: 12px;
+        .speed-ad-product-mock__grid .speed-ad-mock-panel:nth-child(2),
+        .speed-ad-mock-summary {
+          display: none;
+        }
+
+        .speed-ad-mock-panel {
+          margin-bottom: 0;
+          padding: 14px;
+        }
+
+        .speed-ad-mock-field {
+          padding: 9px 10px;
+        }
+
+        .speed-ad-mock-line {
+          margin: 7px 0;
         }
 
         .speed-ad-section {
