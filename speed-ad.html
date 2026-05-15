@@ -566,6 +566,9 @@
 
       .speed-ad-hero .speed-ad-actions .btn {
         margin: 0;
+        padding-right: 18px;
+        padding-left: 18px;
+        font-size: 15px;
       }
 
       .speed-ad-hero .speed-ad-actions .btn::after {
@@ -580,11 +583,11 @@
       }
 
       .speed-ad-hero .speed-ad-actions .btn-primary {
-        min-width: 300px;
+        min-width: 310px;
       }
 
       .speed-ad-hero .speed-ad-actions .btn-default {
-        min-width: 250px;
+        min-width: 256px;
       }
 
       .speed-ad-hero .speed-ad-actions .btn-default {
@@ -595,8 +598,16 @@
 
       .speed-ad-product-scene {
         position: relative;
-        min-height: 400px;
-        padding: 52px 10px 8px 64px;
+        min-height: 390px;
+        padding: 0;
+      }
+
+      .speed-ad-hero-product-image {
+        display: block;
+        width: 800px;
+        max-width: none;
+        margin: 0 0 0 auto;
+        filter: drop-shadow(0 18px 28px rgba(8, 46, 93, 0.12));
       }
 
       .speed-ad-booth-line {
@@ -996,8 +1007,14 @@
         }
 
         .speed-ad-product-scene {
-          min-height: 470px;
+          min-height: auto;
           padding-left: 0;
+        }
+
+        .speed-ad-hero-product-image {
+          width: 100%;
+          max-width: 760px;
+          margin-right: auto;
         }
 
         .speed-ad-booth-line {
@@ -1048,6 +1065,10 @@
         .speed-ad-product-scene {
           min-height: auto;
           padding: 0;
+        }
+
+        .speed-ad-hero-product-image {
+          max-width: 100%;
         }
 
         .speed-ad-booth-line,
@@ -1237,76 +1258,7 @@
         </div>
         <div class="speed-ad-hero__visual" aria-label="SPEED ADの画面イメージ">
           <div class="speed-ad-product-scene">
-            <div class="speed-ad-booth-line" aria-hidden="true"></div>
-            <div class="speed-ad-device">
-              <div class="speed-ad-product-mock">
-                <div class="speed-ad-product-mock__header">
-                  <span>SPEED AD</span>
-                  <div class="speed-ad-product-mock__tabs">
-                    <span>作成</span>
-                    <span>回答</span>
-                    <span>フォロー</span>
-                  </div>
-                </div>
-                <div class="speed-ad-product-mock__body">
-                  <div class="speed-ad-product-mock__grid">
-                    <div class="speed-ad-mock-panel speed-ad-mock-sidebar">
-                      <span class="speed-ad-mock-nav"></span>
-                      <span class="speed-ad-mock-nav"></span>
-                      <span class="speed-ad-mock-nav"></span>
-                      <span class="speed-ad-mock-nav"></span>
-                      <span class="speed-ad-mock-nav"></span>
-                    </div>
-                    <div class="speed-ad-mock-panel speed-ad-mock-editor">
-                      <h3>アンケート編集</h3>
-                      <div class="speed-ad-mock-field">Q1. ご来場のきっかけをお聞かせください</div>
-                      <div class="speed-ad-mock-field">Q2. 興味のある製品・サービスを選択してください</div>
-                      <div class="speed-ad-mock-line"></div>
-                      <div class="speed-ad-mock-line speed-ad-mock-line--short"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="speed-ad-phone" aria-hidden="true">
-              <div class="speed-ad-phone__screen">
-                <strong>アンケートにご協力ください</strong>
-                <span class="speed-ad-phone__line"></span>
-                <span class="speed-ad-phone__line"></span>
-                <span class="speed-ad-phone__line"></span>
-                <span class="speed-ad-phone__button">次へ</span>
-              </div>
-            </div>
-            <div class="speed-ad-floating-card speed-ad-floating-card--qr">
-              <h3>QR案内</h3>
-              <div class="speed-ad-qr-box" aria-hidden="true">
-                <span></span><span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span><span></span>
-              </div>
-              <p>読み取りはこちら</p>
-            </div>
-            <div class="speed-ad-floating-card speed-ad-floating-card--summary">
-              <h3>回答サマリー</h3>
-              <div class="speed-ad-stat-row">
-                <span>回答<strong>確認</strong></span>
-                <span>関心<strong>整理</strong></span>
-                <span>次回<strong>対応</strong></span>
-              </div>
-              <div class="speed-ad-mini-bars" aria-hidden="true">
-                <span style="height: 16px;"></span><span style="height: 27px;"></span><span style="height: 13px;"></span><span style="height: 21px;"></span><span style="height: 30px;"></span>
-              </div>
-            </div>
-            <div class="speed-ad-floating-card speed-ad-floating-card--list">
-              <h3>名刺・来場者データ</h3>
-              <p>回答情報と来場者情報をあわせて確認できます。</p>
-            </div>
-            <div class="speed-ad-floating-card speed-ad-floating-card--mail">
-              <h3>御礼メール準備</h3>
-              <p>対象者と文面を整え、会期後のフォローへつなげます。</p>
-            </div>
+            <img class="speed-ad-hero-product-image" src="image/speed-ad-hero-product.png" alt="SPEED ADのWEBアンケート作成画面、QR案内、スマートフォン回答画面、回答データ整理のイメージ">
           </div>
         </div>
       </div>
