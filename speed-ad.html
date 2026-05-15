@@ -46,7 +46,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 42px;
+        gap: 32px;
         padding: 72px 15px;
         text-align: left;
       }
@@ -495,17 +495,28 @@
       .speed-ad-hero__inner {
         position: relative;
         z-index: 1;
-        min-height: 520px;
-        gap: 28px;
+        width: min(1392px, calc(100% - 88px));
+        max-width: none;
+        min-height: 500px;
+        gap: 42px;
+        justify-content: flex-start;
+        padding-top: 48px;
+        padding-bottom: 40px;
+      }
+
+      .speed-ad-hero__inner::before,
+      .speed-ad-hero__inner::after {
+        content: none;
+        display: none;
       }
 
       .speed-ad-hero__copy {
-        flex-basis: 48%;
+        flex: 0 0 46%;
       }
 
       .speed-ad-hero__visual {
-        flex-basis: 52%;
-        min-width: 520px;
+        flex: 0 0 51%;
+        min-width: 650px;
       }
 
       .speed-ad-eyebrow {
@@ -529,8 +540,8 @@
       .speed-ad-hero h1 {
         max-width: 700px;
         color: #082E5D;
-        font-size: 36px;
-        line-height: 1.34;
+        font-size: 44px;
+        line-height: 1.28;
       }
 
       .speed-ad-title-nowrap {
@@ -539,9 +550,41 @@
       }
 
       .speed-ad-hero__lead {
+        max-width: 560px;
         color: #1a2e43;
         font-size: 16px;
         line-height: 2;
+      }
+
+      .speed-ad-hero .speed-ad-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 18px;
+        margin-top: 34px;
+      }
+
+      .speed-ad-hero .speed-ad-actions .btn {
+        margin: 0;
+      }
+
+      .speed-ad-hero .speed-ad-actions .btn::after {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        margin-left: 18px;
+        border-top: 2px solid currentColor;
+        border-right: 2px solid currentColor;
+        transform: rotate(45deg);
+      }
+
+      .speed-ad-hero .speed-ad-actions .btn-primary {
+        min-width: 300px;
+      }
+
+      .speed-ad-hero .speed-ad-actions .btn-default {
+        min-width: 250px;
       }
 
       .speed-ad-hero .speed-ad-actions .btn-default {
@@ -553,15 +596,15 @@
       .speed-ad-product-scene {
         position: relative;
         min-height: 400px;
-        padding: 28px 12px 8px 82px;
+        padding: 52px 10px 8px 64px;
       }
 
       .speed-ad-booth-line {
         position: absolute;
         top: 0;
-        left: 0;
-        width: 360px;
-        height: 250px;
+        left: -28px;
+        width: 430px;
+        height: 280px;
         border: 2px solid rgba(8, 46, 93, 0.1);
         opacity: 0.8;
       }
@@ -591,7 +634,7 @@
       .speed-ad-device {
         position: relative;
         z-index: 2;
-        width: 520px;
+        width: 590px;
         max-width: 100%;
         margin-left: auto;
       }
@@ -631,7 +674,7 @@
       }
 
       .speed-ad-product-mock__body {
-        padding: 18px;
+        padding: 20px;
       }
 
       .speed-ad-product-mock__grid {
@@ -654,15 +697,15 @@
       }
 
       .speed-ad-mock-editor {
-        min-height: 190px;
+        min-height: 212px;
       }
 
       .speed-ad-phone {
         position: absolute;
-        right: 84px;
-        bottom: 72px;
+        right: 158px;
+        bottom: 58px;
         z-index: 6;
-        width: 118px;
+        width: 122px;
         padding: 10px 8px 12px;
         background-color: #101923;
         border-radius: 14px;
@@ -717,6 +760,17 @@
         font-weight: 700;
       }
 
+      .speed-ad-floating-card h3::before {
+        content: "";
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        margin-right: 7px;
+        vertical-align: -2px;
+        background-color: #5CB85C;
+        box-shadow: inset 0 0 0 3px #fff;
+      }
+
       .speed-ad-floating-card p {
         margin: 0;
         color: #1a2e43;
@@ -725,25 +779,34 @@
       }
 
       .speed-ad-floating-card--qr {
-        left: 26px;
-        bottom: 72px;
-        width: 126px;
+        left: 20px;
+        bottom: 54px;
+        width: 132px;
         text-align: center;
       }
 
       .speed-ad-floating-card--summary {
-        top: 6px;
-        right: -72px;
+        top: 0;
+        right: -24px;
+      }
+
+      .speed-ad-floating-card--summary::before {
+        content: "";
+        position: absolute;
+        top: 64px;
+        left: -86px;
+        width: 86px;
+        border-top: 2px dashed #5CB85C;
       }
 
       .speed-ad-floating-card--list {
-        top: 122px;
-        right: -72px;
+        top: 126px;
+        right: -24px;
       }
 
       .speed-ad-floating-card--mail {
-        top: 250px;
-        right: -72px;
+        top: 258px;
+        right: -24px;
       }
 
       .speed-ad-stat-row {
@@ -785,6 +848,10 @@
         justify-content: center;
         gap: 24px;
         margin-bottom: 28px;
+      }
+
+      .speed-ad-hero + .speed-ad-section {
+        padding-top: 34px;
       }
 
       .speed-ad-steps-heading::before,
@@ -893,9 +960,30 @@
         border-top: 4px solid #082E5D;
       }
 
+      @media screen and (max-width: 1399px) {
+        .speed-ad-hero .speed-ad-actions {
+          gap: 14px;
+        }
+
+        .speed-ad-hero .speed-ad-actions .btn {
+          padding-right: 18px;
+          padding-left: 18px;
+          font-size: 15px;
+        }
+
+        .speed-ad-hero .speed-ad-actions .btn-primary {
+          min-width: 280px;
+        }
+
+        .speed-ad-hero .speed-ad-actions .btn-default {
+          min-width: 230px;
+        }
+      }
+
       @media screen and (max-width: 991px) {
         .speed-ad-hero__inner {
           display: block;
+          width: auto;
           min-height: auto;
           padding: 58px 15px;
           text-align: center;
@@ -929,6 +1017,7 @@
 
       @media screen and (max-width: 767px) {
         .speed-ad-hero__inner {
+          width: auto;
           padding: 44px 15px 34px;
         }
 
@@ -951,6 +1040,8 @@
         }
 
         .speed-ad-actions .btn {
+          width: 100%;
+          min-width: 0 !important;
           margin-right: 0;
         }
 
