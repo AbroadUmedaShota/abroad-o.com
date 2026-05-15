@@ -42,34 +42,183 @@
       }
 
       .speed-ad-hero__inner {
-        min-height: 460px;
+        min-height: 520px;
         display: flex;
         align-items: center;
-        justify-content: center;
-        padding: 70px 15px;
-        text-align: center;
+        justify-content: space-between;
+        gap: 42px;
+        padding: 72px 15px;
+        text-align: left;
+      }
+
+      .speed-ad-hero__copy {
+        flex: 1 1 52%;
+        min-width: 0;
+      }
+
+      .speed-ad-hero__visual {
+        flex: 1 1 42%;
+        min-width: 360px;
       }
 
       .speed-ad-hero h1 {
-        margin: 0 auto 24px;
-        max-width: 980px;
+        margin: 0 0 24px;
+        max-width: 680px;
         font-size: 42px;
         font-weight: 700;
         line-height: 1.45;
       }
 
       .speed-ad-hero__lead {
-        max-width: 920px;
-        margin: 0 auto;
+        max-width: 680px;
+        margin: 0;
         font-size: 18px;
         line-height: 2;
       }
 
       .speed-ad-actions {
         margin-top: 34px;
-        margin-left: auto;
-        margin-right: auto;
-        max-width: 980px;
+      }
+
+      .speed-ad-product-mock {
+        position: relative;
+        background-color: #fff;
+        color: #082E5D;
+        border: 1px solid rgba(255, 255, 255, 0.88);
+        border-top: 5px solid #5CB85C;
+        box-shadow: 0 18px 32px rgba(0, 0, 0, 0.28);
+      }
+
+      .speed-ad-product-mock::before {
+        content: "";
+        position: absolute;
+        top: 20px;
+        right: 18px;
+        bottom: -18px;
+        left: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.36);
+        z-index: 0;
+      }
+
+      .speed-ad-product-mock__header,
+      .speed-ad-product-mock__body {
+        position: relative;
+        z-index: 1;
+      }
+
+      .speed-ad-product-mock__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        background-color: #082E5D;
+        color: #fff;
+        font-weight: 700;
+      }
+
+      .speed-ad-product-mock__tabs span {
+        display: inline-block;
+        margin-left: 8px;
+        padding: 4px 9px;
+        border: 1px solid rgba(255, 255, 255, 0.38);
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .speed-ad-product-mock__body {
+        padding: 22px;
+      }
+
+      .speed-ad-product-mock__grid {
+        display: grid;
+        grid-template-columns: 1.45fr 0.9fr;
+        gap: 16px;
+      }
+
+      .speed-ad-mock-panel {
+        border: 1px solid #d8e2ea;
+        background-color: #f8fbfd;
+        padding: 16px;
+      }
+
+      .speed-ad-mock-panel h3 {
+        margin: 0 0 12px;
+        color: #082E5D;
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .speed-ad-mock-field {
+        margin-bottom: 10px;
+        padding: 10px 12px;
+        background-color: #fff;
+        border-left: 4px solid #5CB85C;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .speed-ad-mock-line {
+        height: 9px;
+        margin: 9px 0;
+        background-color: #d8e2ea;
+      }
+
+      .speed-ad-mock-line--short {
+        width: 66%;
+      }
+
+      .speed-ad-qr-box {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 4px;
+        width: 118px;
+        height: 118px;
+        margin: 0 auto 14px;
+        padding: 10px;
+        background-color: #fff;
+        border: 1px solid #d8e2ea;
+      }
+
+      .speed-ad-qr-box span {
+        background-color: #082E5D;
+      }
+
+      .speed-ad-qr-box span:nth-child(2n),
+      .speed-ad-qr-box span:nth-child(7),
+      .speed-ad-qr-box span:nth-child(18) {
+        background-color: #fff;
+      }
+
+      .speed-ad-mock-chip {
+        display: block;
+        margin-bottom: 8px;
+        padding: 8px 10px;
+        background-color: #fff;
+        border: 1px solid #d8e2ea;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .speed-ad-mock-summary {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      .speed-ad-mock-summary div {
+        padding: 12px;
+        background-color: #fff;
+        border: 1px solid #d8e2ea;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .speed-ad-mock-summary strong {
+        display: block;
+        margin-bottom: 4px;
+        color: #b20009;
+        font-size: 14px;
       }
 
       .speed-ad-actions .btn {
@@ -146,6 +295,61 @@
       .speed-ad-card p {
         margin: 0;
         line-height: 1.9;
+      }
+
+      .speed-ad-product-steps {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin: 0 0 34px;
+      }
+
+      .speed-ad-product-step {
+        position: relative;
+        min-height: 150px;
+        padding: 22px 18px;
+        background-color: #fff;
+        border: 1px solid #d8e2ea;
+        border-top: 5px solid #5CB85C;
+        box-shadow: 0 2px 10px rgba(8, 46, 93, 0.1);
+      }
+
+      .speed-ad-product-step:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: -14px;
+        width: 12px;
+        height: 12px;
+        border-top: 3px solid #082E5D;
+        border-right: 3px solid #082E5D;
+        transform: translateY(-50%) rotate(45deg);
+        background-color: #f2f6f8;
+        z-index: 2;
+      }
+
+      .speed-ad-product-step__label {
+        display: inline-block;
+        margin-bottom: 12px;
+        padding: 4px 9px;
+        background-color: #082E5D;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .speed-ad-product-step h3 {
+        margin: 0 0 10px;
+        color: #082E5D;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1.5;
+      }
+
+      .speed-ad-product-step p {
+        margin: 0;
+        line-height: 1.8;
+        font-size: 14px;
       }
 
       .speed-ad-flow {
@@ -267,16 +471,45 @@
 
       @media screen and (max-width: 767px) {
         .speed-ad-hero__inner {
+          display: block;
           min-height: auto;
           padding: 48px 15px;
+          text-align: center;
+        }
+
+        .speed-ad-hero__visual {
+          min-width: 0;
+          margin-top: 34px;
         }
 
         .speed-ad-hero h1 {
-          font-size: 30px;
+          margin-left: auto;
+          margin-right: auto;
+          font-size: 26px;
         }
 
         .speed-ad-hero__lead {
+          margin-left: auto;
+          margin-right: auto;
           font-size: 15px;
+        }
+
+        .speed-ad-product-mock__tabs {
+          display: none;
+        }
+
+        .speed-ad-product-mock__body {
+          padding: 16px;
+        }
+
+        .speed-ad-product-mock__grid,
+        .speed-ad-mock-summary {
+          display: block;
+        }
+
+        .speed-ad-mock-panel,
+        .speed-ad-mock-summary div {
+          margin-bottom: 12px;
         }
 
         .speed-ad-section {
@@ -295,6 +528,20 @@
         .speed-ad-section .col-sm-4 {
           float: none;
           width: 100%;
+        }
+
+        .speed-ad-product-steps {
+          display: block;
+          margin-bottom: 20px;
+        }
+
+        .speed-ad-product-step {
+          min-height: auto;
+          margin-bottom: 16px;
+        }
+
+        .speed-ad-product-step:not(:last-child)::after {
+          display: none;
         }
 
         .speed-ad-connection-grid {
@@ -378,12 +625,51 @@
   <main>
     <section class="speed-ad-hero">
       <div class="container speed-ad-hero__inner">
-        <div>
-          <h1>展示会出展企業のためのWEBアンケート作成ツール</h1>
+        <div class="speed-ad-hero__copy">
+          <h1>展示会出展企業のための<br>WEBアンケート作成ツール</h1>
           <p class="speed-ad-hero__lead">SPEED ADは、展示会・セミナーで使うWEBアンケート作成から、来場者回答や名刺情報の整理、会期後フォローへの接続までを支援します。基本機能は無料で利用できます。</p>
           <div class="speed-ad-actions">
             <a class="btn btn-primary btn-lg" href="https://abroadumedashota.github.io/SPPED-AD-TEST/" target="_blank" rel="noopener noreferrer">無料でWEBアンケートを作成する</a>
             <a class="btn btn-default btn-lg" href="form.html?service=speed-ad">展示会後の運用を相談する</a>
+          </div>
+        </div>
+        <div class="speed-ad-hero__visual" aria-label="SPEED ADの画面イメージ">
+          <div class="speed-ad-product-mock">
+            <div class="speed-ad-product-mock__header">
+              <span>SPEED AD</span>
+              <div class="speed-ad-product-mock__tabs">
+                <span>作成</span>
+                <span>回答</span>
+                <span>フォロー</span>
+              </div>
+            </div>
+            <div class="speed-ad-product-mock__body">
+              <div class="speed-ad-product-mock__grid">
+                <div class="speed-ad-mock-panel">
+                  <h3>WEBアンケート作成</h3>
+                  <div class="speed-ad-mock-field">展示会名・来場目的</div>
+                  <div class="speed-ad-mock-field">興味のある製品・サービス</div>
+                  <div class="speed-ad-mock-line"></div>
+                  <div class="speed-ad-mock-line speed-ad-mock-line--short"></div>
+                </div>
+                <div class="speed-ad-mock-panel">
+                  <h3>QR回答導線</h3>
+                  <div class="speed-ad-qr-box" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span>
+                  </div>
+                  <span class="speed-ad-mock-chip">会場で案内</span>
+                </div>
+              </div>
+              <div class="speed-ad-mock-summary">
+                <div><strong>回答確認</strong>来場者回答を整理</div>
+                <div><strong>名刺情報</strong>フォロー準備へ接続</div>
+                <div><strong>御礼メール</strong>対象者と文面を準備</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -420,6 +706,28 @@
       <div class="container">
         <h2>SPEED ADでできること</h2>
         <p class="speed-ad-section__lead">WEBアンケート作成を起点に、会場での回答導線、回答情報の整理、名刺情報や御礼メール準備への接続まで扱いやすくします。</p>
+        <div class="speed-ad-product-steps">
+          <div class="speed-ad-product-step">
+            <span class="speed-ad-product-step__label">作成</span>
+            <h3>WEBアンケートを作る</h3>
+            <p>展示会で聞きたい内容を整理し、来場者が回答しやすいフォームを準備します。</p>
+          </div>
+          <div class="speed-ad-product-step">
+            <span class="speed-ad-product-step__label">案内</span>
+            <h3>QRで回答へ誘導</h3>
+            <p>会場で案内しやすい回答導線を用意し、紙の回収作業を減らします。</p>
+          </div>
+          <div class="speed-ad-product-step">
+            <span class="speed-ad-product-step__label">確認</span>
+            <h3>回答情報を整理</h3>
+            <p>会期後に確認・共有しやすい形で、回答内容を扱いやすくします。</p>
+          </div>
+          <div class="speed-ad-product-step">
+            <span class="speed-ad-product-step__label">接続</span>
+            <h3>フォロー準備へつなぐ</h3>
+            <p>名刺情報や御礼メール準備とあわせて、次の対応へ進めやすくします。</p>
+          </div>
+        </div>
         <div class="row">
           <div class="col-sm-4">
             <div class="speed-ad-card">
