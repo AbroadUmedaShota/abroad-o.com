@@ -269,6 +269,15 @@
         text-align: center;
       }
 
+      .speed-ad-steps-image {
+        display: block;
+        width: 100%;
+        max-width: 1120px;
+        margin: 0 auto 28px;
+        background-color: #fff;
+        box-shadow: 0 10px 24px rgba(8, 46, 93, 0.12);
+      }
+
       .speed-ad-list {
         margin: 0;
         padding-left: 1.3em;
@@ -293,8 +302,18 @@
       }
 
       .speed-ad-card p {
-        margin: 0;
+        margin: 0 0 12px;
         line-height: 1.9;
+      }
+
+      .speed-ad-card-list {
+        margin: 0;
+        padding-left: 1.2em;
+        line-height: 1.85;
+      }
+
+      .speed-ad-card-list li {
+        margin-bottom: 4px;
       }
 
       .speed-ad-product-steps {
@@ -306,7 +325,7 @@
 
       .speed-ad-product-step {
         position: relative;
-        min-height: 150px;
+        min-height: 176px;
         padding: 22px 18px;
         background-color: #fff;
         border: 1px solid #d8e2ea;
@@ -352,6 +371,10 @@
         font-size: 14px;
       }
 
+      .speed-ad-product-step .speed-ad-step-visual {
+        display: none;
+      }
+
       .speed-ad-flow {
         counter-reset: flow;
       }
@@ -389,6 +412,12 @@
 
       .speed-ad-flow__item p {
         margin: 0;
+        line-height: 1.9;
+      }
+
+      .speed-ad-flow__item ul {
+        margin: 12px 0 0;
+        padding-left: 1.2em;
         line-height: 1.9;
       }
 
@@ -436,18 +465,76 @@
       }
 
       .speed-ad-free-box {
-        max-width: 900px;
+        position: relative;
+        overflow: hidden;
+        max-width: 980px;
         margin: 0 auto;
-        padding: 34px 32px;
-        border: 2px solid #5CB85C;
-        background-color: #fff;
-        text-align: center;
+        padding: 42px 44px;
+        border: 0;
+        background: linear-gradient(135deg, #082E5D 0%, #0d4f89 72%, #0f6d72 100%);
+        box-shadow: 0 14px 34px rgba(8, 46, 93, 0.22);
+        color: #fff;
+        text-align: left;
+      }
+
+      .speed-ad-free-box::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 36%;
+        background-image:
+          linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+          linear-gradient(0deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+        background-size: 34px 34px;
+        opacity: 0.8;
+      }
+
+      .speed-ad-free-box > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .speed-ad-free-box h2 {
+        margin-bottom: 18px;
+        color: #fff;
+        text-align: left;
       }
 
       .speed-ad-free-box p {
-        max-width: 760px;
-        margin: 0 auto;
+        max-width: 680px;
+        margin: 0;
         line-height: 2;
+      }
+
+      .speed-ad-free-badge {
+        display: inline-block;
+        margin-bottom: 14px;
+        padding: 7px 14px;
+        background-color: #5CB85C;
+        color: #fff;
+        font-weight: 700;
+      }
+
+      .speed-ad-free-points {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 22px 0 4px;
+        padding: 0;
+        list-style: none;
+      }
+
+      .speed-ad-free-points li {
+        padding: 8px 12px;
+        background-color: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        font-weight: 700;
+      }
+
+      .speed-ad-free-box .speed-ad-actions {
+        margin-top: 26px;
       }
 
       .speed-ad-final {
@@ -587,7 +674,7 @@
       }
 
       .speed-ad-hero .speed-ad-actions .btn-default {
-        min-width: 256px;
+        min-width: 255px;
       }
 
       .speed-ad-hero .speed-ad-actions .btn-default {
@@ -1139,6 +1226,10 @@
           margin-bottom: 20px;
         }
 
+        .speed-ad-steps-image {
+          margin-bottom: 18px;
+        }
+
         .speed-ad-product-step {
           min-height: auto;
           margin-bottom: 16px;
@@ -1186,6 +1277,10 @@
         .speed-ad-free-box {
           padding: 26px 20px;
         }
+
+        .speed-ad-free-box h2 {
+          text-align: left;
+        }
       }
     </style>
   </head>
@@ -1225,7 +1320,7 @@
                 <li><a href="aggregate.html">データ集計・分析サービス</a></li>
                 <li><a href="scan.html">スキャニングサービス</a></li>
                 <li><a href="edit.html">画像編集・加工サービス</a></li>
-                <li class="not_border"><a href="speed-ad.html">SPEED AD</a></li>
+                <li class="not_border"><a href="speed-ad.html">WEBアンケート作成サービス</a></li>
               </ul>
             </li>
             <li><a class="page-scroll" href="news.html">NEWS</a></li>
@@ -1269,17 +1364,18 @@
         <div class="speed-ad-steps-heading">
           <h2>SPEED ADで、準備からフォローまでスムーズに</h2>
         </div>
+        <img class="speed-ad-steps-image" src="image/speed-ad-steps-flow.png" alt="WEBアンケート作成、QR案内、回答確認、フォロー準備の流れ">
         <div class="speed-ad-product-steps">
           <div class="speed-ad-product-step">
             <span class="speed-ad-product-step__label">1</span>
             <h3>WEBアンケート作成</h3>
-            <p>展示会で聞きたい内容を整理し、WEBアンケートを作成します。</p>
+            <p>出展目的に合わせて、製品関心・資料希望・相談希望など会場で確認したい内容を整理します。</p>
             <div class="speed-ad-step-visual" aria-hidden="true"></div>
           </div>
           <div class="speed-ad-product-step">
             <span class="speed-ad-product-step__label">2</span>
             <h3>QR案内</h3>
-            <p>会場でQRコードを提示し、来場者をアンケートへ誘導します。</p>
+            <p>ブース掲示や配布資料から回答ページへ案内し、来場者がスマートフォンで回答できる流れを用意します。</p>
             <div class="speed-ad-step-visual speed-ad-step-visual--qr" aria-hidden="true">
               <div class="speed-ad-qr-box">
                 <span></span><span></span><span></span><span></span><span></span>
@@ -1293,7 +1389,7 @@
           <div class="speed-ad-product-step">
             <span class="speed-ad-product-step__label">3</span>
             <h3>回答確認</h3>
-            <p>回収した回答を確認・共有し、来場者の関心を把握します。</p>
+            <p>回収した回答を会期後に見返しやすくし、関心内容や次に確認したい情報を整理します。</p>
             <div class="speed-ad-step-visual speed-ad-step-visual--chart" aria-hidden="true">
               <span></span><span></span><span></span><span></span>
             </div>
@@ -1301,7 +1397,7 @@
           <div class="speed-ad-product-step">
             <span class="speed-ad-product-step__label">4</span>
             <h3>フォロー準備</h3>
-            <p>名刺情報や回答をもとに、御礼メールや営業フォローを準備します。</p>
+            <p>回答内容と名刺情報をもとに、御礼メールや営業フォローに使う情報をまとめます。</p>
             <div class="speed-ad-step-visual speed-ad-step-visual--mail" aria-hidden="true"></div>
           </div>
         </div>
@@ -1311,42 +1407,72 @@
     <section class="speed-ad-section speed-ad-section--muted">
       <div class="container">
         <h2>SPEED ADでできること</h2>
-        <p class="speed-ad-section__lead">WEBアンケート作成を起点に、会場での回答導線、回答情報の整理、名刺情報や御礼メール準備への接続まで扱いやすくします。</p>
+        <p class="speed-ad-section__lead">展示会出展時に必要な「聞く」「集める」「整理する」「次の連絡へつなげる」作業を、WEBアンケートを起点に扱いやすくします。</p>
         <div class="row">
           <div class="col-sm-4">
             <div class="speed-ad-card">
               <h3>WEBアンケート作成</h3>
-              <p>展示会出展時に聞きたい内容を整理し、来場者が回答しやすいWEBアンケートを作成できます。</p>
+              <p>出展目的に合わせて、来場者に確認したい内容をWEBアンケートとして準備します。</p>
+              <ul class="speed-ad-card-list">
+                <li>製品・サービスへの関心を聞く設問</li>
+                <li>資料希望や相談希望の確認</li>
+                <li>会場で回答しやすい設問順の整理</li>
+              </ul>
             </div>
           </div>
           <div class="col-sm-4">
             <div class="speed-ad-card">
               <h3>QR回答導線</h3>
-              <p>作成したアンケートへ案内しやすいQR導線を用意し、会場で回答してもらう流れを作ります。</p>
+              <p>作成したアンケートへ来場者を案内しやすいよう、QRを使った回答導線を準備します。</p>
+              <ul class="speed-ad-card-list">
+                <li>ブース掲示や配布資料での案内</li>
+                <li>スタッフからの声かけ時の案内</li>
+                <li>紙アンケート回収に寄せすぎない運用</li>
+              </ul>
             </div>
           </div>
           <div class="col-sm-4">
             <div class="speed-ad-card">
               <h3>回答情報の整理</h3>
-              <p>回収した回答を会期後に確認・共有しやすい形で扱い、次の対応へつなげやすくします。</p>
+              <p>回収した回答を、会期後に確認・共有しやすい情報として扱えるようにします。</p>
+              <ul class="speed-ad-card-list">
+                <li>関心内容や希望内容の確認</li>
+                <li>社内共有に使う情報の整理</li>
+                <li>次に確認する相手の見極め</li>
+              </ul>
             </div>
           </div>
           <div class="col-sm-4">
             <div class="speed-ad-card">
               <h3>名刺情報の整理</h3>
-              <p>来場者の名刺情報を回答情報とあわせて確認しやすくし、フォロー準備を進めやすくします。</p>
+              <p>来場者の名刺情報を回答情報とあわせて確認し、フォロー前の情報整理を進めやすくします。</p>
+              <ul class="speed-ad-card-list">
+                <li>来場者名や会社情報の確認</li>
+                <li>回答内容との照らし合わせ</li>
+                <li>営業・担当者への共有準備</li>
+              </ul>
             </div>
           </div>
           <div class="col-sm-4">
             <div class="speed-ad-card">
               <h3>御礼メール準備</h3>
-              <p>会期後の御礼メールに向けて、対象者確認や文面準備を進めやすくします。</p>
+              <p>会期後の御礼メールに向けて、送付対象や文面に必要な情報を確認しやすくします。</p>
+              <ul class="speed-ad-card-list">
+                <li>御礼連絡の対象者確認</li>
+                <li>問い合わせ内容に合わせた文面準備</li>
+                <li>会期後の初動フォローの整理</li>
+              </ul>
             </div>
           </div>
           <div class="col-sm-4">
             <div class="speed-ad-card">
               <h3>フォロー判断への活用</h3>
-              <p>整理した情報をもとに、営業フォローや社内共有へつなげる判断をしやすくします。</p>
+              <p>アンケート回答と来場者情報をもとに、会期後にどの対応から進めるか判断しやすくします。</p>
+              <ul class="speed-ad-card-list">
+                <li>優先的に確認したい来場者の整理</li>
+                <li>資料送付・商談相談などの切り分け</li>
+                <li>既存BPO業務へ広げる相談</li>
+              </ul>
             </div>
           </div>
         </div>
@@ -1359,15 +1485,30 @@
         <div class="speed-ad-flow">
           <div class="speed-ad-flow__item">
             <h3>展示会・セミナー前</h3>
-            <p>出展目的に合わせて聞きたい内容を整理し、WEBアンケートと回答導線を準備します。</p>
+            <p>出展目的や当日の運用に合わせて、会場で聞く内容と回答導線を準備します。</p>
+            <ul>
+              <li>新製品への関心、資料希望、相談希望などの設問を整理</li>
+              <li>ブース掲示・配布物・スタッフ案内で使うQR導線を準備</li>
+              <li>会期後に確認したい項目を先に決めておく</li>
+            </ul>
           </div>
           <div class="speed-ad-flow__item">
             <h3>会期中</h3>
-            <p>来場者にアンケート回答を案内し、フォローに必要な情報を集めます。</p>
+            <p>来場者にその場で回答してもらい、名刺や会話だけでは残りにくい関心情報を集めます。</p>
+            <ul>
+              <li>ブース来訪後にQRから回答してもらう</li>
+              <li>紙アンケートの配布・回収に偏らない案内にする</li>
+              <li>会期後の御礼連絡や営業確認に使う情報を残す</li>
+            </ul>
           </div>
           <div class="speed-ad-flow__item">
             <h3>会期後</h3>
-            <p>回答情報と名刺情報をもとに、御礼メールや営業フォローへつなげます。</p>
+            <p>回答情報と名刺情報を確認し、御礼メールや営業フォロー、社内共有につなげます。</p>
+            <ul>
+              <li>回答内容を確認し、次に連絡したい相手を整理</li>
+              <li>御礼メールや資料送付に必要な情報を準備</li>
+              <li>必要に応じて名刺データ化、アンケート集計、名簿整備も相談</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -1407,8 +1548,14 @@
     <section class="speed-ad-section">
       <div class="container">
         <div class="speed-ad-free-box">
+          <span class="speed-ad-free-badge">まずは無料で開始</span>
           <h2>基本機能は無料で利用できます</h2>
           <p>展示会の準備段階から、WEBアンケート作成の流れを確認できます。まずはログイン前ページからSPEED ADに触れて、出展後のフォローに使う情報整理を試せます。</p>
+          <ul class="speed-ad-free-points">
+            <li>WEBアンケート作成を試せる</li>
+            <li>QR案内の流れを確認できる</li>
+            <li>会期後フォローの準備に使える</li>
+          </ul>
           <div class="speed-ad-actions">
             <a class="btn btn-primary btn-lg" href="https://abroadumedashota.github.io/SPPED-AD-TEST/" target="_blank" rel="noopener noreferrer">無料でWEBアンケートを作成する</a>
           </div>
