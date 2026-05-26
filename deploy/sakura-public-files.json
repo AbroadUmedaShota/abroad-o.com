@@ -1,0 +1,43 @@
+{
+  "includeRootFiles": [
+    "*.html",
+    ".htaccess",
+    "sitemap.xml",
+    "style*.css",
+    "global.css"
+  ],
+  "includeDirectories": [
+    "css",
+    "fonts",
+    "image",
+    "js",
+    "news",
+    "pdfjs",
+    "slick",
+    "TOOL"
+  ],
+  "excludeNames": [
+    ".git",
+    ".github",
+    ".vscode",
+    ".deploy",
+    "data",
+    "deploy",
+    "docs",
+    "scripts"
+  ],
+  "excludeFilePatterns": [
+    "*.md"
+  ],
+  "verification": {
+    "expectedOk": [
+      "https://www.abroad-o.com/",
+      "https://www.abroad-o.com/speed-ad.html",
+      "https://www.abroad-o.com/news/news_260526.html",
+      "https://www.abroad-o.com/TOOL/index.html"
+    ],
+    "expectedNotFound": [
+      "https://www.abroad-o.com/docs/TOOL_USAGE.md"
+    ]
+  }
+}

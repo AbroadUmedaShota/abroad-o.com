@@ -1,0 +1,53 @@
+name: Deploy to Sakura
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Package only. Set false to deploy to Sakura."
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Dry run package
+        if: ${{ inputs.dry_run == 'true' }}
+        shell: pwsh
+        run: ./scripts/deploy-sakura.ps1 -Mode DryRun
+
+      - name: Install SSH key
+        if: ${{ inputs.dry_run == 'false' }}
+        shell: bash
+        env:
+          SAKURA_SSH_KEY: ${{ secrets.SAKURA_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.ssh"
+          printf '%s\n' "$SAKURA_SSH_KEY" > "$HOME/.ssh/sakura_deploy_key"
+          chmod 600 "$HOME/.ssh/sakura_deploy_key"
+
+      - name: Deploy to Sakura
+        if: ${{ inputs.dry_run == 'false' }}
+        shell: pwsh
+        env:
+          SAKURA_HOST: ${{ secrets.SAKURA_HOST }}
+          SAKURA_USER: ${{ secrets.SAKURA_USER }}
+          SAKURA_REMOTE_DIR: ${{ secrets.SAKURA_REMOTE_DIR }}
+          SAKURA_PORT: ${{ secrets.SAKURA_PORT }}
+        run: |
+          $env:SAKURA_SSH_KEY_PATH = Join-Path $HOME ".ssh/sakura_deploy_key"
+          ./scripts/deploy-sakura.ps1 -Mode Deploy
