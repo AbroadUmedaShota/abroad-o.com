@@ -1345,3 +1345,51 @@ section#pre_footer .col-md-5 img {
 .disabled-link {
     pointer-events: none;
 }
+
+/*========================================================
+公開HP表示互換
+構造改善で h1 から h2/h3 に変更した箇所へ、既存の見た目を維持するための補正。
+========================================================*/
+.jumbotron h2 {
+  font-size: 40px;
+  color: #fff;
+}
+
+section#service .col-md-6 h3 {
+  font-size: 20px;
+  padding: 20px 0px 20px 0px;
+  font-weight: 500;
+}
+
+section#service2 .col-md-4 h2 {
+  font-size: 20px;
+  padding: 20px 0px 20px 0px;
+  font-weight: 500;
+}
+
+@media screen and (max-width: 1020px) {
+  .jumbotron h2 {
+    font-size: 35px;
+  }
+}
+
+@media screen and (max-width: 991px) {
+  .jumbotron h2 {
+    font-size: 30px;
+  }
+  section#service2 .col-md-4 h2 {
+    font-size: 20px;
+  }
+}
+
+@media screen and (max-width: 780px) {
+  .jumbotron h2 {
+    font-size: 25px;
+  }
+}
+
+@media screen and (max-width: 1199px) {
+  section#service2 .col-md-4 h2 {
+    font-size: 17px;
+  }
+}
