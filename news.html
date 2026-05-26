@@ -50,6 +50,45 @@
             font-weight: bold;
             color: #082E5D;
         }
+        .news-summary-item.news-summary-item-featured {
+            position: relative;
+            background: linear-gradient(90deg, #f3f8ff 0%, #ffffff 72%);
+            border-color: #b9d2ef;
+            border-left: 6px solid #082E5D;
+            padding: 2rem 2rem 1.8rem;
+            box-shadow: 0 5px 18px rgba(8,46,93,0.12);
+        }
+        .news-summary-item-featured::before {
+            content: "NEW SERVICE";
+            display: inline-block;
+            margin-bottom: 0.7rem;
+            padding: 0.25rem 0.7rem;
+            background-color: #D9534F;
+            color: #fff;
+            border-radius: 2px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            letter-spacing: 0.04em;
+        }
+        .news-summary-item-featured h3 {
+            font-size: 1.75rem;
+        }
+        .news-summary-item-featured .news-date {
+            color: #082E5D;
+            font-weight: bold;
+        }
+        .news-summary-item-featured .news-excerpt {
+            color: #333;
+            font-size: 1.02rem;
+        }
+        @media screen and (max-width: 767px) {
+            .news-summary-item.news-summary-item-featured {
+                padding: 1.5rem;
+            }
+            .news-summary-item-featured h3 {
+                font-size: 1.45rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -117,7 +156,7 @@
     </div><!--container-->
   </section>
   <section id="news_list" class="container" style="margin-top: 30px;">
-    <div class="news-summary-item">
+    <div class="news-summary-item news-summary-item-featured">
       <p class="news-date">2026/05/26</p>
       <h3><a href="news/news_260526.html">新サービス「SPEED AD」リリース予定のお知らせ</a></h3>
       <p class="news-excerpt">展示会・セミナーで集めた名刺情報や来場者情報を、すぐに扱いやすいデータとして整える新サービス「SPEED AD」を、2026年6月1日に正式リリース予定です。</p>
