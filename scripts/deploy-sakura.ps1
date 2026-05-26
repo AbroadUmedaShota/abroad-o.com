@@ -264,7 +264,10 @@ function Invoke-RemoteScript {
     param([string]$Script)
     $target = Get-SshTarget
     $sshArgs = Get-SshArgs
-    $Script | & ssh @sshArgs $target "sh -s"
+    $scriptPath = Join-Path $workDirFullPath "remote-script.sh"
+    $normalizedScript = ($Script -replace "`r`n", "`n") -replace "`r", "`n"
+    [System.IO.File]::WriteAllText($scriptPath, $normalizedScript, [System.Text.UTF8Encoding]::new($false))
+    & cmd.exe /c "type `"$scriptPath`" | ssh $($sshArgs -join ' ') $target ""sh -s"""
     if ($LASTEXITCODE -ne 0) {
         throw "Remote command failed."
     }
