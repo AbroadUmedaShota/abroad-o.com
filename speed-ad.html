@@ -238,6 +238,17 @@
         border-color: #000099;
       }
 
+      .speed-ad-actions .speed-ad-cta-disabled,
+      .speed-ad-actions .speed-ad-cta-disabled:hover,
+      .speed-ad-actions .speed-ad-cta-disabled:focus {
+        background-color: #6c7480;
+        border-color: #6c7480;
+        color: #fff;
+        cursor: not-allowed;
+        opacity: 1;
+        pointer-events: none;
+      }
+
       .speed-ad-actions .btn-default {
         background-color: rgba(255, 255, 255, 0.92);
         border-color: #fff;
@@ -667,6 +678,10 @@
         border-top: 2px solid currentColor;
         border-right: 2px solid currentColor;
         transform: rotate(45deg);
+      }
+
+      .speed-ad-hero .speed-ad-actions .speed-ad-cta-disabled::after {
+        content: none;
       }
 
       .speed-ad-hero .speed-ad-actions .btn-primary {
@@ -1347,7 +1362,7 @@
           <h1>展示会出展企業のための<br><span class="speed-ad-title-nowrap">WEBアンケート作成ツール</span></h1>
           <p class="speed-ad-hero__lead">SPEED ADは、展示会・セミナーで使うWEBアンケート作成から、来場者回答や名刺情報の整理、会期後フォローへの接続までを支援します。基本機能は無料で利用できます。</p>
           <div class="speed-ad-actions">
-            <a class="btn btn-primary btn-lg" href="https://abroadumedashota.github.io/SPPED-AD-TEST/" target="_blank" rel="noopener noreferrer">無料でWEBアンケートを作成する</a>
+            <span class="btn btn-primary btn-lg speed-ad-cta-disabled" aria-disabled="true">公式リリースまで準備中</span>
             <a class="btn btn-default btn-lg" href="form.html?service=speed-ad">展示会後の運用を相談する</a>
           </div>
         </div>
@@ -1557,7 +1572,7 @@
             <li>会期後フォローの準備に使える</li>
           </ul>
           <div class="speed-ad-actions">
-            <a class="btn btn-primary btn-lg" href="https://abroadumedashota.github.io/SPPED-AD-TEST/" target="_blank" rel="noopener noreferrer">無料でWEBアンケートを作成する</a>
+            <span class="btn btn-primary btn-lg speed-ad-cta-disabled" aria-disabled="true">公式リリースまで準備中</span>
           </div>
         </div>
       </div>
@@ -1568,7 +1583,7 @@
         <h2>展示会アンケートを、まずは無料で作成してみる。</h2>
         <p>ログイン前ページから、WEBアンケート作成の流れを確認できます。必要に応じて、会期後フォローや既存BPO業務の相談へ広げられます。</p>
         <div class="speed-ad-actions">
-          <a class="btn btn-primary btn-lg" href="https://abroadumedashota.github.io/SPPED-AD-TEST/" target="_blank" rel="noopener noreferrer">無料でWEBアンケートを作成する</a>
+          <span class="btn btn-primary btn-lg speed-ad-cta-disabled" aria-disabled="true">公式リリースまで準備中</span>
           <a class="btn btn-default btn-lg" href="form.html?service=speed-ad">展示会後の運用を相談する</a>
         </div>
       </div>
