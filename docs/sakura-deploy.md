@@ -109,5 +109,6 @@ $env:SAKURA_BACKUP_FILE = "/home/abroad-o/abroad-o-backups/abroad-o-before-YYYYM
 - `https://www.abroad-o.com/` が 200
 - `https://www.abroad-o.com/speed-ad.html` が 200
 - `https://www.abroad-o.com/news/news_260526.html` が 200
+- `https://www.abroad-o.com/news/news_260615.html` が 200
 - `https://www.abroad-o.com/TOOL/index.html` が 200
 - `https://www.abroad-o.com/docs/TOOL_USAGE.md` が 404
