@@ -81,11 +81,44 @@
             color: #333;
             font-size: 1.02rem;
         }
+        .news-summary-item.news-summary-item-press {
+            position: relative;
+            background: linear-gradient(90deg, #fff8f2 0%, #ffffff 72%);
+            border-color: #efc9a5;
+            border-left: 6px solid #B85C00;
+            padding: 2rem 2rem 1.8rem;
+            box-shadow: 0 5px 18px rgba(184,92,0,0.12);
+        }
+        .news-summary-item-press::before {
+            content: "PRESS RELEASE";
+            display: inline-block;
+            margin-bottom: 0.7rem;
+            padding: 0.25rem 0.7rem;
+            background-color: #B85C00;
+            color: #fff;
+            border-radius: 2px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            letter-spacing: 0.04em;
+        }
+        .news-summary-item-press h3 {
+            font-size: 1.75rem;
+        }
+        .news-summary-item-press .news-date {
+            color: #B85C00;
+            font-weight: bold;
+        }
+        .news-summary-item-press .news-excerpt {
+            color: #333;
+            font-size: 1.02rem;
+        }
         @media screen and (max-width: 767px) {
-            .news-summary-item.news-summary-item-featured {
+            .news-summary-item.news-summary-item-featured,
+            .news-summary-item.news-summary-item-press {
                 padding: 1.5rem;
             }
-            .news-summary-item-featured h3 {
+            .news-summary-item-featured h3,
+            .news-summary-item-press h3 {
                 font-size: 1.45rem;
             }
         }
@@ -156,6 +189,12 @@
     </div><!--container-->
   </section>
   <section id="news_list" class="container" style="margin-top: 30px;">
+    <div class="news-summary-item news-summary-item-press">
+      <p class="news-date">2026/06/16</p>
+      <h3><a href="news/news_260616.html">PR TIMESにて新サービス「SPEED AD」提供開始に関するプレスリリースを配信しました</a></h3>
+      <p class="news-excerpt">展示会向けDXサービス「SPEED AD」の提供開始に関するプレスリリースをPR TIMESにて配信しました。サービスの背景、主な機能、料金体系、今後の展開について紹介しています。</p>
+      <p class="read-more"><a href="news/news_260616.html">続きを読む &raquo;</a></p>
+    </div>
     <div class="news-summary-item news-summary-item-featured">
       <p class="news-date">2026/06/15</p>
       <h3><a href="news/news_260615.html">新サービス「SPEED AD」正式リリースのお知らせ</a></h3>
