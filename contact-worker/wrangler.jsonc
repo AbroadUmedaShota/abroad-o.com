@@ -1,0 +1,44 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "abroad-o-contact-form",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-03",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "vars": {
+    "ALLOWED_ORIGINS": "https://www.abroad-o.com,https://abroad-o.com",
+    "ALLOWED_HOSTNAMES": "www.abroad-o.com,abroad-o.com",
+    "UPSTREAM_ALLOWED_HOSTS": "script.google.com",
+    "TURNSTILE_ACTION": "contact-submit",
+    "NOTIFY_ENABLED": "true",
+    "AUTOREPLY_ENABLED": "true"
+  },
+  "ratelimits": [
+    {
+      "name": "IP_RATE_LIMITER",
+      "namespace_id": "27001",
+      "simple": {
+        "limit": 10,
+        "period": 60
+      }
+    },
+    {
+      "name": "EMAIL_RATE_LIMITER",
+      "namespace_id": "27002",
+      "simple": {
+        "limit": 3,
+        "period": 60
+      }
+    }
+  ],
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "head_sampling_rate": 1
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.05
+    }
+  }
+}

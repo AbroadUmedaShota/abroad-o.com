@@ -126,6 +126,13 @@
             width: 150px;
         }
 
+        .turnstile-container {
+            display: flex;
+            justify-content: center;
+            min-height: 70px;
+            margin: 1rem 0;
+        }
+
         /* 個人情報の取り扱いに関するテキストとチェックボックスを中央に配置 */
         .message-box {
             text-align: center;
@@ -337,9 +344,8 @@
             <div class="container">
                 <!-- フォームヘッダー -->
                 <h1 style="text-align: center;">お問い合わせ・お見積もりフォーム</h1>
-                <iframe id="form-submit-frame" name="form-submit-frame" title="お問い合わせフォーム送信用" style="display: none;" aria-hidden="true"></iframe>
                 <!-- フォーム全体 -->
-                <form action="https://docs.google.com/forms/d/e/1FAIpQLSducG_PN_pRRvNlEyEjI8RRUJbhFLKXPr--iopScCsDZhkZ9A/formResponse" method="post" id="contactForm" target="form-submit-frame">
+                <form method="post" id="contactForm" data-contact-api="https://abroad-o-contact-form.abroad-o.workers.dev" novalidate>
                     <!-- フォームテーブル -->
                    <div id="form-tbl" class="form-group">
                         <table id="form" class="table" style="width: 100%;">
@@ -350,45 +356,45 @@
                             <!-- フォーム入力項目 -->
                             <div class="form-group">
                                 <label for="enterprise" class="must"><span class="badge badge-danger">必須</span> 企業名</label>
-                                <input type="text" id="enterprise" name="entry.2325062" class="form-control" required pattern=".*\S.*" placeholder="例：アブロードアウトソーシング株式会社">
+                                <input type="text" id="enterprise" name="enterprise" class="form-control" required maxlength="120" pattern=".*\S.*" placeholder="例：アブロードアウトソーシング株式会社">
                             </div>
 
                             <div class="form-group">
                                 <label for="department" class="nomust">部署・役職</label>
-                                <input type="text" id="department" name="entry.1000001" class="form-control" pattern=".*\S.*">
+                                <input type="text" id="department" name="department" class="form-control" maxlength="120">
                             </div>
 
                             <div class="form-group">
                                 <label for="name" class="must"><span class="badge badge-danger">必須</span> お名前</label>
-                                <input type="text" id="name" name="entry.1000002" class="form-control" required pattern=".*\S.*">
+                                <input type="text" id="name" name="name" class="form-control" required maxlength="80" pattern=".*\S.*">
                             </div>
 
                             <div class="form-group">
                                 <label for="email" class="must"><span class="badge badge-danger">必須</span> メールアドレス</label>
-                                <input type="email" id="email" name="entry.1000003" class="form-control" required pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$" placeholder="例：info@abroad-o.com" title="正しいメールアドレスを入力してください。">
+                                <input type="email" id="email" name="email" class="form-control" required maxlength="254" placeholder="例：info@abroad-o.com" title="正しいメールアドレスを入力してください。">
                                 <span class="error-message">正しいメールアドレスを入力してください。</span>
                             </div>
 
                             <!-- ハニーポットフィールドの追加 -->
                             <div class="form-group honeypot" aria-hidden="true">
                                 <label for="honeypot_email" aria-hidden="true">メールアドレス（入力しないでください）</label>
-                                <input type="text" id="honeypot_email" name="entry.1234567890" class="form-control" tabindex="-1" autocomplete="off" aria-hidden="true">
+                                <input type="text" id="honeypot_email" name="website" class="form-control" tabindex="-1" autocomplete="off" aria-hidden="true">
                             </div>
 
                             <div class="form-group">
                                 <label for="phone" class="must"><span class="badge badge-danger">必須</span> 電話番号</label>
-                                <input type="tel" id="phone" name="entry.1000004" class="form-control" required pattern="^(?:\+81|0)\d{1,4}[- ]?\d{1,4}[- ]?\d{4}$" placeholder="例：03-5835-0250" title="電話番号の形式が正しくありません。例：03-5835-0250">
-                                <span class="error-message">電話番号の形式が正しくありません。例：03-5835-0250</span>
+                                <input type="tel" id="phone" name="phone" class="form-control" required maxlength="30" pattern="^[0-9+() -]{7,30}$" placeholder="例：03-5835-0250" title="電話番号の形式が正しくありません。例：03-5835-0250">
+                                <span class="error-message">電話番号の形式が正しくありません。</span>
                             </div>
 
                             <div class="form-group">
                                 <label for="address" class="nomust">住所</label>
-                                <textarea id="address" name="entry.1000749928" class="form-control" placeholder="例：東京都千代田区岩本町2-11-9 IT2ビル 8階"></textarea>
+                                <textarea id="address" name="address" class="form-control" maxlength="500" placeholder="例：東京都千代田区岩本町2-11-9 IT2ビル 8階"></textarea>
                             </div>
 
                             <div class="form-group">
                                  <label for="inquiry_details" class="must"><span class="badge badge-danger">必須</span> お問い合わせ内容</label>
-                                 <textarea id="inquiry_details" name="entry.1000005" class="form-control" required pattern=".*\S.*"></textarea>
+                                 <textarea id="inquiry_details" name="inquiryDetails" class="form-control" required maxlength="4000"></textarea>
                             </div>
                         </table>
                     </div>
@@ -480,19 +486,15 @@
                     <!-- 同意チェックボックス -->
                     <div class="form-group consent-container">
                         <label for="consent">
-                            <input type="checkbox" id="consent" name="entry.2027890221" required><span>個人情報の取扱について同意する。</span>
+                            <input type="checkbox" id="consent" name="consent" required><span>個人情報の取扱について同意する。</span>
                         </label>
                     </div>
+                    <div id="turnstile-container" class="turnstile-container" aria-label="bot対策の確認"></div>
+                    <noscript><p class="msg">送信にはJavaScriptが必要です。利用できない場合は、下記メールアドレスまたは電話番号からお問い合わせください。</p></noscript>
                     <!-- 送信ボタン -->
                     <div class="form-group mt-4 text-center">
-                        <input type="submit" value="送信する" class="btn btn-primary btn-submit">
+                        <input type="submit" value="送信する" class="btn btn-primary btn-submit" disabled>
                     </div>
-                    <!-- Google Formのhidden inputは送信に必要なので残す -->
-                    <input type="hidden" name="fvv" value="1">
-                    <input type="hidden" name="partialResponse" value="[null,null,"-1188643857103301952"]">
-                    <input type="hidden" name="pageHistory" value="0">
-                    <input type="hidden" name="fbzx" value="-1188643857103301952">
-
                 </form>
                 <!-- フォームフィードバックエリア -->
                 <div id="form-feedback" class="mt-3" aria-live="polite"></div>
@@ -512,126 +514,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-smooth-scroll/2.2.0/jquery.smoothscroll.min.js"></script> jQueryスムーズスクロールは後でプレーンJSに置き換え -->
 
-    <script>
-        const form = document.getElementById('contactForm');
-        const formFeedback = document.getElementById('form-feedback');
-        const honeypotField = document.getElementById('honeypot_email');
-        const emailField = document.getElementById('email');
-        const phoneField = document.getElementById('phone');
-        const inquiryDetailsField = document.getElementById('inquiry_details');
-        const emailError = emailField.nextElementSibling;
-        const phoneError = phoneField.nextElementSibling;
-        const submitButton = document.querySelector('.btn-submit');
-        const submitFrame = document.getElementById('form-submit-frame');
-        const emailPattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-        const phonePattern = /^(?:\+81|0)\d{1,4}[- ]?\d{1,4}[- ]?\d{4}$/;
-        let submitted = false;
-
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('service') === 'speed-ad' && inquiryDetailsField && inquiryDetailsField.value.trim() === '') {
-            inquiryDetailsField.value = 'SPEED ADについて相談したいです。';
-        }
-
-        function setFieldError(field, errorElement, hasError) {
-            field.classList.toggle('invalid', hasError);
-            errorElement.classList.toggle('error-visible', hasError);
-        }
-
-        [emailField, phoneField].forEach((field) => {
-            field.addEventListener('input', () => {
-                if (field === emailField) {
-                    setFieldError(emailField, emailError, !emailPattern.test(emailField.value.trim()));
-                } else {
-                    setFieldError(phoneField, phoneError, !phonePattern.test(phoneField.value.trim()));
-                }
-            });
-        });
-
-        // フォーム表示時刻を記録（ページロード時）
-        const formLoadTime = Date.now();
-        const MIN_SUBMISSION_TIME_MS = 3000; // 最低送信時間（ミリ秒、例: 3秒）
-
-        submitFrame.addEventListener('load', () => {
-            if (!submitted) {
-                return;
-            }
-
-            submitted = false;
-            window.location.href = 'thank.html';
-        });
-
-        form.addEventListener('submit', (event) => {
-            formFeedback.textContent = '';
-            formFeedback.style.color = '';
-            setFieldError(emailField, emailError, false);
-            setFieldError(phoneField, phoneError, false);
-
-            if (honeypotField.value !== '') {
-                console.warn('Bot detected via honeypot.');
-                event.preventDefault();
-                formFeedback.textContent = 'エラーが発生しました。再度お試しいただくか、別の方法でご連絡ください。';
-                formFeedback.style.color = 'red';
-                return;
-            }
-
-            const submissionTime = Date.now();
-            const elapsedTime = submissionTime - formLoadTime;
-
-            if (elapsedTime < MIN_SUBMISSION_TIME_MS) {
-                console.warn('Bot detected: Submission too fast.');
-                event.preventDefault();
-                formFeedback.textContent = 'エラーが発生しました。再度お試しいただくか、別の方法でご連絡ください。';
-                formFeedback.style.color = 'red';
-                return;
-            }
-
-            if (!emailPattern.test(emailField.value.trim())) {
-                event.preventDefault();
-                setFieldError(emailField, emailError, true);
-                emailField.focus();
-                return;
-            }
-
-            if (!phonePattern.test(phoneField.value.trim())) {
-                event.preventDefault();
-                setFieldError(phoneField, phoneError, true);
-                phoneField.focus();
-                return;
-            }
-
-            const consentCheckbox = document.getElementById('consent');
-            if (!consentCheckbox.checked) {
-                event.preventDefault();
-                alert('個人情報の取扱について同意をお願いします。');
-                return;
-            }
-
-            submitted = true;
-            submitButton.disabled = true;
-            formFeedback.textContent = '送信中です。';
-        });
-
-
-        // smoothScroll (jQuery 不要)
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            const targetSelector = anchor.getAttribute('href');
-            if (!targetSelector || targetSelector.length <= 1) {
-                return;
-            }
-
-            anchor.addEventListener('click', function (e) {
-                const target = document.querySelector(targetSelector);
-                if (!target) {
-                    return;
-                }
-
-                e.preventDefault();
-                target.scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-
-    </script>
+    <script src="js/contact-form.js?v=20260803-security"></script>
 </body>
 </html>
