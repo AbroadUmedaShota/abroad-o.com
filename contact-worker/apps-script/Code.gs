@@ -118,13 +118,23 @@ function doPost(event) {
     }
 
     try {
-      if (cache.get(cacheKey)) {
+      const fingerprint = payloadFingerprint_(payload, secret);
+      const cachedFingerprint = cache.get(cacheKey);
+      if (cachedFingerprint) {
+        if (!constantTimeHexEqual_(cachedFingerprint, fingerprint)) {
+          console.warn(JSON.stringify({
+            event: 'contact_receiver',
+            outcome: 'rejected',
+            reason: 'request_id_conflict',
+            requestId: requestId,
+          }));
+          return json_({ ok: false, code: 'request_id_conflict' });
+        }
         return json_({ ok: true, duplicate: true });
       }
 
       const sheet = getContactSheet_(properties);
       ensureHeaders_(sheet);
-      const fingerprint = payloadFingerprint_(payload, secret);
       const existingCell = findRequestRow_(sheet, requestId);
       if (existingCell) {
         const existingRowNumber = existingCell.getRow();
@@ -139,7 +149,7 @@ function doPost(event) {
           return json_({ ok: false, code: 'request_id_conflict' });
         }
         resumeDelivery_(properties, payload, sheet, existingRowNumber, deliveryState);
-        cache.put(cacheKey, 'accepted', 21600);
+        cache.put(cacheKey, fingerprint, 21600);
         console.log(JSON.stringify({
           event: 'contact_receiver',
           outcome: 'duplicate',
@@ -159,7 +169,7 @@ function doPost(event) {
         autoReplyEnabled ? '待機' : '停止',
         fingerprint,
       ]);
-      cache.put(cacheKey, 'accepted', 21600);
+      cache.put(cacheKey, fingerprint, 21600);
 
       console.log(JSON.stringify({
         event: 'contact_receiver',

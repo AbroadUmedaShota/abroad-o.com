@@ -250,6 +250,20 @@ test('Apps Script receiver stores once, escapes formulas and keeps auto-reply di
   assert.equal(logText.includes('サービスについて相談'), false);
 });
 
+test('Apps Script receiver rejects changed content when the duplicate cache is populated', () => {
+  const harness = createHarness();
+  const first = harness.context.doPost(signedEvent());
+  assert.deepEqual(JSON.parse(first.text), { ok: true });
+  assert.equal(harness.cache.size, 1);
+
+  const conflict = harness.context.doPost(signedEvent({
+    inquiryDetails: '内容を変更した再送です。',
+  }));
+  assert.deepEqual(JSON.parse(conflict.text), { ok: false, code: 'request_id_conflict' });
+  assert.equal(harness.rows.length, 2);
+  assert.equal(harness.sentEmails.length, 1);
+});
+
 test('Apps Script receiver requires both signed controls and Script Properties for mail', () => {
   const harness = createHarness({
     CONTACT_NOTIFY_ENABLED: 'false',
