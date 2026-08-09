@@ -13,6 +13,21 @@ const CONTACT_HEADERS = [
   '内容指紋',
 ];
 
+const CONTACT_AUTOREPLY_RANGE_NAME = 'CONTACT_AUTOREPLY_PUBLISHED';
+const CONTACT_AUTOREPLY_SUBJECT_MAX = 150;
+const CONTACT_AUTOREPLY_BODY_MAX = 20000;
+const CONTACT_AUTOREPLY_PLACEHOLDERS = [
+  '{{お名前}}',
+  '{{お問い合わせ日時}}',
+  '{{受付ID}}',
+  '{{貴社名}}',
+  '{{部署・役職}}',
+  '{{メールアドレス}}',
+  '{{電話番号}}',
+  '{{住所}}',
+  '{{お問い合わせ内容}}',
+];
+
 /**
  * One-time authorization helper for deployments created through clasp.
  * Run this from the Apps Script editor as the deploying account. It requests
@@ -337,23 +352,164 @@ function sendInternalNotification_(properties, payload, sheet, rowNumber) {
 
 function sendAutoReply_(properties, payload) {
   const fields = payload.fields;
-  const body = [
-    fields.name + ' 様',
-    '',
-    'お問い合わせを受け付けました。',
-    '内容を確認のうえ、担当者からご連絡いたします。',
-    '',
-    '受付ID: ' + payload.requestId,
-    '',
-    'このメールに心当たりがない場合は、返信せず削除してください。',
-  ].join('\n');
+  const receivedAt = Utilities.formatDate(
+    new Date(payload.receivedAt),
+    'Asia/Tokyo',
+    'yyyy/M/d H:mm:ss'
+  );
+  const template = getPublishedAutoReplyTemplate_(properties);
+  const replacements = {
+    '{{お名前}}': fields.name,
+    '{{お問い合わせ日時}}': receivedAt,
+    '{{受付ID}}': payload.requestId,
+    '{{貴社名}}': fields.enterprise,
+    '{{部署・役職}}': fields.department,
+    '{{メールアドレス}}': fields.email,
+    '{{電話番号}}': fields.phone,
+    '{{住所}}': fields.address,
+    '{{お問い合わせ内容}}': fields.inquiryDetails,
+  };
+  const subject = renderMailTemplate_(template.subject, replacements)
+    .replace(/[\r\n]+/g, ' ')
+    .slice(0, CONTACT_AUTOREPLY_SUBJECT_MAX);
+  const body = renderMailTemplate_(template.body, replacements);
 
   MailApp.sendEmail({
     to: fields.email,
-    subject: 'お問い合わせを受け付けました',
+    subject: subject,
     body: body,
     name: properties.getProperty('CONTACT_FROM_NAME') || 'アブロードアウトソーシング株式会社',
   });
+}
+
+function getPublishedAutoReplyTemplate_(properties) {
+  const fallback = defaultAutoReplyTemplate_();
+  try {
+    const spreadsheetId = requireProperty_(properties, 'CONTACT_SPREADSHEET_ID');
+    const spreadsheet = SpreadsheetApp.openById(spreadsheetId);
+    const range = spreadsheet.getRangeByName(CONTACT_AUTOREPLY_RANGE_NAME);
+    if (!range) {
+      throw new Error('template_range_missing');
+    }
+    const values = range.getValues();
+    if (values.length !== 1 || values[0].length < 5) {
+      throw new Error('template_range_invalid');
+    }
+    const row = values[0];
+    const template = {
+      version: Number(row[0]),
+      subject: String(row[1] == null ? '' : row[1]),
+      body: String(row[2] == null ? '' : row[2]),
+    };
+    const reason = validateAutoReplyTemplate_(template);
+    if (reason) {
+      throw new Error(reason);
+    }
+    return template;
+  } catch (error) {
+    console.warn(JSON.stringify({
+      event: 'contact_template',
+      outcome: 'template_fallback',
+      reason: safeTemplateErrorReason_(error),
+    }));
+    return fallback;
+  }
+}
+
+function validateAutoReplyTemplate_(template) {
+  if (!template || !Number.isInteger(template.version) || template.version < 1) {
+    return 'template_version_invalid';
+  }
+  if (!template.subject || template.subject.length > CONTACT_AUTOREPLY_SUBJECT_MAX) {
+    return 'template_subject_invalid';
+  }
+  if (/[\r\n]/.test(template.subject)) {
+    return 'template_subject_newline';
+  }
+  if (!template.body || template.body.length > CONTACT_AUTOREPLY_BODY_MAX) {
+    return 'template_body_invalid';
+  }
+
+  const combined = template.subject + '\n' + template.body;
+  const found = combined.match(/\{\{[^{}]+\}\}/g) || [];
+  const unknown = found.some(function (placeholder) {
+    return CONTACT_AUTOREPLY_PLACEHOLDERS.indexOf(placeholder) < 0;
+  });
+  if (unknown || /\{\{|\}\}/.test(combined.replace(/\{\{[^{}]+\}\}/g, ''))) {
+    return 'template_placeholder_invalid';
+  }
+  const missing = CONTACT_AUTOREPLY_PLACEHOLDERS.some(function (placeholder) {
+    return template.body.indexOf(placeholder) < 0;
+  });
+  return missing ? 'template_placeholder_missing' : '';
+}
+
+function renderMailTemplate_(template, replacements) {
+  return String(template).replace(/\{\{[^{}]+\}\}/g, function (placeholder) {
+    return Object.prototype.hasOwnProperty.call(replacements, placeholder)
+      ? String(replacements[placeholder] == null ? '' : replacements[placeholder])
+      : placeholder;
+  });
+}
+
+function defaultAutoReplyTemplate_() {
+  return {
+    version: 1,
+    subject: '【Abroad】お問い合わせありがとうございます',
+    body: [
+    '{{お名前}} 様',
+    '',
+    'この度はアブロードアウトソーシング株式会社にお問い合わせいただき、誠にありがとうございます。',
+    '',
+    '以下の内容でお問い合わせを承りました：',
+    '',
+    'お問い合わせ日時：{{お問い合わせ日時}}',
+    '受付ID：{{受付ID}}',
+    '貴社名：{{貴社名}}',
+    '部署・役職：{{部署・役職}}',
+    'お名前：{{お名前}}',
+    'メールアドレス：{{メールアドレス}}',
+    '電話番号：{{電話番号}}',
+    '住所：{{住所}}',
+    'お問い合わせ内容：',
+    '{{お問い合わせ内容}}',
+    '',
+    '内容を確認の上、２営業日以内に担当者より順次ご連絡させていただきます。',
+    '',
+    'また、ご記入いただいたメールアドレスに誤りがある場合、弊社からの返信が届かない可能性がございます。',
+    'メールアドレスに誤りがないかご確認いただき、数日経っても弊社からの返信がない場合は、お手数ではございますが、以下のメールアドレスまでお問い合わせ下さい。',
+    '',
+    'info@abroad-o.com',
+    '',
+    'このメールに心当たりがない場合は、返信せず削除してください。',
+    '',
+    '今後ともご愛顧賜りますよう、よろしくお願い申し上げます。',
+    '',
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    'アブロードアウトソーシング株式会社',
+    '〒101-0032',
+    '東京都千代田区岩本町2-11-9　IT2ビル8階',
+    'TEL：03-5835-0250',
+    'FAX：03-3863-2570',
+    'Email: info@abroad-o.com',
+    'Website: www.abroad-o.com',
+    'プライバシーマーク認定(10862401(06))',
+    'ISMS（情報セキュリティマネジメントシステム）',
+    'ISO/IEC 27001:2022 / JIS Q 27001:2023',
+    'QMS（品質マネジメントシステム）',
+    'ISO 9001:2015 & JIS Q 9001:2015',
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    '',
+    '※本メールは自動送信されています。',
+    'このメールへの返信はお受けできませんので、あらかじめご了承ください。',
+    'サービス番号：ABOHPQF2024',
+    ].join('\n'),
+  };
+}
+
+function safeTemplateErrorReason_(error) {
+  const message = error && error.message ? String(error.message) : '';
+  return /^template_[a-z_]+$/.test(message) ? message : 'template_unavailable';
 }
 
 function escapeSheetValue_(value) {
@@ -385,7 +541,7 @@ function propertyIsTrue_(properties, name) {
 }
 
 function hmacHex_(value, secret) {
-  return Utilities.computeHmacSha256Signature(value, secret)
+  return Utilities.computeHmacSha256Signature(value, secret, Utilities.Charset.UTF_8)
     .map(function (byte) {
       const normalized = byte < 0 ? byte + 256 : byte;
       return normalized.toString(16).padStart(2, '0');
