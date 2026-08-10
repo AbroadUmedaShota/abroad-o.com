@@ -101,6 +101,7 @@
         turnstileWidgetId = window.turnstile.render('#turnstile-container', {
             sitekey: config.turnstileSiteKey,
             action: config.turnstileAction || 'contact-submit',
+            theme: 'light',
             callback: (token) => {
                 turnstileToken = token;
                 submitButton.disabled = false;

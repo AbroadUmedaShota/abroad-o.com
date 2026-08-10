@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("Package", "DryRun", "Deploy", "Verify", "Restore")]
+    [ValidateSet("Package", "DryRun", "Audit", "Deploy", "Verify", "Restore")]
     [string]$Mode = "DryRun",
 
     [string]$ConfigPath = "deploy/sakura-public-files.json",
@@ -245,7 +245,7 @@ function Get-RemoteDir {
 }
 
 function Get-SshArgs {
-    $args = @("-p", "$Port", "-o", "IdentitiesOnly=yes", "-o", "StrictHostKeyChecking=accept-new")
+    $args = @("-p", "$Port", "-o", "BatchMode=yes", "-o", "ConnectTimeout=15", "-o", "IdentitiesOnly=yes", "-o", "StrictHostKeyChecking=accept-new")
     if ($SshKeyPath) {
         $args += @("-i", $SshKeyPath)
     }
@@ -253,7 +253,7 @@ function Get-SshArgs {
 }
 
 function Get-ScpArgs {
-    $args = @("-P", "$Port", "-o", "IdentitiesOnly=yes", "-o", "StrictHostKeyChecking=accept-new")
+    $args = @("-P", "$Port", "-o", "BatchMode=yes", "-o", "ConnectTimeout=15", "-o", "IdentitiesOnly=yes", "-o", "StrictHostKeyChecking=accept-new")
     if ($SshKeyPath) {
         $args += @("-i", $SshKeyPath)
     }
@@ -271,6 +271,93 @@ function Invoke-RemoteScript {
     if ($LASTEXITCODE -ne 0) {
         throw "Remote command failed."
     }
+}
+
+function Invoke-RemoteScriptOutput {
+    param([string]$Script)
+    $target = Get-SshTarget
+    $sshArgs = Get-SshArgs
+    $scriptPath = Join-Path $workDirFullPath "remote-audit.sh"
+    $normalizedScript = ($Script -replace "`r`n", "`n") -replace "`r", "`n"
+    [System.IO.File]::WriteAllText($scriptPath, $normalizedScript, [System.Text.UTF8Encoding]::new($false))
+    $output = & cmd.exe /c "type `"$scriptPath`" | ssh $($sshArgs -join ' ') $target `"sh -s`""
+    if ($LASTEXITCODE -ne 0) {
+        throw "Remote command failed."
+    }
+    return @($output)
+}
+
+function Invoke-ContentAudit {
+    param(
+        [object]$Package,
+        [string]$RemoteDirectory
+    )
+
+    $manifest = @(Get-Content -LiteralPath $Package.ManifestPath)
+    foreach ($path in $manifest) {
+        if ($path -notmatch '^[A-Za-z0-9._/@+-]+$') {
+            throw "Audit does not support this public path: $path"
+        }
+    }
+
+    $localHashes = @{}
+    foreach ($path in $manifest) {
+        $localPath = Join-Path $Package.StagingDir $path
+        $localHashes[$path] = (Get-FileHash -LiteralPath $localPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    }
+
+    $manifestBody = $manifest -join "`n"
+    $auditScript = @"
+set -eu
+REMOTE_DIR='$RemoteDirectory'
+cd "`$REMOTE_DIR"
+while IFS= read -r path; do
+  if [ -f "`$path" ]; then
+    sha256sum "`$path"
+  else
+    printf 'MISSING  %s\n' "`$path"
+  fi
+done <<'CODEX_MANIFEST'
+$manifestBody
+CODEX_MANIFEST
+"@
+
+    $remoteOutput = Invoke-RemoteScriptOutput -Script $auditScript
+    $remoteHashes = @{}
+    $missing = @()
+    foreach ($line in $remoteOutput) {
+        if ($line -match '^MISSING\s{2}(.+)$') {
+            $missing += $Matches[1]
+            continue
+        }
+        if ($line -match '^([0-9a-fA-F]{64})\s+\*?(.+)$') {
+            $remoteHashes[$Matches[2]] = $Matches[1].ToLowerInvariant()
+        }
+    }
+
+    $different = @()
+    foreach ($path in $manifest) {
+        if ($remoteHashes.ContainsKey($path) -and $remoteHashes[$path] -ne $localHashes[$path]) {
+            $different += $path
+        }
+    }
+
+    foreach ($path in $missing) {
+        Write-Host "MISSING $path"
+    }
+    foreach ($path in $different) {
+        Write-Host "DIFFERENT $path"
+    }
+
+    Write-Host "Audit files: $($manifest.Count)"
+    Write-Host "Audit missing: $($missing.Count)"
+    Write-Host "Audit different: $($different.Count)"
+
+    if ($missing.Count -gt 0 -or $different.Count -gt 0) {
+        throw "Public content audit found drift."
+    }
+
+    Write-Host "Public content audit passed."
 }
 
 function Invoke-Verification {
@@ -372,6 +459,11 @@ foreach ($path in $excludedChecks) {
         throw "Excluded path was included in package: $path"
     }
     Write-Host "Excluded check passed: $path"
+}
+
+if ($Mode -eq "Audit") {
+    Invoke-ContentAudit -Package $package -RemoteDirectory (Get-RemoteDir)
+    exit 0
 }
 
 if ($Mode -eq "Package" -or $Mode -eq "DryRun") {
