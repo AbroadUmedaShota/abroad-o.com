@@ -4,20 +4,17 @@ title: "アブロードアウトソーシング株式会社│スキャニング
 description: "書類、契約書、書籍、図面、写真などのスキャニングサービスと対応原稿・価格帯をご案内します。"
 canonicalUrl: "https://www.abroad-o.com/scan.html"
 layoutVariant: "modern"
+activeNav: "service"
 ---
 {% extends "layouts/site.njk" %}
 
-{% block head %}
+{% block headExtras %}
 <!-- Required meta tags -->
-    <meta charset="utf-8">
     <!-- Responsive meta tag -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 検索ページ用タイトル -->
-    <meta name="description" content="{{ description }}">
     <!-- 検索ヒット用キーワード -->
     <meta name="keywords" content="スキャニング,画像化,PDF化,画像編集">
     <!-- HPタイトル -->
-    <title>{{ title }}</title>
     <!-- SNS用タイトル -->
     <meta property="og:title" content="アブロードアウトソーシング株式会社│スキャニングサービス">
     <!-- SNS用説明文 -->
@@ -37,7 +34,6 @@ layoutVariant: "modern"
     <!-- 自作CSS　-->
       <link href="style3.css" rel="stylesheet">
     <!--【要個別設定】カノニカルタグ-->
-      <link rel="canonical" href="{{ canonicalUrl }}">
     <!--favicon-->
       <link rel="shortcut icon" href="image/favicon.png" >
     <!-- Google Web Fonts-->
@@ -762,8 +758,4 @@ layoutVariant: "modern"
         </div>
       </section><!--問合せ-->
     </main>
-{% endblock %}
-
-{% block scripts %}
-{% include "partials/scripts-modern.njk" %}
 {% endblock %}

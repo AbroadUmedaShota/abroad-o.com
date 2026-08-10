@@ -4,17 +4,14 @@ title: "アブロードアウトソーシング株式会社│データ入力、
 description: "スキャニング、データ入力、集計、画像編集等のアウトソーシング業務を低コスト・高品質で提供しています。"
 canonicalUrl: "https://www.abroad-o.com/"
 layoutVariant: "modern"
+activeNav: "home"
 ---
 {% extends "layouts/site.njk" %}
 
-{% block head %}
+{% block headExtras %}
 <!-- メタタグ設定 -->
-    <meta charset="utf-8">
     <!-- ビューポートの設定 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="{{ description }}">
     <meta name="keywords" content="スキャニング,データ入力,画像編集,集計,スキャニング依頼,コスト削減">
-    <title>{{ title }}</title>
     <!-- SNS共有用のメタタグ -->
     <meta property="og:title" content="アブロードアウトソーシング株式会社│データ入力、スキャニング、画像加工ならお任せ！">
     <meta property="og:description" content="スキャニング、データ入力、集計、画像編集等のアウトソーシング業務を低コスト・高品質で提供しています。">
@@ -39,7 +36,6 @@ layoutVariant: "modern"
     <link rel="stylesheet" href="slick/slick.css">
     <link rel="stylesheet" href="slick/slick-theme.css">
     
-    <link rel="canonical" href="{{ canonicalUrl }}">
     <link rel="icon" href="image/favicon.png" type="image/png">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Text&display=swap" rel="stylesheet">
@@ -195,8 +191,4 @@ layoutVariant: "modern"
       </div>
     </section>
   </main>
-{% endblock %}
-
-{% block scripts %}
-{% include "partials/scripts-modern.njk" %}
 {% endblock %}

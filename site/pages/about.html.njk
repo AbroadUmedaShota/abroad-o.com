@@ -4,16 +4,13 @@ title: "アブロードアウトソーシング株式会社│会社概要・企
 description: "アブロードアウトソーシング株式会社の会社概要、企業理念、役員紹介、お問い合わせ先をご案内します。"
 canonicalUrl: "https://www.abroad-o.com/about.html"
 layoutVariant: "legacy"
+activeNav: "about"
 ---
 {% extends "layouts/site.njk" %}
 
-{% block head %}
-<meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="{{ description }}">
+{% block headExtras %}
     <meta name="keywords" content="スキャニング,データ入力,画像編集,集計,スキャニング依頼,コスト削減">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>{{ title }}</title>
     <meta property="og:title" content="アブロードアウトソーシング株式会社│会社概要・企業理念">
     <meta property="og:description" content="アブロードアウトソーシング株式会社の会社概要、企業理念、役員紹介、お問い合わせ先をご案内します。">
     <!-- Bootstrap -->
@@ -36,7 +33,6 @@ layoutVariant: "legacy"
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     <!--カノニカルタグ-->
-    <link rel="canonical" href="{{ canonicalUrl }}">
     <!--favicon-->
     <link rel="shortcut icon" href="image/favicon.png" >
     <!-- Google Web Fonts-->

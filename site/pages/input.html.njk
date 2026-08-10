@@ -4,18 +4,15 @@ title: "アブロードアウトソーシング株式会社│データ入力サ
 description: "名簿、アンケート、申込書、書籍などに対応するデータ入力サービスをご案内します。"
 canonicalUrl: "https://www.abroad-o.com/input.html"
 layoutVariant: "legacy"
+activeNav: "service"
 ---
 {% extends "layouts/site.njk" %}
 
-{% block head %}
+{% block headExtras %}
 <!-- メタタグ設定 -->
-    <meta charset="utf-8">
     <!-- ビューポートの設定 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- メタ情報の設定 -->
-    <meta name="description" content="{{ description }}">
     <meta name="keywords" content="スキャニング,データ入力,画像編集,集計,スキャニング依頼,コスト削減">
-    <title>{{ title }}</title>
     <!-- OGP設定 -->
     <meta property="og:title" content="アブロードアウトソーシング株式会社│データ入力サービス">
     <meta property="og:description" content="名簿、アンケート、申込書、書籍などに対応するデータ入力サービスをご案内します。">
@@ -40,7 +37,6 @@ layoutVariant: "legacy"
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     <!--カノニカルタグ-->
-    <link rel="canonical" href="{{ canonicalUrl }}">
     <!-- ファビコン設定 -->
     <link rel="shortcut icon" href="image/favicon.png" >
     <!-- Google Fonts読み込み -->

@@ -4,14 +4,11 @@ title: "アブロードアウトソーシング株式会社│お問い合わせ
 description: "アブロードアウトソーシング株式会社へのお問い合わせフォームです。データ入力、スキャニング、画像加工に関するご相談やお見積もりはこちらから。"
 canonicalUrl: "https://www.abroad-o.com/form.html"
 layoutVariant: "legacy"
+activeNav: "contact"
 ---
 {% extends "layouts/site.njk" %}
 
-{% block head %}
-<meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ title }}</title>
-    <meta name="description" content="{{ description }}">
+{% block headExtras %}
     <meta name="google-site-verification" content="Nqa719cJbf2AfjLk6kCgmpJHM73egoAodcPCb-cdyyc" />
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-51168812-1"></script>
     <script>
@@ -22,7 +19,6 @@ layoutVariant: "legacy"
     </script>
     <link href="css/bootstrap.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
-    <link rel="canonical" href="{{ canonicalUrl }}">
     <link rel="shortcut icon" href="image/favicon.png" >
     <link href="https://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">

@@ -4,15 +4,12 @@ title: "アブロードアウトソーシング株式会社│SPEED AD 展示会
 description: "SPEED ADは、展示会出展企業向けのWEBアンケート作成ツールです。基本機能を無料で利用でき、来場者回答や名刺情報を会期後フォローにつなげやすくします。"
 canonicalUrl: "https://www.abroad-o.com/speed-ad.html"
 layoutVariant: "legacy"
+activeNav: "service"
 ---
 {% extends "layouts/site.njk" %}
 
-{% block head %}
-<meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="{{ description }}">
+{% block headExtras %}
     <meta name="keywords" content="SPEED AD,展示会出展,WEBアンケート作成,無料,名刺データ化,御礼メール,データ入力,アンケート集計">
-    <title>{{ title }}</title>
     <meta property="og:title" content="アブロードアウトソーシング株式会社│SPEED AD 展示会向けWEBアンケート作成ツール">
     <meta property="og:description" content="展示会・セミナーで使うWEBアンケート作成から、来場者回答や名刺情報の整理、会期後フォローへの接続までを支援します。">
     <meta name="google-site-verification" content="Nqa719cJbf2AfjLk6kCgmpJHM73egoAodcPCb-cdyyc" />
@@ -25,7 +22,6 @@ layoutVariant: "legacy"
     </script>
     <link href="css/bootstrap.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
-    <link rel="canonical" href="{{ canonicalUrl }}">
     <link rel="shortcut icon" href="image/favicon.png" >
     <link href="https://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet">
     <style>

@@ -4,16 +4,13 @@ title: "アブロードアウトソーシング株式会社│フィルムスキ
 description: "ネガ・ポジ・各種写真フィルムに対応したフィルムスキャンサービスをご案内します。"
 canonicalUrl: "https://www.abroad-o.com/film.html"
 layoutVariant: "legacy"
+activeNav: "service"
 ---
 {% extends "layouts/site.njk" %}
 
-{% block head %}
-<meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="{{ description }}">
+{% block headExtras %}
     <meta name="keywords" content="ネガフィルム,ポジフィルム,ブローニー,中判フィルム,フィルムスキャン,フィルム電子化,アルバム電子化,古い写真">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>{{ title }}</title>
     <meta property="og:title" content="アブロードアウトソーシング株式会社│フィルムスキャンサービス">
     <meta property="og:description" content="ネガ・ポジ・各種写真フィルムに対応したフィルムスキャンサービスをご案内します。">
     <!-- Bootstrap -->
@@ -36,7 +33,6 @@ layoutVariant: "legacy"
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     <!--カノニカルタグ-->
-    <link rel="canonical" href="{{ canonicalUrl }}">
     <!--favicon-->
     <link rel="shortcut icon" href="image/favicon.png" >
     <!-- Google Web Fonts-->

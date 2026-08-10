@@ -4,6 +4,8 @@ title: "アブロードアウトソーシング株式会社│PR TIMESにて新�
 description: "2026年6月16日、PR TIMESにて新サービス「SPEED AD」の提供開始に関するプレスリリースを配信しました。展示会・イベント後の来場者情報整理や営業フォローを支援するサービスです。"
 canonicalUrl: "https://www.abroad-o.com/news/news_260616.html"
 layoutVariant: "legacy"
+activeNav: "news"
+scriptsVariant: "news"
 tags: ["newsArticle"]
 newsOrder: "20260616"
 displayDate: "2026/06/16"
@@ -13,18 +15,13 @@ summaryClass: "news-summary-item-press"
 ---
 {% extends "layouts/site.njk" %}
 
-{% block head %}
-<meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ title }}</title>
-    <meta name="description" content="{{ description }}">
+{% block headExtras %}
     <meta name="keywords" content="SPEED AD,PR TIMES,プレスリリース,展示会,セミナー,名刺データ化,来場者情報,WEBアンケート,御礼メール">
     <meta property="og:title" content="アブロードアウトソーシング株式会社│PR TIMESにて新サービス「SPEED AD」提供開始に関するプレスリリースを配信しました">
     <meta property="og:description" content="2026年6月16日、PR TIMESにて新サービス「SPEED AD」の提供開始に関するプレスリリースを配信しました。">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://www.abroad-o.com/news/news_260616.html">
     <meta property="og:image" content="https://www.abroad-o.com/image/og-image.jpg">
-    <link rel="canonical" href="{{ canonicalUrl }}">
     <link href="../css/bootstrap.css" rel="stylesheet">
     <link href="../style.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -163,8 +160,4 @@ summaryClass: "news-summary-item-press"
     </div>
   </section>
 </main>
-{% endblock %}
-
-{% block scripts %}
-{% include "partials/scripts-news.njk" %}
 {% endblock %}

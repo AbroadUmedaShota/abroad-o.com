@@ -4,14 +4,12 @@ title: "アブロードアウトソーシング株式会社│お知らせ一覧
 description: "アブロードアウトソーシング株式会社からのお知らせ、休業案内、認証取得情報を掲載しています。"
 canonicalUrl: "https://www.abroad-o.com/news.html"
 layoutVariant: "legacy"
+activeNav: "news"
+scriptsVariant: "news"
 ---
 {% extends "layouts/site.njk" %}
 
-{% block head %}
-<meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="{{ description }}">
-    <title>{{ title }}</title>
+{% block headExtras %}
     <link href="css/bootstrap.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -20,7 +18,6 @@ layoutVariant: "legacy"
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     <link rel="icon" href="image/favicon.png" type="image/png">
-    <link rel="canonical" href="{{ canonicalUrl }}">
     <link href="https://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet">
     <style>
         .news-summary-item {
@@ -150,8 +147,4 @@ layoutVariant: "legacy"
 {% endfor %}
   </section>
 </main>
-{% endblock %}
-
-{% block scripts %}
-{% include "partials/scripts-news.njk" %}
 {% endblock %}

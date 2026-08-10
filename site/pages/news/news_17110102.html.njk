@@ -4,6 +4,8 @@ title: "アブロードアウトソーシング株式会社│【サンプル追
 description: "【サンプル追加】対象物修正＆アンチエイジング"
 canonicalUrl: "https://www.abroad-o.com/news/news_17110102.html"
 layoutVariant: "legacy"
+activeNav: "news"
+scriptsVariant: "news"
 tags: ["newsArticle"]
 newsOrder: "20171101"
 displayDate: "2017/11/01"
@@ -13,12 +15,7 @@ summaryClass: ""
 ---
 {% extends "layouts/site.njk" %}
 
-{% block head %}
-<meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="canonical" href="{{ canonicalUrl }}">
-    <title>{{ title }}</title>
-    <meta name="description" content="{{ description }}">
+{% block headExtras %}
     <link href="../css/bootstrap.css" rel="stylesheet">
     <link href="../style.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -61,8 +58,4 @@ summaryClass: ""
     </div>
   </section>
 </main>
-{% endblock %}
-
-{% block scripts %}
-{% include "partials/scripts-news.njk" %}
 {% endblock %}

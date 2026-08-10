@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-{% block head %}{% endblock %}
+{% include "partials/head.njk" %}
+{% block headExtras %}{% endblock %}
 </head>
 <body>
 {% if layoutVariant == "modern" %}
@@ -15,6 +16,13 @@
 {% else %}
 {% include "partials/footer-legacy.njk" %}
 {% endif %}
+{% if layoutVariant == "modern" %}
+{% include "partials/scripts-modern.njk" %}
+{% elif scriptsVariant == "news" %}
+{% include "partials/scripts-news.njk" %}
+{% else %}
 {% block scripts %}{% endblock %}
+{% endif %}
+{% block scriptsExtras %}{% endblock %}
 </body>
 </html>

@@ -4,6 +4,8 @@ title: "アブロードアウトソーシング株式会社│年末年始のご
 description: "年末年始のご案内"
 canonicalUrl: "https://www.abroad-o.com/news/news_171211.html"
 layoutVariant: "legacy"
+activeNav: "news"
+scriptsVariant: "news"
 tags: ["newsArticle"]
 newsOrder: "20171211"
 displayDate: "2017/12/11"
@@ -13,12 +15,7 @@ summaryClass: ""
 ---
 {% extends "layouts/site.njk" %}
 
-{% block head %}
-<meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="canonical" href="{{ canonicalUrl }}">
-    <title>{{ title }}</title>
-    <meta name="description" content="{{ description }}">
+{% block headExtras %}
     <link href="../css/bootstrap.css" rel="stylesheet">
     <link href="../style.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -54,8 +51,4 @@ summaryClass: ""
     </div>
   </section>
 </main>
-{% endblock %}
-
-{% block scripts %}
-{% include "partials/scripts-news.njk" %}
 {% endblock %}
