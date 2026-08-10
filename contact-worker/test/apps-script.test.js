@@ -330,6 +330,14 @@ test('Apps Script receiver sends notification and auto-reply when both productio
   assert.deepEqual(JSON.parse(result.text), { ok: true });
   assert.equal(harness.sentEmails.length, 2);
   assert.equal(harness.sentEmails[0].to, 'operations@example.invalid');
+  assert.equal(
+    harness.sentEmails[0].subject,
+    '[abroad-o.com 問い合わせ受付] テスト株式会社 / テスト担当'
+  );
+  assert.match(
+    harness.sentEmails[0].body,
+    /回答行: https:\/\/docs\.google\.com\/spreadsheets\/d\/test#gid=123&range=A2\n\nサービス番号：ABOHPQF2024$/
+  );
   assert.equal(harness.sentEmails[1].to, 'visitor@example.net');
   assert.equal(harness.rows[1][9], '完了');
   assert.equal(harness.rows[1][10], '完了');

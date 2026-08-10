@@ -324,7 +324,7 @@ function sendInternalNotification_(properties, payload, sheet, rowNumber) {
 
   const fields = payload.fields;
   const rowUrl = sheet.getParent().getUrl() + '#gid=' + sheet.getSheetId() + '&range=A' + rowNumber;
-  const subject = '[問い合わせ] ' + safeSubjectPart_(fields.enterprise) + ' / ' + safeSubjectPart_(fields.name);
+  const subject = '[abroad-o.com 問い合わせ受付] ' + safeSubjectPart_(fields.enterprise) + ' / ' + safeSubjectPart_(fields.name);
   const body = [
     'Webサイトから問い合わせを受け付けました。',
     '',
@@ -340,6 +340,8 @@ function sendInternalNotification_(properties, payload, sheet, rowNumber) {
     fields.inquiryDetails,
     '',
     '回答行: ' + rowUrl,
+    '',
+    'サービス番号：ABOHPQF2024',
   ].join('\n');
 
   MailApp.sendEmail({
