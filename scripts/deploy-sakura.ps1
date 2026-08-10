@@ -311,15 +311,28 @@ function Invoke-ContentAudit {
 set -eu
 REMOTE_DIR='$RemoteDirectory'
 cd "`$REMOTE_DIR"
+if command -v sha256sum >/dev/null 2>&1; then
+  HASH_COMMAND='sha256sum'
+elif command -v shasum >/dev/null 2>&1; then
+  HASH_COMMAND='shasum -a 256'
+else
+  echo 'Neither sha256sum nor shasum is available on the remote host.' >&2
+  exit 1
+fi
+HASH_LIST=`$(mktemp)
+trap 'rm -f "`$HASH_LIST"' EXIT
 while IFS= read -r path; do
   if [ -f "`$path" ]; then
-    sha256sum "`$path"
+    printf '%s\n' "`$path" >> "`$HASH_LIST"
   else
     printf 'MISSING  %s\n' "`$path"
   fi
 done <<'CODEX_MANIFEST'
 $manifestBody
 CODEX_MANIFEST
+if [ -s "`$HASH_LIST" ]; then
+  xargs `$HASH_COMMAND < "`$HASH_LIST"
+fi
 "@
 
     $remoteOutput = Invoke-RemoteScriptOutput -Script $auditScript
