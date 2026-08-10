@@ -1,0 +1,157 @@
+---
+permalink: "/news.html"
+title: "アブロードアウトソーシング株式会社│お知らせ一覧"
+description: "アブロードアウトソーシング株式会社からのお知らせ、休業案内、認証取得情報を掲載しています。"
+canonicalUrl: "https://www.abroad-o.com/news.html"
+layoutVariant: "legacy"
+---
+{% extends "layouts/site.njk" %}
+
+{% block head %}
+<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{ description }}">
+    <title>{{ title }}</title>
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <link rel="icon" href="image/favicon.png" type="image/png">
+    <link rel="canonical" href="{{ canonicalUrl }}">
+    <link href="https://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet">
+    <style>
+        .news-summary-item {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: box-shadow 0.3s ease-in-out;
+        }
+        .news-summary-item:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .news-date {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        .news-summary-item h3 {
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+        .news-summary-item h3 a {
+            text-decoration: none;
+            color: #333;
+        }
+        .news-summary-item h3 a:hover {
+            color: #082E5D;
+        }
+        .news-excerpt {
+            color: #555;
+        }
+        .read-more a {
+            font-weight: bold;
+            color: #082E5D;
+        }
+        .news-summary-item.news-summary-item-featured {
+            position: relative;
+            background: linear-gradient(90deg, #f3f8ff 0%, #ffffff 72%);
+            border-color: #b9d2ef;
+            border-left: 6px solid #082E5D;
+            padding: 2rem 2rem 1.8rem;
+            box-shadow: 0 5px 18px rgba(8,46,93,0.12);
+        }
+        .news-summary-item-featured::before {
+            content: "NEW SERVICE";
+            display: inline-block;
+            margin-bottom: 0.7rem;
+            padding: 0.25rem 0.7rem;
+            background-color: #D9534F;
+            color: #fff;
+            border-radius: 2px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            letter-spacing: 0.04em;
+        }
+        .news-summary-item-featured h3 {
+            font-size: 1.75rem;
+        }
+        .news-summary-item-featured .news-date {
+            color: #082E5D;
+            font-weight: bold;
+        }
+        .news-summary-item-featured .news-excerpt {
+            color: #333;
+            font-size: 1.02rem;
+        }
+        .news-summary-item.news-summary-item-press {
+            position: relative;
+            background: linear-gradient(90deg, #fff8f2 0%, #ffffff 72%);
+            border-color: #efc9a5;
+            border-left: 6px solid #B85C00;
+            padding: 2rem 2rem 1.8rem;
+            box-shadow: 0 5px 18px rgba(184,92,0,0.12);
+        }
+        .news-summary-item-press::before {
+            content: "PRESS RELEASE";
+            display: inline-block;
+            margin-bottom: 0.7rem;
+            padding: 0.25rem 0.7rem;
+            background-color: #B85C00;
+            color: #fff;
+            border-radius: 2px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            letter-spacing: 0.04em;
+        }
+        .news-summary-item-press h3 {
+            font-size: 1.75rem;
+        }
+        .news-summary-item-press .news-date {
+            color: #B85C00;
+            font-weight: bold;
+        }
+        .news-summary-item-press .news-excerpt {
+            color: #333;
+            font-size: 1.02rem;
+        }
+        @media screen and (max-width: 767px) {
+            .news-summary-item.news-summary-item-featured,
+            .news-summary-item.news-summary-item-press {
+                padding: 1.5rem;
+            }
+            .news-summary-item-featured h3,
+            .news-summary-item-press h3 {
+                font-size: 1.45rem;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+<main>
+  <section id="title_top">
+    <div class="container">
+      <h1>NEWS</h1>
+    </div><!--container-->
+  </section>
+  <section id="news_list" class="container" style="margin-top: 30px;">
+{% for article in collections.newsArticles %}
+    <div class="news-summary-item{% if article.data.summaryClass %} {{ article.data.summaryClass }}{% endif %}">
+      <p class="news-date">{{ article.data.displayDate }}</p>
+      <h3><a href="{{ article.url }}">{{ article.data.summaryTitle }}</a></h3>
+      <p class="news-excerpt">{{ article.data.excerpt }}</p>
+      <p class="read-more"><a href="{{ article.url }}">続きを読む &raquo;</a></p>
+    </div>
+{% endfor %}
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+{% include "partials/scripts-news.njk" %}
+{% endblock %}

@@ -189,18 +189,28 @@ function New-DeployPackage {
     }
     New-Item -ItemType Directory -Path $stagingDir -Force | Out-Null
 
-    foreach ($pattern in $Config.includeRootFiles) {
-        Get-ChildItem -Path $RepoRoot -Filter $pattern -File -Force | ForEach-Object {
-            if (-not (Test-FilePatternExcluded -Name $_.Name -Config $Config)) {
-                Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $stagingDir $_.Name) -Force
+    if ($Config.publicRoot) {
+        $publicRoot = Join-Path $RepoRoot $Config.publicRoot
+        if (-not (Test-Path -LiteralPath $publicRoot)) {
+            throw "Generated public root was not found: $publicRoot"
+        }
+        Get-ChildItem -LiteralPath $publicRoot -Force | ForEach-Object {
+            Copy-FilteredItem -Source $_.FullName -Destination (Join-Path $stagingDir $_.Name) -Config $Config
+        }
+    } else {
+        foreach ($pattern in $Config.includeRootFiles) {
+            Get-ChildItem -Path $RepoRoot -Filter $pattern -File -Force | ForEach-Object {
+                if (-not (Test-FilePatternExcluded -Name $_.Name -Config $Config)) {
+                    Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $stagingDir $_.Name) -Force
+                }
             }
         }
-    }
 
-    foreach ($directory in $Config.includeDirectories) {
-        $sourceDir = Join-Path $RepoRoot $directory
-        if (Test-Path $sourceDir) {
-            Copy-FilteredItem -Source $sourceDir -Destination (Join-Path $stagingDir $directory) -Config $Config
+        foreach ($directory in $Config.includeDirectories) {
+            $sourceDir = Join-Path $RepoRoot $directory
+            if (Test-Path $sourceDir) {
+                Copy-FilteredItem -Source $sourceDir -Destination (Join-Path $stagingDir $directory) -Config $Config
+            }
         }
     }
 
@@ -311,15 +321,28 @@ function Invoke-ContentAudit {
 set -eu
 REMOTE_DIR='$RemoteDirectory'
 cd "`$REMOTE_DIR"
+if command -v sha256sum >/dev/null 2>&1; then
+  HASH_COMMAND='sha256sum'
+elif command -v shasum >/dev/null 2>&1; then
+  HASH_COMMAND='shasum -a 256'
+else
+  echo 'Neither sha256sum nor shasum is available on the remote host.' >&2
+  exit 1
+fi
+HASH_LIST=`$(mktemp)
+trap 'rm -f "`$HASH_LIST"' EXIT
 while IFS= read -r path; do
   if [ -f "`$path" ]; then
-    sha256sum "`$path"
+    printf '%s\n' "`$path" >> "`$HASH_LIST"
   else
     printf 'MISSING  %s\n' "`$path"
   fi
 done <<'CODEX_MANIFEST'
 $manifestBody
 CODEX_MANIFEST
+if [ -s "`$HASH_LIST" ]; then
+  xargs `$HASH_COMMAND < "`$HASH_LIST"
+fi
 "@
 
     $remoteOutput = Invoke-RemoteScriptOutput -Script $auditScript
@@ -413,6 +436,14 @@ if (-not (Test-Path $configFullPath)) {
 $config = Get-Content -Path $configFullPath -Raw | ConvertFrom-Json
 $workDirFullPath = Join-Path $repoRoot $WorkDir
 New-Item -ItemType Directory -Path $workDirFullPath -Force | Out-Null
+
+if ($config.publicRoot -and $Mode -notin @("Verify", "Restore")) {
+    $npmCommand = if ($IsWindows) { "npm.cmd" } else { "npm" }
+    & $npmCommand run build:site
+    if ($LASTEXITCODE -ne 0) {
+        throw "Eleventy site build failed. Run npm ci before packaging."
+    }
+}
 
 if ($UseFileZillaConfig) {
     Set-ConnectionFromFileZilla

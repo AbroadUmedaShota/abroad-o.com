@@ -1,0 +1,13 @@
+{
+  "name": "abroad-o-public-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:site": "node scripts/clean-site.mjs && eleventy",
+    "serve:site": "eleventy --serve",
+    "check:site": "npm run build:site && node scripts/check-site.mjs"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "3.1.6"
+  }
+}

@@ -6,12 +6,12 @@ FileZillaの手作業に依存せず、Git管理された公開ファイルだ�
 
 ## 公開対象
 
-公開対象は `deploy/sakura-public-files.json` で管理する。
+公開対象は `deploy/sakura-public-files.json` で管理する。HTMLはEleventyで`site/`から`_site/`へ生成し、デプロイスクリプトは`_site/`だけを梱包する。
 
 含めるもの:
 
-- ルートの `*.html`, `.htaccess`, `sitemap.xml`, `style*.css`, `global.css`
-- `css/`, `fonts/`, `image/`, `js/`, `news/`, `pdfjs/`, `slick/`, `TOOL/`
+- `_site/`に生成されたルートHTMLとNEWS記事
+- `_site/`へコピーされた`.htaccess`、CSS、画像、JavaScript、PDF.js、`slick/`、`TOOL/`
 
 含めないもの:
 
@@ -24,8 +24,12 @@ FileZillaの手作業に依存せず、Git管理された公開ファイルだ�
 PowerShellでリポジトリルートから実行する。
 
 ```powershell
+npm ci
+npm run check:site
 .\scripts\deploy-sakura.ps1 -Mode DryRun
 ```
+
+単一ファイルを公開する場合も、編集元の`site/pages/`ではなく`npm run build:site`で生成した`_site/<対象ファイル>`をアップロードする。
 
 FileZillaに保存されている接続先情報を確認する場合:
 
