@@ -277,7 +277,12 @@ function Invoke-RemoteScript {
     $scriptPath = Join-Path $workDirFullPath "remote-script.sh"
     $normalizedScript = ($Script -replace "`r`n", "`n") -replace "`r", "`n"
     [System.IO.File]::WriteAllText($scriptPath, $normalizedScript, [System.Text.UTF8Encoding]::new($false))
-    & cmd.exe /c "type `"$scriptPath`" | ssh $($sshArgs -join ' ') $target ""sh -s"""
+    if ($IsWindows) {
+        & cmd.exe /c "type `"$scriptPath`" | ssh $($sshArgs -join ' ') $target ""sh -s"""
+    }
+    else {
+        Get-Content -LiteralPath $scriptPath -Raw | & ssh @sshArgs $target "sh -s"
+    }
     if ($LASTEXITCODE -ne 0) {
         throw "Remote command failed."
     }
@@ -290,7 +295,12 @@ function Invoke-RemoteScriptOutput {
     $scriptPath = Join-Path $workDirFullPath "remote-audit.sh"
     $normalizedScript = ($Script -replace "`r`n", "`n") -replace "`r", "`n"
     [System.IO.File]::WriteAllText($scriptPath, $normalizedScript, [System.Text.UTF8Encoding]::new($false))
-    $output = & cmd.exe /c "type `"$scriptPath`" | ssh $($sshArgs -join ' ') $target `"sh -s`""
+    if ($IsWindows) {
+        $output = & cmd.exe /c "type `"$scriptPath`" | ssh $($sshArgs -join ' ') $target `"sh -s`""
+    }
+    else {
+        $output = Get-Content -LiteralPath $scriptPath -Raw | & ssh @sshArgs $target "sh -s"
+    }
     if ($LASTEXITCODE -ne 0) {
         throw "Remote command failed."
     }
