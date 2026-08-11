@@ -14,8 +14,7 @@
     "js",
     "news",
     "pdfjs",
-    "slick",
-    "TOOL"
+    "slick"
   ],
   "excludeNames": [
     ".git",
@@ -37,8 +36,7 @@
     "js",
     "news",
     "pdfjs",
-    "slick",
-    "TOOL"
+    "slick"
   ],
   "managedRootFiles": [
     ".htaccess",
@@ -69,7 +67,31 @@
     "thank.html"
   ],
   "minimumFreeBytes": 104857600,
-  "deletePaths": [],
+  "deletePaths": [
+    "pdfjs/LICENSE"
+  ],
+  "deletePrefixes": [
+    "TOOL/",
+    "pdfjs/build/",
+    "pdfjs/web/"
+  ],
+  "protectedPaths": [
+    {
+      "path": "pdfjs/1c_abroad.pdf",
+      "bytes": 730670,
+      "sha256": "b04b9773ab78143e3e58450d888a984eb4a2c03dcd6010344d606974b74a39c9"
+    },
+    {
+      "path": "pdfjs/2c_abroad.pdf",
+      "bytes": 6180052,
+      "sha256": "5617f03865319d34c6b055850638c1f1b87bf2cfc2cf2189dad58fed79c7cc2b"
+    },
+    {
+      "path": "pdfjs/4c_abroad.pdf",
+      "bytes": 6604538,
+      "sha256": "2531be1bb4bff62b5106cdf634aa92b5b05533e49af764c53070d8b00793ac0c"
+    }
+  ],
   "verification": {
     "expectedOk": [
       "https://www.abroad-o.com/",
@@ -77,10 +99,15 @@
       "https://www.abroad-o.com/news/news_260526.html",
       "https://www.abroad-o.com/news/news_260615.html",
       "https://www.abroad-o.com/news/news_260616.html",
-      "https://www.abroad-o.com/TOOL/index.html"
+      "https://www.abroad-o.com/sample2.html",
+      "https://www.abroad-o.com/pdfjs/1c_abroad.pdf",
+      "https://www.abroad-o.com/pdfjs/2c_abroad.pdf",
+      "https://www.abroad-o.com/pdfjs/4c_abroad.pdf"
     ],
     "expectedNotFound": [
-      "https://www.abroad-o.com/docs/TOOL_USAGE.md"
+      "https://www.abroad-o.com/docs/TOOL_USAGE.md",
+      "https://www.abroad-o.com/TOOL/index.html",
+      "https://www.abroad-o.com/pdfjs/web/viewer.html"
     ]
   }
 }

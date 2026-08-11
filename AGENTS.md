@@ -60,7 +60,6 @@
    https://www.abroad-o.com/
    https://www.abroad-o.com/speed-ad.html
    https://www.abroad-o.com/news/news_260526.html
-   https://www.abroad-o.com/TOOL/index.html
    ```
 
 4. 元の作業ツリーで `git status --short` を再確認し、対象外の変更が保持されていることを確認する。
