@@ -30,6 +30,46 @@
   "excludeFilePatterns": [
     "*.md"
   ],
+  "managedDirectories": [
+    "css",
+    "fonts",
+    "image",
+    "js",
+    "news",
+    "pdfjs",
+    "slick",
+    "TOOL"
+  ],
+  "managedRootFiles": [
+    ".htaccess",
+    "about.html",
+    "aggregate.html",
+    "edit.html",
+    "film.html",
+    "form.html",
+    "global.css",
+    "index.html",
+    "input.html",
+    "largeformat.html",
+    "microfilm.html",
+    "news.html",
+    "recruit.html",
+    "rule.html",
+    "sample.html",
+    "sample2.html",
+    "scan.html",
+    "service-pack.html",
+    "service.html",
+    "sitemap.xml",
+    "speed-ad.html",
+    "style.css",
+    "style2.css",
+    "style3.css",
+    "telework.html",
+    "thank.html"
+  ],
+  "minimumFreeBytes": 104857600,
+  "deletePaths": [],
   "verification": {
     "expectedOk": [
       "https://www.abroad-o.com/",

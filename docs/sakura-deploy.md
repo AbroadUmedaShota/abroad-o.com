@@ -98,7 +98,11 @@ GitHub repository secrets:
 
 ## バックアップと復元
 
-`Deploy` は反映前にリモート側で `~/abroad-o-backups/abroad-o-before-<timestamp>.tgz` を作る。
+`Deploy` は `Preflight`、`Stage`、限定 `Promote` の順で実行する。Preflightは読み取り専用で、公開ディレクトリがシンボリックリンクでないこと、公開ファイルがローカルmanifestと完全一致すること、空き容量が100 MiB以上あることを確認する。未知のリモートファイルが1件でもある場合は反映を中止する。
+
+`Stage` は公開tarballをホームディレクトリに置くだけで、公開ディレクトリを変更しない。`Promote` はmanifest記載ファイルだけを上書きし、公開ルートや管理ディレクトリを一括削除しない。反映前に `~/abroad-o-backups/abroad-o-before-<timestamp>.tgz` を作り、manifestのSHA-256を操作証跡として出力する。
+
+これらのモードはSSH/SCP鍵認証が必須である。FileZillaにFTP/21の設定しかない場合は、このスクリプトで接続・公開しない。FTPパスワードの読取り、表示、またはFTPへのフォールバックは行わない。
 
 直近の本番反映時バックアップ:
 
@@ -111,6 +115,15 @@ GitHub repository secrets:
 ```powershell
 $env:SAKURA_BACKUP_FILE = "/home/abroad-o/abroad-o-backups/abroad-o-before-YYYYMMDD-HHMMSS.tgz"
 .\scripts\deploy-sakura.ps1 -Mode Restore
+```
+
+段階操作を個別に実行する場合は、`Stage` の出力したリモートtarballパスを `Promote` に渡す。
+
+```powershell
+.\scripts\deploy-sakura.ps1 -Mode Preflight
+.\scripts\deploy-sakura.ps1 -Mode Stage
+$env:SAKURA_STAGED_PACKAGE = '$HOME/abroad-o-public-YYYYMMDD-HHMMSS.tgz'
+.\scripts\deploy-sakura.ps1 -Mode Promote
 ```
 
 ## 確認
