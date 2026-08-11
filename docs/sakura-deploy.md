@@ -75,7 +75,11 @@ FileZillaがFTP/21番で保存されていても、このデプロイスクリ�
 
 ## GitHub Actions
 
-`.github/workflows/deploy-sakura.yml` は手動実行のみ。
+`.github/workflows/deploy-sakura.yml` は手動実行のみ。実行時は次の3モードから選択する。
+
+- `package`: Eleventyビルドと公開パッケージ作成のみ。SecretsとSakura接続は不要。
+- `audit`: SSHで本番を読み取り、Gitから生成した公開物とSHA-256を照合する。本番は更新しない。
+- `deploy`: 公開前バックアップを作成し、Sakuraへ本番反映する。実行前に明示確認を得る。
 
 GitHub repository secrets:
 
@@ -83,9 +87,12 @@ GitHub repository secrets:
 - `SAKURA_USER`
 - `SAKURA_REMOTE_DIR`
 - `SAKURA_SSH_KEY`
+- `SAKURA_KNOWN_HOSTS`
 - `SAKURA_PORT`
 
-最初は `dry_run=true` で実行し、公開対象のパッケージだけ確認する。実公開する場合だけ `dry_run=false` を選ぶ。
+最初は `package` で公開対象のパッケージを確認する。Secrets登録後は `audit` でSSH接続と公開物の一致を確認し、明示承認後の実公開に限って `deploy` を選ぶ。
+
+`audit` は生のSHA-256を優先し、差分があるテキストファイルだけCRLF/LFを正規化したSHA-256も比較する。内容が同一で改行だけが異なる場合は `line-ending-only` として件数を分け、内容差分には含めない。
 
 さくらサーバー側で国外IPアドレスフィルターが有効な場合、GitHub ActionsからのSSH/SFTP接続が拒否される可能性がある。広く無効化せず、必要な許可リスト運用を優先する。
 
