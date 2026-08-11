@@ -8,6 +8,6 @@
     "check": "node --check src/index.js && wrangler deploy --dry-run --outdir .wrangler-dist"
   },
   "devDependencies": {
-    "wrangler": "4.118.0"
+    "wrangler": "4.120.1"
   }
 }
