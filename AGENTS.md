@@ -25,6 +25,8 @@
 
 サイト全体用スクリプトは公開対象一式を再配置するため、作業ツリーに無関係な変更がある場合は単一ファイル FTP を使用する。
 
+公開HTMLはEleventyの生成物を使用する。`npm ci`実行後、`npm run build:site`で生成した`_site/<対象ファイル>`をアップロード元とし、`site/pages/`のテンプレートを直接アップロードしない。
+
 1. `%APPDATA%\FileZilla\filezilla.xml` または `sitemanager.xml` から `abroad-o.sakura.ne.jp` の既存 FTP 設定を読み込む。
 2. 資格情報は処理内だけで復号し、値を出力しない。
 3. FTP 上の対象ファイルを取得し、更新前の内容であることを確認する。

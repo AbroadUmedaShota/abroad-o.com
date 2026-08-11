@@ -1,4 +1,5 @@
 {
+  "publicRoot": "_site",
   "includeRootFiles": [
     "*.html",
     ".htaccess",

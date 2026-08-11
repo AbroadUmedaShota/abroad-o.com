@@ -189,18 +189,28 @@ function New-DeployPackage {
     }
     New-Item -ItemType Directory -Path $stagingDir -Force | Out-Null
 
-    foreach ($pattern in $Config.includeRootFiles) {
-        Get-ChildItem -Path $RepoRoot -Filter $pattern -File -Force | ForEach-Object {
-            if (-not (Test-FilePatternExcluded -Name $_.Name -Config $Config)) {
-                Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $stagingDir $_.Name) -Force
+    if ($Config.publicRoot) {
+        $publicRoot = Join-Path $RepoRoot $Config.publicRoot
+        if (-not (Test-Path -LiteralPath $publicRoot)) {
+            throw "Generated public root was not found: $publicRoot"
+        }
+        Get-ChildItem -LiteralPath $publicRoot -Force | ForEach-Object {
+            Copy-FilteredItem -Source $_.FullName -Destination (Join-Path $stagingDir $_.Name) -Config $Config
+        }
+    } else {
+        foreach ($pattern in $Config.includeRootFiles) {
+            Get-ChildItem -Path $RepoRoot -Filter $pattern -File -Force | ForEach-Object {
+                if (-not (Test-FilePatternExcluded -Name $_.Name -Config $Config)) {
+                    Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $stagingDir $_.Name) -Force
+                }
             }
         }
-    }
 
-    foreach ($directory in $Config.includeDirectories) {
-        $sourceDir = Join-Path $RepoRoot $directory
-        if (Test-Path $sourceDir) {
-            Copy-FilteredItem -Source $sourceDir -Destination (Join-Path $stagingDir $directory) -Config $Config
+        foreach ($directory in $Config.includeDirectories) {
+            $sourceDir = Join-Path $RepoRoot $directory
+            if (Test-Path $sourceDir) {
+                Copy-FilteredItem -Source $sourceDir -Destination (Join-Path $stagingDir $directory) -Config $Config
+            }
         }
     }
 
@@ -426,6 +436,14 @@ if (-not (Test-Path $configFullPath)) {
 $config = Get-Content -Path $configFullPath -Raw | ConvertFrom-Json
 $workDirFullPath = Join-Path $repoRoot $WorkDir
 New-Item -ItemType Directory -Path $workDirFullPath -Force | Out-Null
+
+if ($config.publicRoot -and $Mode -notin @("Verify", "Restore")) {
+    $npmCommand = if ($IsWindows) { "npm.cmd" } else { "npm" }
+    & $npmCommand run build:site
+    if ($LASTEXITCODE -ne 0) {
+        throw "Eleventy site build failed. Run npm ci before packaging."
+    }
+}
 
 if ($UseFileZillaConfig) {
     Set-ConnectionFromFileZilla

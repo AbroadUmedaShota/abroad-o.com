@@ -1,0 +1,194 @@
+---
+permalink: "/index.html"
+title: "アブロードアウトソーシング株式会社│データ入力、スキャニング、画像加工ならお任せ！"
+description: "スキャニング、データ入力、集計、画像編集等のアウトソーシング業務を低コスト・高品質で提供しています。"
+canonicalUrl: "https://www.abroad-o.com/"
+layoutVariant: "modern"
+activeNav: "home"
+---
+{% extends "layouts/site.njk" %}
+
+{% block headExtras %}
+<!-- メタタグ設定 -->
+    <!-- ビューポートの設定 -->
+    <meta name="keywords" content="スキャニング,データ入力,画像編集,集計,スキャニング依頼,コスト削減">
+    <!-- SNS共有用のメタタグ -->
+    <meta property="og:title" content="アブロードアウトソーシング株式会社│データ入力、スキャニング、画像加工ならお任せ！">
+    <meta property="og:description" content="スキャニング、データ入力、集計、画像編集等のアウトソーシング業務を低コスト・高品質で提供しています。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.abroad-o.com/">
+    <meta property="og:image" content="https://www.abroad-o.com/image/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Google Analytics設定 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-51168812-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-51168812-1');
+    </script>
+
+    <!-- CSSファイルの読み込み -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style3.css">
+    <link rel="stylesheet" href="slick/slick.css">
+    <link rel="stylesheet" href="slick/slick-theme.css">
+    
+    <link rel="icon" href="image/favicon.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block main %}
+<main>
+    <!-- トップセクション -->
+    <section id="top">
+      <div class="top_wrap">
+        <div class="container">
+          <h1>私達は、業務の標準化と、
+           <br>効率的なアウトソーシングの活用により、全てのお客様の、
+           <br class="hidden-br">業務効率・業務スピード・業務精度を向上させ、効率的資源配分を実現します。</h1>
+        </div>
+      </div>
+    </section>
+
+    <!-- サービス紹介セクション -->
+    <section id="service">
+      <!-- テレワーク関連の案内 -->
+      <div class="jumbotron">
+        <!-- テレワークの内容 -->
+        <div class="container">
+          <h2>テレワークで紙媒体のデジタル化をご検討のお客様</h2>
+          <p>テレワークの環境整備のための書類のデジタル化をお手伝いします。</p>
+          <p><a class="btn btn-primary btn-lg" href="telework.html" role="button">　詳しくはこちら　</a></p>
+        </div>
+      </div>
+
+      <!-- サービス一覧 -->
+      <div class="title_height fade-in">
+        <h2>OUR SERVICES</h2>
+      </div>
+      <div class="container">
+        <!-- サービスの詳細説明 -->
+        <div class="row">
+          <div class="col-sm-12 col-md-6 yellow">
+            <h3>データ入力</h3>
+            <img src="image/top1_1.png" alt="データ入力サービス">
+            <p>専属データ入力センターにより、活字入力＠0.25円～の業界最安値で、最高水準の入力精度をご提供します。アンケート、申込書、応募ハガキ、名簿、書籍の入力など、様々な原稿からの入力が可能です。</p>
+            <!-- Default button -->
+            <a class="btn btn-default" href="input.html">詳しくはこちら</a>
+          </div>
+          <div class="col-sm-12 col-md-6 orange">
+            <h3>データ集計・分析</h3>
+            <img src="image/top1_2.png" alt="スキャニングサービス">
+            <p>アンケートの集計作業、名簿やデータベースのクリーニング・コンバート作業など、プラスαの付加価値をご提供します。</p><br>
+            <!-- Default button -->
+            <a class="btn btn-default" href="aggregate.html">詳しくはこちら</a>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12 col-md-6 blue">
+            <h3>スキャニング</h3>
+            <img src="image/top1_3.png" alt="スキャニングサービス">
+            <p>独自の作業スキームとPDF分割法により、高精度で低価格なスキャニングを提供します。書類、契約書、書籍、図面、写真など、様々な原稿のスキャニングが可能です。</p>
+            <!-- Default button -->
+            <a class="btn btn-default" href="scan.html">詳しくはこちら</a>
+          </div>
+          <div class="col-sm-12 col-md-6 green">
+            <h3>画像編集・加工</h3>
+            <img src="image/top1_4.png" alt="画像編集サービス">
+            <p>細かいご要望にも対応可能な社内編集チームと、同一の加工作業を大量且つスピーディーに施工可能な海外チームの組み合わせにより、お求めのクオリティやご予算に合わせたサービスを提供します。</p>
+            <!-- Default button -->
+            <a class="btn btn-default" href="edit.html">詳しくはこちら</a>
+          </div>
+        </div>
+        <div class="btn_center_margin">
+          <a class="btn btn-danger btn-lg" href="form.html"><strong>≪　お問合わせはこちら　≫</strong></a>
+        </div>
+      </div> <!--container-->
+    </section>
+
+    <section class="bottom_img fade-in">
+      <div class="cover">
+        <p>豊富な作業実績や高品質リソースの活用によりBPO業務を通して<br>社内のコスト削減・合理化を支援致します</p>
+      </div>
+    </section>
+
+    <!-- 特徴紹介セクション -->
+    <section id="service2">
+      <div class="container fade-in">
+        <!-- 会社の特徴説明 -->
+        <div class="row">
+          <div class="col-sm-12 col-md-4">
+            <h2>小ロットから大プロジェクトまで</h2>
+            <img src="image/top2_left.png" alt="ニーズに応えるBPO業務">
+            <p>プロジェクトの規模に関わらず、また一連業務フローの一部・全体関わらず、積極的にご相談をお受けし、お客様のニーズに応えたサービスを展開しています。<br><br></p>
+          </div>
+          <div class="col-sm-12 col-md-4">
+            <h2>業務フローの標準化</h2>
+            <img src="image/top2_middle.png" alt="シンプル・イズ・ベスト">
+            <p>アウトソーシングすべき範囲と、お客様社内で処理される範囲を最適化し、最大限の効率化を図る事で、業務の属人性を無くし、プロジェクト予算を抑える。それが私達が進める「標準化」です。</p>
+          </div>
+          <div class="col-sm-12 col-md-4">
+            <h2>高品質＆高セキュリティなリソース</h2>
+            <img src="image/top2_right.png" alt="高品質リソースの活用">
+            <p>業務内容に応じて、独自テストに合格した高品質な海外リソースや、国内在宅ワーカーなどを組み合わせて業務処理を行います。各リソースは、定期的な現地視察で徹底したセキュリティ管理が行われています。</p>
+          </div>
+        </div>
+      </div> <!--container-->
+    </section>
+
+    <section class="bottom_img">
+      <div class="cover fade-in">
+        <p>私達のサービスは、効率的なアウトソーシング手段として、<br>多くの官公庁、大学、企業様でご利用頂いております。</p>
+      </div>
+    </section>
+
+    <!-- 顧客紹介セクション -->
+    <section id="corp">
+      <div class="title_height fade-in">
+        <h2>ご利用のお客様</h2>
+      </div>
+      <div class="autoplay">
+        <!-- 顧客ロゴのスライダー -->
+        <p><img src="image/c-000.png" alt="防衛省"></p>
+        <p><img src="image/c-001.png" alt="電通"></p>
+        <p><img src="image/c-002.png" alt="東京大学"></p>
+        <p><img src="image/c-003.png" alt="京都大学"></p>
+        <p><img src="image/c-004.png" alt="東北大学"></p>
+        <p><img src="image/c-005.png" alt="弘前大学"></p>
+        <p><img src="image/c-006.png" alt="中央大学"></p>
+        <p><img src="image/c-007.png" alt="東京海上日動"></p>
+        <p><img src="image/c-008.png" alt="三省堂書店"></p>
+        <p><img src="image/c-009.png" alt="CTC"></p>
+      </div>
+    </section>
+
+    <!-- 資格紹介セクション -->
+    <section id="pre_footer">
+      <div class="container fade-in">
+        <div class="title_height">
+          <h2>外部認証資格</h2>
+        </div>
+        <!-- 資格の詳細説明 -->
+        <div class="row">
+          <div class="col-sm-12 col-md-5 center">
+            <a href="https://privacymark.jp/" target="_blank"><img src="image/ANAB_font.jpg" alt="Pマーク"></a>
+          </div>
+          <div class="col-sm-12 col-md-7">
+            <p>弊社では、以下の認証資格を取得しております。</p>
+            <p>
+              ◆ <a href="https://privacymark.jp/" target="_blank">プライバシーマーク</a> 10862401(03)<br>
+              ◆ <a href="https://www.eqajapan.com/html/iso/27001.htm#27001_1" target="_blank">ISMS（情報セキュリティマネジメントシステム）</a> ISO/IEC 27001:2013 / JIS Q 27001:2014<br>
+              ◆ <a href="https://www.eqajapan.com/html/iso/9001.htm#9001_1" target="_blank">QMS（品質マネジメントシステム）</a> ISO 9001:2015 & JIS Q 9001:2015
+            </p>
+            <p>また、<a href="https://www.jiima.or.jp/qualification/docinfo_sv/intro/" target="_blank">文書情報管理士</a>在籍で、皆様にご安心してご依頼頂けるよう、適切な個人情報の取扱・運営を行っております。</p>
+            <p><a href="rule.html">プライバシーポリシー</a><br><a href="rule.html#security-policy">情報セキュリティ基本方針・品質方針</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+{% endblock %}

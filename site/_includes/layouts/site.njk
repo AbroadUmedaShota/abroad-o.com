@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+{% include "partials/head.njk" %}
+{% block headExtras %}{% endblock %}
+</head>
+<body>
+{% if layoutVariant == "modern" %}
+{% include "partials/header-modern.njk" %}
+{% else %}
+{% include "partials/header-legacy.njk" %}
+{% endif %}
+{% block main %}{% endblock %}
+{% if layoutVariant == "modern" %}
+{% include "partials/footer-modern.njk" %}
+{% else %}
+{% include "partials/footer-legacy.njk" %}
+{% endif %}
+{% if layoutVariant == "modern" %}
+{% include "partials/scripts-modern.njk" %}
+{% elif scriptsVariant == "news" %}
+{% include "partials/scripts-news.njk" %}
+{% else %}
+{% block scripts %}{% endblock %}
+{% endif %}
+{% block scriptsExtras %}{% endblock %}
+</body>
+</html>

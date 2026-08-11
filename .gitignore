@@ -3,6 +3,8 @@ data/
 .env
 .env.*
 node_modules/
+_site/
+/output/
 .wrangler/
 .wrangler-dist/
 .clasp.json
