@@ -22,10 +22,11 @@ const server = http.createServer((request, response) => {
 await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
 const port = server.address().port;
 const browser = await chromium.launch();
+const context = await browser.newContext();
 try {
   const critical = [];
   for (const pagePath of pages) {
-    const page = await browser.newPage();
+    const page = await context.newPage();
     await page.goto(`http://127.0.0.1:${port}${pagePath}`, { waitUntil: 'networkidle' });
     const results = await new AxeBuilder({ page }).analyze();
     for (const violation of results.violations.filter((violation) => violation.impact === 'critical')) {
@@ -36,6 +37,7 @@ try {
   }
   if (critical.length) throw new Error(`Critical accessibility violations:\n${critical.join('\n')}`);
 } finally {
+  await context.close();
   await browser.close();
   await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
 }

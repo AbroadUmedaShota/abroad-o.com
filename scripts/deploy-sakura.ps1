@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("Package", "DryRun", "Audit", "Preflight", "Stage", "Promote", "Deploy", "Verify", "Restore", "Rollback")]
+    [ValidateSet("Package", "DryRun", "Audit", "Preflight", "Stage", "Promote", "Deploy", "Verify", "Restore")]
     [string]$Mode = "DryRun",
 
     [string]$ConfigPath = "deploy/sakura-public-files.json",
@@ -10,7 +10,7 @@ param(
     [string]$SshKeyPath = $env:SAKURA_SSH_KEY_PATH,
     [int]$Port = $(if ($env:SAKURA_PORT) { [int]$env:SAKURA_PORT } else { 22 }),
     [string]$BackupFile = $env:SAKURA_BACKUP_FILE,
-    [string]$StagedPackage = $env:SAKURA_STAGED_PACKAGE,
+    [string]$StagedReleaseId = $env:SAKURA_STAGED_RELEASE_ID,
     [switch]$UseFileZillaConfig
 )
 
@@ -266,6 +266,21 @@ function Assert-DeployContract {
             throw "Unsafe deployment path: $path"
         }
     }
+    foreach ($path in @($Config.deletePaths)) {
+        if ($path -notmatch '^[A-Za-z0-9._/@+-]+$' -or $path.StartsWith("/") -or $path.Contains("..") -or $path.Contains("`n") -or $path.Contains("`r")) {
+            throw "Unsafe delete allowlist path: $path"
+        }
+        if ($paths -contains $path) { throw "Delete allowlist path is still in the deployment manifest: $path" }
+        if ($path -in @('.htaccess', 'sitemap.xml')) { throw "Protected path cannot be deleted: $path" }
+    }
+}
+
+function Assert-RemoteInput {
+    param([string]$Directory)
+    if ($Directory -notmatch '^/[A-Za-z0-9_./-]+$' -or $Directory.Contains('..') -or $Directory.Contains("`n") -or $Directory.Contains("`r")) {
+        throw "SAKURA_REMOTE_DIR must be a safe absolute Unix path."
+    }
+    if ($UserName -notmatch '^[A-Za-z0-9_-]+$') { throw "SAKURA_USER contains unsafe characters." }
 }
 
 function Invoke-RemotePreflight {
@@ -276,12 +291,16 @@ function Invoke-RemotePreflight {
 set -eu
 REMOTE_DIR='$RemoteDirectory'
 MINIMUM_FREE_BYTES='$($Config.minimumFreeBytes)'
+PACKAGE_BYTES='$((Get-Item -LiteralPath $Package.PackagePath).Length)'
 test -d "`$REMOTE_DIR"
 test ! -L "`$REMOTE_DIR"
 available=`$(df -Pk "`$REMOTE_DIR" | awk 'NR == 2 { print `$4 * 1024 }')
 test -n "`$available"
-if [ "`$available" -lt "`$MINIMUM_FREE_BYTES" ]; then
-  echo "Insufficient free space: `$available bytes" >&2
+backup_bytes=`$(du -sk "`$REMOTE_DIR" | awk '{print `$1 * 1024}')
+required=`$((PACKAGE_BYTES + backup_bytes + 20971520))
+if [ "`$required" -lt "`$MINIMUM_FREE_BYTES" ]; then required="`$MINIMUM_FREE_BYTES"; fi
+if [ "`$available" -lt "`$required" ]; then
+  echo "Insufficient free space: available=`$available required=`$required bytes" >&2
   exit 1
 fi
 expected=`$(mktemp)
@@ -303,7 +322,7 @@ if [ -n "`$unknown" ]; then
   printf '%s\n' "`$unknown" >&2
   exit 1
 fi
-echo "Preflight passed: freeBytes=`$available manifestSha256=$($Package.ManifestSha256)"
+echo "Preflight passed: freeBytes=`$available requiredBytes=`$required manifestSha256=$($Package.ManifestSha256)"
 "@
     Invoke-RemoteScript -Script $script
 }
@@ -344,17 +363,43 @@ echo "Promote completed: backup=`$REMOTE_BACKUP manifestSha256=$($Package.Manife
 }
 
 function Assert-RemoteStage {
-    param([object]$Package, [string]$RemotePackage)
+    param([object]$Package, [string]$ReleaseId)
+    if ($ReleaseId -notmatch '^[A-Za-z0-9._-]+$') { throw "Unsafe staged release id." }
     $localPackageHash = (Get-FileHash -LiteralPath $Package.PackagePath -Algorithm SHA256).Hash.ToLowerInvariant()
     $script = @"
 set -eu
-PACKAGE='$RemotePackage'
+RELEASE_ID='$ReleaseId'
+PACKAGE="`$HOME/`$RELEASE_ID.tgz"
+METADATA="`$HOME/.abroad-o-stages/`$RELEASE_ID.meta"
 test -f "`$PACKAGE"
-if command -v sha256sum >/dev/null 2>&1; then sha256sum "`$PACKAGE" | awk '{print `$1}'; else shasum -a 256 "`$PACKAGE" | awk '{print `$1}'; fi
+if command -v sha256sum >/dev/null 2>&1; then archive_sha=`$(sha256sum "`$PACKAGE" | awk '{print `$1}'); else archive_sha=`$(shasum -a 256 "`$PACKAGE" | awk '{print `$1}'); fi
+test "`$archive_sha" = '$localPackageHash'
+mkdir -p "`$(dirname "`$METADATA")"
+printf '%s  %s\n' "`$archive_sha" '$($Package.ManifestSha256)' > "`$METADATA"
+printf '%s\n' "`$PACKAGE"
 "@
-    $remoteHash = (Invoke-RemoteScriptOutput -Script $script | Select-Object -Last 1).Trim().ToLowerInvariant()
-    if ($remoteHash -ne $localPackageHash) { throw "Staged package SHA-256 mismatch." }
-    Write-Host "Stage SHA-256 verified: $remoteHash manifestSha256=$($Package.ManifestSha256)"
+    $remotePackage = (Invoke-RemoteScriptOutput -Script $script | Select-Object -Last 1).Trim()
+    if ($remotePackage -notmatch '^/home/') { throw "Remote stage did not return an absolute package path." }
+    Write-Host "Stage SHA-256 verified: $localPackageHash manifestSha256=$($Package.ManifestSha256) release=$ReleaseId"
+    return $remotePackage
+}
+
+function Get-VerifiedStagedPackage {
+    param([object]$Package, [string]$ReleaseId)
+    if (-not $ReleaseId -or $ReleaseId -notmatch '^[A-Za-z0-9._-]+$') { throw "StagedReleaseId or SAKURA_STAGED_RELEASE_ID is required for Promote." }
+    $script = @"
+set -eu
+RELEASE_ID='$ReleaseId'
+PACKAGE="`$HOME/`$RELEASE_ID.tgz"
+METADATA="`$HOME/.abroad-o-stages/`$RELEASE_ID.meta"
+test -f "`$PACKAGE" && test -f "`$METADATA"
+read archive_sha manifest_sha < "`$METADATA"
+test "`$manifest_sha" = '$($Package.ManifestSha256)'
+if command -v sha256sum >/dev/null 2>&1; then actual_sha=`$(sha256sum "`$PACKAGE" | awk '{print `$1}'); else actual_sha=`$(shasum -a 256 "`$PACKAGE" | awk '{print `$1}'); fi
+test "`$actual_sha" = "`$archive_sha"
+printf '%s\n' "`$PACKAGE"
+"@
+    return (Invoke-RemoteScriptOutput -Script $script | Select-Object -Last 1).Trim()
 }
 
 function Get-SshTarget {
@@ -642,7 +687,7 @@ if ($Mode -eq "Verify") {
     exit 0
 }
 
-if ($Mode -in @("Restore", "Rollback")) {
+if ($Mode -eq "Restore") {
     if (-not $BackupFile) {
         throw "BackupFile or SAKURA_BACKUP_FILE is required for Restore."
     }
@@ -693,10 +738,11 @@ if ($Mode -eq "Package" -or $Mode -eq "DryRun") {
 
 $target = Get-SshTarget
 $remoteDirValue = Get-RemoteDir
-$remotePackageName = "abroad-o-public-$($package.Stamp).tgz"
-$remotePackageForScp = "~/$remotePackageName"
+Assert-RemoteInput -Directory $remoteDirValue
+$releaseId = "abroad-o-public-$($package.Stamp)"
+$remotePackageForScp = "~/$releaseId.tgz"
 $remoteBackupName = "abroad-o-before-$($package.Stamp).tgz"
-$remoteBackupPath = "`$HOME/abroad-o-backups/$remoteBackupName"
+$remoteBackupPath = "/home/$UserName/abroad-o-backups/$remoteBackupName"
 
 if ($Mode -in @("Preflight", "Stage", "Promote", "Deploy")) {
     Invoke-RemotePreflight -Package $package -RemoteDirectory $remoteDirValue -Config $config
@@ -712,16 +758,15 @@ if ($Mode -in @("Stage", "Deploy")) {
     if ($LASTEXITCODE -ne 0) {
         throw "scp failed while uploading deployment package."
     }
-    Assert-RemoteStage -Package $package -RemotePackage "`$HOME/$remotePackageName"
-    Write-Host "Stage completed: $remotePackageForScp manifestSha256=$($package.ManifestSha256)"
+    $remotePackagePath = Assert-RemoteStage -Package $package -ReleaseId $releaseId
+    Write-Host "Stage completed: release=$releaseId manifestSha256=$($package.ManifestSha256)"
     if ($Mode -eq "Stage") {
         exit 0
     }
 }
 
-$remotePackagePath = if ($Mode -eq "Promote") { $StagedPackage } else { "`$HOME/$remotePackageName" }
-if (-not $remotePackagePath) {
-    throw "StagedPackage or SAKURA_STAGED_PACKAGE is required for Promote."
+if ($Mode -eq "Promote") {
+    $remotePackagePath = Get-VerifiedStagedPackage -Package $package -ReleaseId $StagedReleaseId
 }
 Invoke-RemotePromote -Package $package -RemoteDirectory $remoteDirValue -RemotePackage $remotePackagePath -RemoteBackup $remoteBackupPath -Config $config
 Invoke-Verification -Config $config
