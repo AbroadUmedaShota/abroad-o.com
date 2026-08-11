@@ -320,14 +320,15 @@ function Invoke-ContentAudit {
         }
     }
 
-    $textExtensions = @(".css", ".html", ".js", ".json", ".less", ".map", ".md", ".properties", ".rb", ".scss", ".txt", ".xml")
+    $textExtensions = @(".css", ".html", ".js", ".json", ".less", ".map", ".md", ".properties", ".rb", ".scss", ".svg", ".txt", ".xml")
     $localHashes = @{}
     $localNormalizedHashes = @{}
     foreach ($path in $manifest) {
         $localPath = Join-Path $Package.StagingDir $path
         $localHashes[$path] = (Get-FileHash -LiteralPath $localPath -Algorithm SHA256).Hash.ToLowerInvariant()
         $extension = [IO.Path]::GetExtension($path).ToLowerInvariant()
-        if ($textExtensions -contains $extension -or [IO.Path]::GetFileName($path) -eq ".htaccess") {
+        $fileName = [IO.Path]::GetFileName($path)
+        if ($textExtensions -contains $extension -or $fileName -in @(".htaccess", "LICENSE")) {
             $bytes = [IO.File]::ReadAllBytes($localPath)
             $normalizedStream = [IO.MemoryStream]::new()
             try {
@@ -381,7 +382,7 @@ if [ -s "`$HASH_LIST" ]; then
 fi
 while IFS= read -r path; do
   case "`$path" in
-    *.css|*.html|*.js|*.json|*.less|*.map|*.md|*.properties|*.rb|*.scss|*.txt|*.xml|*/.htaccess|.htaccess)
+    *.css|*.html|*.js|*.json|*.less|*.map|*.md|*.properties|*.rb|*.scss|*.svg|*.txt|*.xml|*/.htaccess|.htaccess|*/LICENSE|LICENSE)
       if [ -f "`$path" ]; then
         NORMALIZED_HASH=`$(perl -pe 's/\r\n/\n/g' < "`$path" | `$HASH_COMMAND | awk '{ print `$1 }')
         printf 'NORMALIZED %s  %s\n' "`$NORMALIZED_HASH" "`$path"
