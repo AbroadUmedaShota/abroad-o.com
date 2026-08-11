@@ -287,17 +287,25 @@ function Invoke-RemotePreflight {
     param([object]$Package, [string]$RemoteDirectory, [object]$Config)
 
     $manifestBody = (Get-Content -LiteralPath $Package.ManifestPath) -join "`n"
+    $stagingBytes = (Get-ChildItem -LiteralPath $Package.StagingDir -Recurse -File | Measure-Object -Property Length -Sum).Sum
     $script = @"
 set -eu
 REMOTE_DIR='$RemoteDirectory'
 MINIMUM_FREE_BYTES='$($Config.minimumFreeBytes)'
 PACKAGE_BYTES='$((Get-Item -LiteralPath $Package.PackagePath).Length)'
+STAGING_BYTES='$stagingBytes'
 test -d "`$REMOTE_DIR"
 test ! -L "`$REMOTE_DIR"
+if find "`$REMOTE_DIR" -type l -print -quit | grep -q .; then
+  echo 'Remote directory contains a symlink; refusing deployment.' >&2
+  exit 1
+fi
 available=`$(df -Pk "`$REMOTE_DIR" | awk 'NR == 2 { print `$4 * 1024 }')
 test -n "`$available"
 backup_bytes=`$(du -sk "`$REMOTE_DIR" | awk '{print `$1 * 1024}')
-required=`$((PACKAGE_BYTES + backup_bytes + 20971520))
+largest_tree="`$backup_bytes"
+if [ "`$STAGING_BYTES" -gt "`$largest_tree" ]; then largest_tree="`$STAGING_BYTES"; fi
+required=`$((PACKAGE_BYTES + 2 * largest_tree + 20971520))
 if [ "`$required" -lt "`$MINIMUM_FREE_BYTES" ]; then required="`$MINIMUM_FREE_BYTES"; fi
 if [ "`$available" -lt "`$required" ]; then
   echo "Insufficient free space: available=`$available required=`$required bytes" >&2
@@ -340,9 +348,27 @@ STAGE_DIR=`$(mktemp -d "`$HOME/abroad-o-stage.XXXXXX")
 cleanup() { rm -rf "`$STAGE_DIR"; }
 trap cleanup EXIT
 test -f "`$REMOTE_PACKAGE"
+if find "`$REMOTE_DIR" -type l -print -quit | grep -q .; then
+  echo 'Remote directory contains a symlink immediately before promote; refusing deployment.' >&2
+  exit 1
+fi
+unsafe_entries=`$(tar -tzf "`$REMOTE_PACKAGE" | awk '/^\// || /(^|\/)\.\.($|\/)/ { print; exit }')
+if [ -n "`$unsafe_entries" ]; then
+  echo "Staged archive contains an unsafe entry: `$unsafe_entries" >&2
+  exit 1
+fi
+archive_links=`$(tar -tvzf "`$REMOTE_PACKAGE" | awk 'substr(`$1, 1, 1) == "l" || substr(`$1, 1, 1) == "h" { print; exit }')
+if [ -n "`$archive_links" ]; then
+  echo 'Staged archive contains a symlink or hard link; refusing deployment.' >&2
+  exit 1
+fi
 mkdir -p "`$(dirname "`$REMOTE_BACKUP")"
 tar -czf "`$REMOTE_BACKUP" -C "`$REMOTE_DIR" .
 tar -xzf "`$REMOTE_PACKAGE" -C "`$STAGE_DIR"
+if find "`$STAGE_DIR" -type l -print -quit | grep -q .; then
+  echo 'Extracted staging directory contains a symlink; refusing deployment.' >&2
+  exit 1
+fi
 while IFS= read -r path; do
   test -f "`$STAGE_DIR/`$path"
   mkdir -p "`$(dirname "`$REMOTE_DIR/`$path")"

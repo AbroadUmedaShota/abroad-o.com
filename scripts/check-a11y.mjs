@@ -27,7 +27,10 @@ try {
   const critical = [];
   for (const pagePath of pages) {
     const page = await context.newPage();
-    await page.goto(`http://127.0.0.1:${port}${pagePath}`, { waitUntil: 'networkidle' });
+    const response = await page.goto(`http://127.0.0.1:${port}${pagePath}`, { waitUntil: 'networkidle' });
+    if (!response || !response.ok()) {
+      throw new Error(`Accessibility target did not return 2xx: ${pagePath} (${response?.status() ?? 'no response'})`);
+    }
     const results = await new AxeBuilder({ page }).analyze();
     for (const violation of results.violations.filter((violation) => violation.impact === 'critical')) {
       critical.push(`${pagePath}: ${violation.id} (${violation.nodes.length} nodes)`);
