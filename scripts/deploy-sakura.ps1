@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("Package", "DryRun", "Audit", "Deploy", "Verify", "Restore")]
+    [ValidateSet("Package", "DryRun", "Audit", "Preflight", "Stage", "Promote", "Deploy", "Verify", "Restore")]
     [string]$Mode = "DryRun",
 
     [string]$ConfigPath = "deploy/sakura-public-files.json",
@@ -10,6 +10,7 @@ param(
     [string]$SshKeyPath = $env:SAKURA_SSH_KEY_PATH,
     [int]$Port = $(if ($env:SAKURA_PORT) { [int]$env:SAKURA_PORT } else { 22 }),
     [string]$BackupFile = $env:SAKURA_BACKUP_FILE,
+    [string]$StagedReleaseId = $env:SAKURA_STAGED_RELEASE_ID,
     [switch]$UseFileZillaConfig
 )
 
@@ -183,6 +184,7 @@ function New-DeployPackage {
     $stagingDir = Join-Path $WorkDirPath "staging"
     $packagePath = Join-Path $WorkDirPath "abroad-o-public-$stamp.tgz"
     $manifestPath = Join-Path $WorkDirPath "manifest-$stamp.txt"
+    $evidencePath = Join-Path $WorkDirPath "manifest-$stamp.sha256"
 
     if (Test-Path $stagingDir) {
         Remove-Item -LiteralPath $stagingDir -Recurse -Force
@@ -219,6 +221,12 @@ function New-DeployPackage {
         Sort-Object
     $manifest | Set-Content -Path $manifestPath -Encoding UTF8
 
+    $manifestEvidence = foreach ($path in $manifest) {
+        $hash = (Get-FileHash -LiteralPath (Join-Path $stagingDir $path) -Algorithm SHA256).Hash.ToLowerInvariant()
+        "$hash  $path"
+    }
+    $manifestEvidence | Set-Content -Path $evidencePath -Encoding UTF8
+
     if ($manifest.Count -eq 0) {
         throw "Deployment package is empty."
     }
@@ -232,9 +240,192 @@ function New-DeployPackage {
         StagingDir = $stagingDir
         PackagePath = $packagePath
         ManifestPath = $manifestPath
+        EvidencePath = $evidencePath
+        ManifestSha256 = (Get-FileHash -LiteralPath $evidencePath -Algorithm SHA256).Hash.ToLowerInvariant()
         FileCount = $manifest.Count
         Stamp = $stamp
     }
+}
+
+function Assert-DeployContract {
+    param([object]$Package, [object]$Config)
+
+    $paths = @(Get-Content -LiteralPath $Package.ManifestPath)
+    $roots = @($paths | Where-Object { $_ -notlike "*/*" } | Sort-Object)
+    $expectedRoots = @($Config.managedRootFiles | Sort-Object)
+    if (Compare-Object -ReferenceObject $expectedRoots -DifferenceObject $roots) {
+        throw "Package root files differ from deploy/sakura-public-files.json. Update the explicit managedRootFiles manifest before deployment."
+    }
+    $directories = @($paths | Where-Object { $_ -like "*/*" } | ForEach-Object { ($_ -split "/", 2)[0] } | Sort-Object -Unique)
+    $expectedDirectories = @($Config.managedDirectories | Sort-Object)
+    if (Compare-Object -ReferenceObject $expectedDirectories -DifferenceObject $directories) {
+        throw "Package directories differ from the managed directory allowlist."
+    }
+    foreach ($path in $paths) {
+        if ($path -notmatch '^[A-Za-z0-9._/@+-]+$' -or $path.StartsWith("/") -or $path.Contains("..")) {
+            throw "Unsafe deployment path: $path"
+        }
+    }
+    foreach ($path in @($Config.deletePaths)) {
+        if ($path -notmatch '^[A-Za-z0-9._/@+-]+$' -or $path.StartsWith("/") -or $path.Contains("..") -or $path.Contains("`n") -or $path.Contains("`r")) {
+            throw "Unsafe delete allowlist path: $path"
+        }
+        if ($paths -contains $path) { throw "Delete allowlist path is still in the deployment manifest: $path" }
+        if ($path -in @('.htaccess', 'sitemap.xml')) { throw "Protected path cannot be deleted: $path" }
+    }
+}
+
+function Assert-RemoteInput {
+    param([string]$Directory)
+    if ($Directory -notmatch '^/[A-Za-z0-9_./-]+$' -or $Directory.Contains('..') -or $Directory.Contains("`n") -or $Directory.Contains("`r")) {
+        throw "SAKURA_REMOTE_DIR must be a safe absolute Unix path."
+    }
+    if ($UserName -notmatch '^[A-Za-z0-9_-]+$') { throw "SAKURA_USER contains unsafe characters." }
+}
+
+function Invoke-RemotePreflight {
+    param([object]$Package, [string]$RemoteDirectory, [object]$Config)
+
+    $manifestBody = (Get-Content -LiteralPath $Package.ManifestPath) -join "`n"
+    $stagingBytes = (Get-ChildItem -LiteralPath $Package.StagingDir -Recurse -File | Measure-Object -Property Length -Sum).Sum
+    $script = @"
+set -eu
+REMOTE_DIR='$RemoteDirectory'
+MINIMUM_FREE_BYTES='$($Config.minimumFreeBytes)'
+PACKAGE_BYTES='$((Get-Item -LiteralPath $Package.PackagePath).Length)'
+STAGING_BYTES='$stagingBytes'
+test -d "`$REMOTE_DIR"
+test ! -L "`$REMOTE_DIR"
+if find "`$REMOTE_DIR" -type l -print -quit | grep -q .; then
+  echo 'Remote directory contains a symlink; refusing deployment.' >&2
+  exit 1
+fi
+available=`$(df -Pk "`$REMOTE_DIR" | awk 'NR == 2 { print `$4 * 1024 }')
+test -n "`$available"
+backup_bytes=`$(du -sk "`$REMOTE_DIR" | awk '{print `$1 * 1024}')
+largest_tree="`$backup_bytes"
+if [ "`$STAGING_BYTES" -gt "`$largest_tree" ]; then largest_tree="`$STAGING_BYTES"; fi
+required=`$((PACKAGE_BYTES + 2 * largest_tree + 20971520))
+if [ "`$required" -lt "`$MINIMUM_FREE_BYTES" ]; then required="`$MINIMUM_FREE_BYTES"; fi
+if [ "`$available" -lt "`$required" ]; then
+  echo "Insufficient free space: available=`$available required=`$required bytes" >&2
+  exit 1
+fi
+expected=`$(mktemp)
+deletable=`$(mktemp)
+allowed=`$(mktemp)
+actual=`$(mktemp)
+trap 'rm -f "`$expected" "`$deletable" "`$allowed" "`$actual"' EXIT
+cat > "`$expected" <<'CODEX_MANIFEST'
+$manifestBody
+CODEX_MANIFEST
+cat > "`$deletable" <<'CODEX_DELETE_PATHS'
+$(@($Config.deletePaths) -join "`n")
+CODEX_DELETE_PATHS
+(cd "`$REMOTE_DIR" && find . -type f -printf '%P\n' | LC_ALL=C sort) > "`$actual"
+cat "`$expected" "`$deletable" | LC_ALL=C sort -u > "`$allowed"
+unknown=`$(comm -23 "`$actual" "`$allowed" || true)
+if [ -n "`$unknown" ]; then
+  echo 'Remote contains files outside the explicit ownership/deletion contract; refusing to overwrite.' >&2
+  printf '%s\n' "`$unknown" >&2
+  exit 1
+fi
+echo "Preflight passed: freeBytes=`$available requiredBytes=`$required manifestSha256=$($Package.ManifestSha256)"
+"@
+    Invoke-RemoteScript -Script $script
+}
+
+function Invoke-RemotePromote {
+    param([object]$Package, [string]$RemoteDirectory, [string]$RemotePackage, [string]$RemoteBackup, [object]$Config)
+
+    $manifestBody = (Get-Content -LiteralPath $Package.ManifestPath) -join "`n"
+    $script = @"
+set -eu
+REMOTE_DIR='$RemoteDirectory'
+REMOTE_PACKAGE='$RemotePackage'
+REMOTE_BACKUP='$RemoteBackup'
+STAGE_DIR=`$(mktemp -d "`$HOME/abroad-o-stage.XXXXXX")
+cleanup() { rm -rf "`$STAGE_DIR"; }
+trap cleanup EXIT
+test -f "`$REMOTE_PACKAGE"
+if find "`$REMOTE_DIR" -type l -print -quit | grep -q .; then
+  echo 'Remote directory contains a symlink immediately before promote; refusing deployment.' >&2
+  exit 1
+fi
+unsafe_entries=`$(tar -tzf "`$REMOTE_PACKAGE" | awk '/^\// || /(^|\/)\.\.($|\/)/ { print; exit }')
+if [ -n "`$unsafe_entries" ]; then
+  echo "Staged archive contains an unsafe entry: `$unsafe_entries" >&2
+  exit 1
+fi
+archive_links=`$(tar -tvzf "`$REMOTE_PACKAGE" | awk 'substr(`$1, 1, 1) == "l" || substr(`$1, 1, 1) == "h" { print; exit }')
+if [ -n "`$archive_links" ]; then
+  echo 'Staged archive contains a symlink or hard link; refusing deployment.' >&2
+  exit 1
+fi
+mkdir -p "`$(dirname "`$REMOTE_BACKUP")"
+tar -czf "`$REMOTE_BACKUP" -C "`$REMOTE_DIR" .
+tar -xzf "`$REMOTE_PACKAGE" -C "`$STAGE_DIR"
+if find "`$STAGE_DIR" -type l -print -quit | grep -q .; then
+  echo 'Extracted staging directory contains a symlink; refusing deployment.' >&2
+  exit 1
+fi
+while IFS= read -r path; do
+  test -f "`$STAGE_DIR/`$path"
+  mkdir -p "`$(dirname "`$REMOTE_DIR/`$path")"
+  cp -p "`$STAGE_DIR/`$path" "`$REMOTE_DIR/`$path"
+done <<'CODEX_MANIFEST'
+$manifestBody
+CODEX_MANIFEST
+while IFS= read -r path; do
+  [ -n "`$path" ] || continue
+  rm -f "`$REMOTE_DIR/`$path"
+done <<'CODEX_DELETE_PATHS'
+$(@($Config.deletePaths) -join "`n")
+CODEX_DELETE_PATHS
+rm -f "`$REMOTE_PACKAGE"
+echo "Promote completed: backup=`$REMOTE_BACKUP manifestSha256=$($Package.ManifestSha256)"
+"@
+    Invoke-RemoteScript -Script $script
+}
+
+function Assert-RemoteStage {
+    param([object]$Package, [string]$ReleaseId)
+    if ($ReleaseId -notmatch '^[A-Za-z0-9._-]+$') { throw "Unsafe staged release id." }
+    $localPackageHash = (Get-FileHash -LiteralPath $Package.PackagePath -Algorithm SHA256).Hash.ToLowerInvariant()
+    $script = @"
+set -eu
+RELEASE_ID='$ReleaseId'
+PACKAGE="`$HOME/`$RELEASE_ID.tgz"
+METADATA="`$HOME/.abroad-o-stages/`$RELEASE_ID.meta"
+test -f "`$PACKAGE"
+if command -v sha256sum >/dev/null 2>&1; then archive_sha=`$(sha256sum "`$PACKAGE" | awk '{print `$1}'); else archive_sha=`$(shasum -a 256 "`$PACKAGE" | awk '{print `$1}'); fi
+test "`$archive_sha" = '$localPackageHash'
+mkdir -p "`$(dirname "`$METADATA")"
+printf '%s  %s\n' "`$archive_sha" '$($Package.ManifestSha256)' > "`$METADATA"
+printf '%s\n' "`$PACKAGE"
+"@
+    $remotePackage = (Invoke-RemoteScriptOutput -Script $script | Select-Object -Last 1).Trim()
+    if ($remotePackage -notmatch '^/home/') { throw "Remote stage did not return an absolute package path." }
+    Write-Host "Stage SHA-256 verified: $localPackageHash manifestSha256=$($Package.ManifestSha256) release=$ReleaseId"
+    return $remotePackage
+}
+
+function Get-VerifiedStagedPackage {
+    param([object]$Package, [string]$ReleaseId)
+    if (-not $ReleaseId -or $ReleaseId -notmatch '^[A-Za-z0-9._-]+$') { throw "StagedReleaseId or SAKURA_STAGED_RELEASE_ID is required for Promote." }
+    $script = @"
+set -eu
+RELEASE_ID='$ReleaseId'
+PACKAGE="`$HOME/`$RELEASE_ID.tgz"
+METADATA="`$HOME/.abroad-o-stages/`$RELEASE_ID.meta"
+test -f "`$PACKAGE" && test -f "`$METADATA"
+read archive_sha manifest_sha < "`$METADATA"
+test "`$manifest_sha" = '$($Package.ManifestSha256)'
+if command -v sha256sum >/dev/null 2>&1; then actual_sha=`$(sha256sum "`$PACKAGE" | awk '{print `$1}'); else actual_sha=`$(shasum -a 256 "`$PACKAGE" | awk '{print `$1}'); fi
+test "`$actual_sha" = "`$archive_sha"
+printf '%s\n' "`$PACKAGE"
+"@
+    return (Invoke-RemoteScriptOutput -Script $script | Select-Object -Last 1).Trim()
 }
 
 function Get-SshTarget {
@@ -536,9 +727,6 @@ if [ ! -f "`$BACKUP_FILE" ]; then
   exit 1
 fi
 mkdir -p "`$REMOTE_DIR"
-find "`$REMOTE_DIR" -maxdepth 1 -type f -name '*.html' -delete
-rm -rf "`$REMOTE_DIR/css" "`$REMOTE_DIR/fonts" "`$REMOTE_DIR/image" "`$REMOTE_DIR/js" "`$REMOTE_DIR/news" "`$REMOTE_DIR/pdfjs" "`$REMOTE_DIR/slick" "`$REMOTE_DIR/TOOL"
-rm -f "`$REMOTE_DIR/.htaccess" "`$REMOTE_DIR/sitemap.xml" "`$REMOTE_DIR/global.css" "`$REMOTE_DIR/style.css" "`$REMOTE_DIR/style2.css" "`$REMOTE_DIR/style3.css"
 tar -xzf "`$BACKUP_FILE" -C "`$REMOTE_DIR"
 echo "Restored from `$BACKUP_FILE"
 "@
@@ -549,7 +737,11 @@ echo "Restored from `$BACKUP_FILE"
 $package = New-DeployPackage -RepoRoot $repoRoot -Config $config -WorkDirPath $workDirFullPath
 Write-Host "Package: $($package.PackagePath)"
 Write-Host "Manifest: $($package.ManifestPath)"
+Write-Host "Manifest evidence: $($package.EvidencePath)"
+Write-Host "Manifest SHA-256: $($package.ManifestSha256)"
 Write-Host "Files: $($package.FileCount)"
+
+Assert-DeployContract -Package $package -Config $config
 
 $excludedChecks = @("docs/TOOL_USAGE.md", "data/chatwork.sqlite", "issue_body.md", "issue_comment_body.md", "pr_body.md")
 $manifestText = Get-Content -Path $package.ManifestPath
@@ -572,32 +764,35 @@ if ($Mode -eq "Package" -or $Mode -eq "DryRun") {
 
 $target = Get-SshTarget
 $remoteDirValue = Get-RemoteDir
-$remotePackageName = "abroad-o-public-$($package.Stamp).tgz"
-$remotePackageForScp = "~/$remotePackageName"
+Assert-RemoteInput -Directory $remoteDirValue
+$releaseId = "abroad-o-public-$($package.Stamp)"
+$remotePackageForScp = "~/$releaseId.tgz"
 $remoteBackupName = "abroad-o-before-$($package.Stamp).tgz"
+$remoteBackupPath = "/home/$UserName/abroad-o-backups/$remoteBackupName"
 
-$scpArgs = Get-ScpArgs
-& scp @scpArgs $package.PackagePath "${target}:$remotePackageForScp"
-if ($LASTEXITCODE -ne 0) {
-    throw "scp failed while uploading deployment package."
+if ($Mode -in @("Preflight", "Stage", "Promote", "Deploy")) {
+    Invoke-RemotePreflight -Package $package -RemoteDirectory $remoteDirValue -Config $config
 }
 
-$deployScript = @"
-set -eu
-REMOTE_DIR='$remoteDirValue'
-REMOTE_PACKAGE="`$HOME/$remotePackageName"
-REMOTE_BACKUP="`$HOME/abroad-o-backups/$remoteBackupName"
-TMP_DIR=`$(mktemp -d "`$HOME/abroad-o-deploy.XXXXXX")
-mkdir -p "`$REMOTE_DIR" "`$(dirname "`$REMOTE_BACKUP")"
-tar -czf "`$REMOTE_BACKUP" -C "`$REMOTE_DIR" .
-tar -xzf "`$REMOTE_PACKAGE" -C "`$TMP_DIR"
-find "`$REMOTE_DIR" -maxdepth 1 -type f -name '*.html' -delete
-rm -rf "`$REMOTE_DIR/css" "`$REMOTE_DIR/fonts" "`$REMOTE_DIR/image" "`$REMOTE_DIR/js" "`$REMOTE_DIR/news" "`$REMOTE_DIR/pdfjs" "`$REMOTE_DIR/slick" "`$REMOTE_DIR/TOOL"
-rm -f "`$REMOTE_DIR/.htaccess" "`$REMOTE_DIR/sitemap.xml" "`$REMOTE_DIR/global.css" "`$REMOTE_DIR/style.css" "`$REMOTE_DIR/style2.css" "`$REMOTE_DIR/style3.css"
-cp -Rp "`$TMP_DIR/." "`$REMOTE_DIR/"
-rm -rf "`$TMP_DIR" "`$REMOTE_PACKAGE"
-echo "Backup: `$REMOTE_BACKUP"
-"@
+if ($Mode -eq "Preflight") {
+    exit 0
+}
 
-Invoke-RemoteScript -Script $deployScript
+$scpArgs = Get-ScpArgs
+if ($Mode -in @("Stage", "Deploy")) {
+    & scp @scpArgs $package.PackagePath "${target}:$remotePackageForScp"
+    if ($LASTEXITCODE -ne 0) {
+        throw "scp failed while uploading deployment package."
+    }
+    $remotePackagePath = Assert-RemoteStage -Package $package -ReleaseId $releaseId
+    Write-Host "Stage completed: release=$releaseId manifestSha256=$($package.ManifestSha256)"
+    if ($Mode -eq "Stage") {
+        exit 0
+    }
+}
+
+if ($Mode -eq "Promote") {
+    $remotePackagePath = Get-VerifiedStagedPackage -Package $package -ReleaseId $StagedReleaseId
+}
+Invoke-RemotePromote -Package $package -RemoteDirectory $remoteDirValue -RemotePackage $remotePackagePath -RemoteBackup $remoteBackupPath -Config $config
 Invoke-Verification -Config $config

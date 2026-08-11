@@ -3,11 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build:site": "node scripts/clean-site.mjs && eleventy",
+    "build:site": "node scripts/build-site.mjs",
     "serve:site": "eleventy --serve",
-    "check:site": "npm run build:site && node scripts/check-site.mjs"
+    "check:site": "npm run build:site && node scripts/check-site.mjs",
+    "check:a11y": "npm run build:site && node scripts/check-a11y.mjs"
   },
   "devDependencies": {
-    "@11ty/eleventy": "3.1.6"
+    "@11ty/eleventy": "3.1.6",
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.62.1"
   }
 }

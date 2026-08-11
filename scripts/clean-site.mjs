@@ -6,6 +6,9 @@ const outputRoot = path.resolve(import.meta.dirname, '..', '_site');
 function removeDirectory(directory) {
   for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
     const target = path.join(directory, entry.name);
+    if (!fs.existsSync(target)) {
+      continue;
+    }
     if (entry.isDirectory()) {
       removeDirectory(target);
     } else {
