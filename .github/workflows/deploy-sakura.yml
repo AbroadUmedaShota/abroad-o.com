@@ -3,14 +3,15 @@ name: Deploy to Sakura
 on:
   workflow_dispatch:
     inputs:
-      dry_run:
-        description: "Package only. Set false to deploy to Sakura."
+      mode:
+        description: "Package, audit the current public files, or deploy to Sakura."
         required: true
-        default: "true"
+        default: "package"
         type: choice
         options:
-          - "true"
-          - "false"
+          - "package"
+          - "audit"
+          - "deploy"
 
 permissions:
   contents: read
@@ -33,24 +34,64 @@ jobs:
       - name: Install site dependencies
         run: npm ci
 
-      - name: Dry run package
-        if: ${{ inputs.dry_run == 'true' }}
+      - name: Package only
+        if: ${{ inputs.mode == 'package' }}
         shell: pwsh
         run: ./scripts/deploy-sakura.ps1 -Mode DryRun
 
-      - name: Install SSH key
-        if: ${{ inputs.dry_run == 'false' }}
+      - name: Validate Sakura secrets
+        if: ${{ inputs.mode == 'audit' || inputs.mode == 'deploy' }}
         shell: bash
         env:
+          SAKURA_HOST: ${{ secrets.SAKURA_HOST }}
+          SAKURA_USER: ${{ secrets.SAKURA_USER }}
+          SAKURA_REMOTE_DIR: ${{ secrets.SAKURA_REMOTE_DIR }}
           SAKURA_SSH_KEY: ${{ secrets.SAKURA_SSH_KEY }}
+          SAKURA_KNOWN_HOSTS: ${{ secrets.SAKURA_KNOWN_HOSTS }}
+          SAKURA_PORT: ${{ secrets.SAKURA_PORT }}
+        run: |
+          set -euo pipefail
+          missing=()
+          for name in SAKURA_HOST SAKURA_USER SAKURA_REMOTE_DIR SAKURA_SSH_KEY SAKURA_KNOWN_HOSTS SAKURA_PORT; do
+            if [[ -z "${!name}" ]]; then
+              missing+=("$name")
+            fi
+          done
+          if (( ${#missing[@]} > 0 )); then
+            printf 'Missing required repository secrets: %s\n' "${missing[*]}" >&2
+            exit 1
+          fi
+
+      - name: Install SSH key
+        if: ${{ inputs.mode == 'audit' || inputs.mode == 'deploy' }}
+        shell: bash
+        env:
+          SAKURA_HOST: ${{ secrets.SAKURA_HOST }}
+          SAKURA_SSH_KEY: ${{ secrets.SAKURA_SSH_KEY }}
+          SAKURA_KNOWN_HOSTS: ${{ secrets.SAKURA_KNOWN_HOSTS }}
         run: |
           set -euo pipefail
           mkdir -p "$HOME/.ssh"
           printf '%s\n' "$SAKURA_SSH_KEY" > "$HOME/.ssh/sakura_deploy_key"
+          printf '%s\n' "$SAKURA_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
           chmod 600 "$HOME/.ssh/sakura_deploy_key"
+          ssh-keygen -y -f "$HOME/.ssh/sakura_deploy_key" > /dev/null
+          ssh-keygen -F "$SAKURA_HOST" -f "$HOME/.ssh/known_hosts" > /dev/null
+
+      - name: Audit Sakura public files
+        if: ${{ inputs.mode == 'audit' }}
+        shell: pwsh
+        env:
+          SAKURA_HOST: ${{ secrets.SAKURA_HOST }}
+          SAKURA_USER: ${{ secrets.SAKURA_USER }}
+          SAKURA_REMOTE_DIR: ${{ secrets.SAKURA_REMOTE_DIR }}
+          SAKURA_PORT: ${{ secrets.SAKURA_PORT }}
+        run: |
+          $env:SAKURA_SSH_KEY_PATH = Join-Path $HOME ".ssh/sakura_deploy_key"
+          ./scripts/deploy-sakura.ps1 -Mode Audit
 
       - name: Deploy to Sakura
-        if: ${{ inputs.dry_run == 'false' }}
+        if: ${{ inputs.mode == 'deploy' }}
         shell: pwsh
         env:
           SAKURA_HOST: ${{ secrets.SAKURA_HOST }}

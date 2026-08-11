@@ -310,10 +310,36 @@ function Invoke-ContentAudit {
         }
     }
 
+    $textExtensions = @(".css", ".html", ".js", ".json", ".less", ".map", ".md", ".properties", ".rb", ".scss", ".txt", ".xml")
     $localHashes = @{}
+    $localNormalizedHashes = @{}
     foreach ($path in $manifest) {
         $localPath = Join-Path $Package.StagingDir $path
         $localHashes[$path] = (Get-FileHash -LiteralPath $localPath -Algorithm SHA256).Hash.ToLowerInvariant()
+        $extension = [IO.Path]::GetExtension($path).ToLowerInvariant()
+        if ($textExtensions -contains $extension -or [IO.Path]::GetFileName($path) -eq ".htaccess") {
+            $bytes = [IO.File]::ReadAllBytes($localPath)
+            $normalizedStream = [IO.MemoryStream]::new()
+            try {
+                for ($index = 0; $index -lt $bytes.Length; $index++) {
+                    $byte = $bytes[$index]
+                    if ($byte -eq 13 -and $index + 1 -lt $bytes.Length -and $bytes[$index + 1] -eq 10) {
+                        continue
+                    }
+                    $normalizedStream.WriteByte($byte)
+                }
+                $sha256 = [Security.Cryptography.SHA256]::Create()
+                try {
+                    $localNormalizedHashes[$path] = [Convert]::ToHexString($sha256.ComputeHash($normalizedStream.ToArray())).ToLowerInvariant()
+                }
+                finally {
+                    $sha256.Dispose()
+                }
+            }
+            finally {
+                $normalizedStream.Dispose()
+            }
+        }
     }
 
     $manifestBody = $manifest -join "`n"
@@ -343,10 +369,23 @@ CODEX_MANIFEST
 if [ -s "`$HASH_LIST" ]; then
   xargs `$HASH_COMMAND < "`$HASH_LIST"
 fi
+while IFS= read -r path; do
+  case "`$path" in
+    *.css|*.html|*.js|*.json|*.less|*.map|*.md|*.properties|*.rb|*.scss|*.txt|*.xml|*/.htaccess|.htaccess)
+      if [ -f "`$path" ]; then
+        NORMALIZED_HASH=`$(perl -pe 's/\r\n/\n/g' < "`$path" | `$HASH_COMMAND | awk '{ print `$1 }')
+        printf 'NORMALIZED %s  %s\n' "`$NORMALIZED_HASH" "`$path"
+      fi
+      ;;
+  esac
+done <<'CODEX_NORMALIZED_MANIFEST'
+$manifestBody
+CODEX_NORMALIZED_MANIFEST
 "@
 
     $remoteOutput = Invoke-RemoteScriptOutput -Script $auditScript
     $remoteHashes = @{}
+    $remoteNormalizedHashes = @{}
     $missing = @()
     foreach ($line in $remoteOutput) {
         if ($line -match '^MISSING\s{2}(.+)$') {
@@ -355,13 +394,27 @@ fi
         }
         if ($line -match '^([0-9a-fA-F]{64})\s+\*?(.+)$') {
             $remoteHashes[$Matches[2]] = $Matches[1].ToLowerInvariant()
+            continue
+        }
+        if ($line -match '^NORMALIZED\s+([0-9a-fA-F]{64})\s{2}(.+)$') {
+            $remoteNormalizedHashes[$Matches[2]] = $Matches[1].ToLowerInvariant()
         }
     }
 
     $different = @()
+    $lineEndingOnly = @()
     foreach ($path in $manifest) {
         if ($remoteHashes.ContainsKey($path) -and $remoteHashes[$path] -ne $localHashes[$path]) {
-            $different += $path
+            if (
+                $localNormalizedHashes.ContainsKey($path) -and
+                $remoteNormalizedHashes.ContainsKey($path) -and
+                $localNormalizedHashes[$path] -eq $remoteNormalizedHashes[$path]
+            ) {
+                $lineEndingOnly += $path
+            }
+            else {
+                $different += $path
+            }
         }
     }
 
@@ -371,10 +424,14 @@ fi
     foreach ($path in $different) {
         Write-Host "DIFFERENT $path"
     }
+    foreach ($path in $lineEndingOnly) {
+        Write-Host "LINE_ENDING_ONLY $path"
+    }
 
     Write-Host "Audit files: $($manifest.Count)"
     Write-Host "Audit missing: $($missing.Count)"
     Write-Host "Audit different: $($different.Count)"
+    Write-Host "Audit line-ending-only: $($lineEndingOnly.Count)"
 
     if ($missing.Count -gt 0 -or $different.Count -gt 0) {
         throw "Public content audit found drift."
