@@ -19,7 +19,7 @@ activeNav: "service"
       gtag('js', new Date());
       gtag('config', 'UA-51168812-1');
     </script>
-    <link href="css/bootstrap.css" rel="stylesheet">
+    {% include "partials/styles-legacy-core.njk" %}
     <link href="style.css" rel="stylesheet">
     <link rel="shortcut icon" href="image/favicon.png" >
     <link href="https://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet">
@@ -1541,12 +1541,7 @@ activeNav: "service"
 {% endblock %}
 
 {% block scripts %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="https://use.fontawesome.com/297671da61.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootsnav/1.2.0/js/bootsnav.min.js"></script>
-    <script src="js/jquery.smooth-scroll.min.js"></script>
+{% include "partials/scripts-legacy-core.njk" %}
     <script src="js/custom.js"></script>
     <script>
       $(function() {

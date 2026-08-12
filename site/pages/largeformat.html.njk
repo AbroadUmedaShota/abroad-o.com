@@ -22,7 +22,7 @@ activeNav: "service"
 
       gtag('config', 'UA-51168812-1');
     </script>
-    <link href="css/bootstrap.css" rel="stylesheet">
+    {% include "partials/styles-legacy-core.njk" %}
     <link href="style.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -35,10 +35,6 @@ activeNav: "service"
     <link rel="shortcut icon" href="image/favicon.png" >
     <!-- Google Web Fonts-->
     <link href="https://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet">
-    <!-- lightbox2-->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.9.0/css/lightbox.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-1.12.4.min.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.9.0/js/lightbox.min.js" type="text/javascript"></script>
     <!-- 追加CSS -->
     <style>
       .no-link-style {
@@ -352,16 +348,7 @@ activeNav: "service"
 {% endblock %}
 
 {% block scripts %}
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <!-- Bootstrap JS -->
-    <script src="js/bootstrap.min.js"></script>
-    <!-- FontAwesome CDN -->
-    <script src="https://use.fontawesome.com/297671da61.js"></script>
-    <!-- Plugin JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootsnav/1.2.0/js/bootsnav.min.js"></script>
-    <script src="js/jquery.smooth-scroll.min.js"></script>
+{% include "partials/scripts-legacy-core.njk" %}
     <!-- ふわっと表示jQuery -->
     <script src="js/box-fadeup.js"></script>
     <!-- Custom Theme JavaScript -->

@@ -23,6 +23,7 @@ jobs:
       - run: npm run check:site
       - run: npm run check:a11y
       - run: npm run check:modern-ui
+      - run: npm run check:legacy-ui
       - name: Install and test Apache redirects
         run: |
           sudo apt-get update
