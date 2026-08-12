@@ -38,7 +38,8 @@ test('creates a stable no-delete inventory across HTML CSS and JavaScript refere
   assert.equal(first.commit, 'test-commit');
   assert.equal(first.historyCompleteness, 'full');
   assert.equal(first.uncertainties.some((item) => item.type === 'history-partial'), false);
-  assert.deepEqual(first.summary, { entrypoints: 1, protected: 0, reachable: 7, staticUnreferenced: 0, uncertainties: 0, deletionEligible: 0 });
+  assert.ok(first.uncertainties.some((item) => item.type === 'access-logs-not-reviewed'));
+  assert.deepEqual(first.summary, { entrypoints: 1, protected: 0, reachable: 7, staticUnreferenced: 0, uncertainties: 1, deletionEligible: 0 });
 });
 
 for (const [name, files, expected] of [
@@ -56,6 +57,8 @@ for (const [name, files, expected] of [
   ['missing CSS import target', { 'index.html': '<link href="style.css">', 'style.css': '@import "css/missing.css";' }, /missing local file/],
   ['missing CSS image-set quoted target', { 'index.html': '<link href="style.css">', 'style.css': '.x{background:image-set("image/missing.webp" 1x)}' }, /missing local file/],
   ['missing JavaScript import target', { 'index.html': '<script src="js/app.js"></script>', 'style.css': '', 'js/app.js': 'import "../image/missing.png";' }, /missing local file/],
+  ['missing dynamic import target', { 'index.html': '<script src="js/app.js"></script>', 'style.css': '', 'js/app.js': 'import("../image/missing.png");' }, /missing local file/],
+  ['missing extensionless import target', { 'index.html': '<script src="js/app.js"></script>', 'style.css': '', 'js/app.js': 'import("../image/missing");' }, /missing local file/],
   ['missing JavaScript fixed target', { 'index.html': '<script src="js/app.js"></script>', 'style.css': '', 'js/app.js': 'const value = "../image/missing.png";' }, /missing local file/],
   ['case mismatch', { 'index.html': '<img src="image/Logo.png">', 'style.css': '', 'image/logo.png': 'logo' }, /missing local file/]
 ]) test(`rejects ${name}`, () => assert.throws(() => inventory(files), expected));
@@ -68,6 +71,21 @@ test('normalizes query/hash and extensionless public page URLs', () => {
   });
   assert.equal(result.assets.find((asset) => asset.path === 'about.html').classification, 'entrypoint');
   assert.equal(result.assets.find((asset) => asset.path === 'index.html').classification, 'entrypoint');
+});
+
+test('resolves static extensionless imports and legacy HTML image attributes', () => {
+  const result = inventory({
+    'index.html': '<script src="js/app.js"></script><div data-background="image/a.png" data-bg="image/a.png" data-url="image/a.png" data-image="image/a.png" background="image/a.png"></div>',
+    'style.css': '', 'js/app.js': 'import("./module")', 'js/module.js': '', 'image/a.png': 'a'
+  });
+  assert.equal(result.assets.find((asset) => asset.path === 'js/module.js').classification, 'reachable');
+});
+
+test('ignores quoted external and data URLs before and after normalization', () => {
+  assert.doesNotThrow(() => inventory({
+    'index.html': '<a href="https://example.com/a.png">x</a><img src="data:image/png;base64,x"><img src="//example.com/a.png">',
+    'style.css': '.x{background:url("https://example.com/a.png"); mask-image:url("data:image/svg+xml,x")}'
+  }));
 });
 
 test('treats every public HTML file including slick/largeformat as a direct entrypoint', () => {
@@ -101,6 +119,7 @@ test('marks protected paths and records dynamic references only for partial hist
   assert.ok(result.uncertainties.some((item) => item.type === 'dynamic-reference'));
   assert.ok(result.uncertainties.some((item) => item.type === 'inline-event-handler'));
   assert.ok(result.uncertainties.some((item) => item.type === 'history-partial'));
+  assert.ok(result.uncertainties.some((item) => item.type === 'access-logs-not-reviewed'));
   assert.ok(result.uncertainties.some((item) => item.kind === 'js:concatenation'));
 });
 

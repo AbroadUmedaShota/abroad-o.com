@@ -44,7 +44,7 @@ function localReference(raw, from, kind, references, uncertainties, { rootRelati
     references.push({ from, kind, raw, invalid: 'Windows drive and backslash paths are not public URLs.' });
     return;
   }
-  if (ignoredUrl.test(raw)) return;
+  if (ignoredUrl.test(unquoted)) return;
   let clean;
   try {
     clean = decodeURIComponent(normalizeUrl(raw));
@@ -52,6 +52,7 @@ function localReference(raw, from, kind, references, uncertainties, { rootRelati
     references.push({ from, kind, raw, invalid: 'Invalid percent-encoded public URL.' });
     return;
   }
+  if (ignoredUrl.test(clean)) return;
   if (/^[A-Za-z]:[\\/]/.test(clean) || clean.includes('\\')) {
     references.push({ from, kind, raw, invalid: 'Windows drive and backslash paths are not public URLs.' });
     return;
@@ -75,19 +76,23 @@ function cssReferences(css, from, kind, references, uncertainties) {
   }
   for (const match of activeCss.matchAll(/image-set\((?:[^()]|\([^)]*\))*\)/gi)) {
     const body = match[0].slice(match[0].indexOf('(') + 1, -1);
-    for (const candidate of body.matchAll(/(?:^|,)\s*['"]([^'"]+)['"](?=\s+(?:type\(|\d))/gi)) {
+    for (const candidate of body.matchAll(/(?:^|,)\s*['"]([^'"]+)['"](?=\s*(?:type\(|\d|,|$))/gi)) {
       localReference(candidate[1], from, `${kind}:image-set`, references, uncertainties);
     }
   }
 }
 
 function jsReferences(js, from, references, uncertainties) {
-  for (const match of js.matchAll(/(?:\bimport\s*(?:[^('";]+?\s+from\s*)?|\brequire\s*\(|\bnew\s+URL\s*\()\s*['"]([^'"]+)['"]/g)) {
+  for (const match of js.matchAll(/(?:\bimport\s*(?:\(\s*|(?:[^('";]+?\s+from\s*)?)|\brequire\s*\(|\bnew\s+URL\s*\()\s*['"]([^'"]+)['"]/g)) {
     if (/^require\s*\(/.test(match[0]) && /CommonJS environment/i.test(js)) {
       uncertainties.push({ type: 'unresolved-reference', from, kind: 'js:commonjs', value: match[1] });
       continue;
     }
-    localReference(match[1], from, 'js:module', references, uncertainties);
+    if (!/^(?:\.\.?\/|\/)/.test(match[1])) {
+      uncertainties.push({ type: 'unresolved-reference', from, kind: 'js:bare-module', value: match[1] });
+      continue;
+    }
+    localReference(match[1], from, 'js:module', references, uncertainties, { allowExtensionless: true });
   }
   for (const match of js.matchAll(/['"]([^'"]+\.(?:avif|bmp|css|eot|gif|html?|ico|jpe?g|js|mjs|map|mp3|mp4|ogg|otf|pdf|png|svg|ttf|txt|webm|webp|woff2?)(?:[?#][^'"]*)?)['"]/gi)) {
     if (/(?:\bimport|\brequire|\bnew\s+URL)\s*\(\s*$/.test(js.slice(0, match.index))) continue;
@@ -109,7 +114,7 @@ function htmlReferences(html, from, references, uncertainties) {
   const visit = (node) => {
     const attrs = new Map((node.attrs || []).map(({ name, value }) => [name.toLowerCase(), value]));
     for (const [name, value] of attrs) {
-      if (['src', 'href', 'poster', 'lazy', 'data-src', 'data-href', 'data-lazy', 'data-original', 'action', 'formaction'].includes(name)
+      if (['src', 'href', 'poster', 'lazy', 'background', 'data-src', 'data-href', 'data-lazy', 'data-original', 'data-background', 'data-bg', 'data-url', 'data-image', 'action', 'formaction'].includes(name)
         || (node.tagName === 'object' && name === 'data')) {
         localReference(value, from, `html:${name}`, references, uncertainties, { allowExtensionless: ['href', 'action', 'formaction'].includes(name) });
       } else if (name === 'srcset' || name === 'data-srcset') {
@@ -136,10 +141,12 @@ function resolveReference(reference, files, publicManifest) {
   if (resolved === '..' || resolved.startsWith('../') || path.posix.isAbsolute(resolved)) {
     throw new Error(`Public reference escapes the root: ${reference.from} -> ${reference.raw}`);
   }
-  const extensionlessPage = reference.kind.startsWith('html:') && !path.posix.extname(resolved) ? `${resolved}.html` : null;
-  const target = files.has(resolved) ? resolved : extensionlessPage && files.has(extensionlessPage) ? extensionlessPage : null;
+  const extensionlessCandidates = !path.posix.extname(resolved)
+    ? reference.kind === 'js:module' ? [`${resolved}.js`, `${resolved}.mjs`, `${resolved}.css`, `${resolved}.html`] : reference.kind.startsWith('html:') ? [`${resolved}.html`] : []
+    : [];
+  const target = [resolved, ...extensionlessCandidates].find((candidate) => files.has(candidate));
   if (!target) {
-    if (!extensionlessPage && !managedPath(resolved, publicManifest)) {
+    if (!extensionlessCandidates.length && !managedPath(resolved, publicManifest)) {
       throw new Error(`Public reference targets an unmanaged path: ${reference.from} -> ${reference.raw} (${resolved})`);
     }
     throw new Error(`Public reference targets a missing local file: ${reference.from} -> ${reference.raw} (${resolved})`);
@@ -154,7 +161,7 @@ export function createPublicAssetInventory({ outputRoot, publicManifest, protect
   if (unmanagedFiles.length) throw new Error(`Published files outside the public manifest:\n${unmanagedFiles.join('\n')}`);
 
   const references = [];
-  const uncertainties = [];
+  const uncertainties = [{ type: 'access-logs-not-reviewed', detail: 'Access logs are not used to establish deletion eligibility.' }];
   if (historyCompleteness === 'partial') uncertainties.push({ type: 'history-partial', detail: 'Git history is shallow; access logs are not used to establish deletion eligibility.' });
   for (const file of files) {
     const absolute = path.join(outputRoot, file);
