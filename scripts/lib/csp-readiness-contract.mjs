@@ -110,6 +110,14 @@ export function assertNoInlineExecutableScripts(html, file) {
   if (inline.length) throw new Error(`Inline executable script remains in ${file}: ${inline.length}`);
 }
 
+export function assertNoInlineEventAttributes(html, file) {
+  const eventAttributes = [];
+  visit(parse(html), (node) => {
+    for (const { name } of node.attrs || []) if (/^on[a-z]/i.test(name)) eventAttributes.push(name);
+  });
+  if (eventAttributes.length) throw new Error(`Inline event attributes remain in ${file}: ${eventAttributes.join(', ')}`);
+}
+
 export function assertAnalyticsOrder(html, analyticsScript, file) {
   const scripts = scriptInventory(html);
   const loader = 'https://www.googletagmanager.com/gtag/js?id=UA-51168812-1';

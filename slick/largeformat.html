@@ -12,26 +12,19 @@
     
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-51168812-1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-    
-      gtag('config', 'UA-51168812-1');
-    </script>    <!-- Bootstrap -->
+    <script src="/js/analytics.js"></script>
+    <!-- Bootstrap -->
     <meta name="google-site-verification" content="Nqa719cJbf2AfjLk6kCgmpJHM73egoAodcPCb-cdyyc" />
-    <link href="../css/bootstrap.css" rel="stylesheet">
+    <link href="/vendor/bootstrap3/css/bootstrap.min.css" rel="stylesheet">
     <link href="../style.css" rel="stylesheet">
     <!--カノニカルタグ-->
-    <link rel="canonical" href="https://www.abroad-o.com/edit.html">
+    <link rel="canonical" href="https://www.abroad-o.com/largeformat.html">
     <!--favicon-->
     <link rel="shortcut icon" href="../image/favicon.png" >
     <!-- Google Web Fonts-->
     <link rel="stylesheet" href="/css/fonts.css">
-    <!-- lightbox2-->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.9.0/css/lightbox.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-1.12.4.min.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.9.0/js/lightbox.min.js" type="text/javascript"></script>      
+    <link href="/vendor/fontawesome/css/all.min.css" rel="stylesheet">
+    <link href="/vendor/fontawesome/css/v4-shims.min.css" rel="stylesheet">
   </head>
   <body>
 
@@ -104,7 +97,7 @@
       <div class="panel-body">
 		<ul class="nav nav-tabs">
           <li role="presentation" class="active"><a href="#sampleContentA" data-toggle="tab">　大判（A1サイズまで）の電子化　</a></li>
-          <li><a href="../scan.html" style="color: #CCCCCC">前の画面に戻る</a></li>
+          <li><a href="../scan.html" class="legacy-return-link">前の画面に戻る</a></li>
           <li><a href="#tabref-ContentC" data-toggle="tab"></a></li>
         </ul>
       <!--tab_contents-->      
@@ -168,17 +161,17 @@
                </tr>   
                <tr>
                  <td>電子化作業</td>
-                 <td>基本料金<b style="color: #f00"></b></td>
+                 <td>基本料金<b class="largeformat-price-marker"></b></td>
                  <td>無料</td>                 
                </tr>           
                <tr>
                  <td>電子化作業</td>
-                 <td>A2・B3サイズ<b style="color: #f00"></b></td>
+                 <td>A2・B3サイズ<b class="largeformat-price-marker"></b></td>
                  <td>120円</td>                 
                </tr>
                <tr>
                  <td>電子化作業</td>
-                 <td>A1・B2サイズ<b style="color: #f00"></b></td>
+                 <td>A1・B2サイズ<b class="largeformat-price-marker"></b></td>
                  <td>200円</td>                 
                </tr> 
                <tr class="active">
@@ -370,9 +363,9 @@
             <div class="row big-btn">
               <p class="cercle">無料でヒアリングをさせて頂き、最適な内容をご提案をします。<br>まずはお気軽にご相談ください。</p>
               <div class="btn_center">
-                <button type="button" class="btn btn-danger btn-lg" onclick="location.href='../form.html'"  tabindex="1" accesskey="U">
+                <a href="../form.html" class="btn btn-danger btn-lg" tabindex="1" accesskey="U">
                 <strong>　　無料お見積り・お問合せはコチラ　　</strong>
-                </button>    
+                </a>
               </div>
               <center><i class="fa fa-phone-square" aria-hidden="true"></i>　03-5835-0250<br class="hidden_br">（平日10時~19時）</center>
             </div>            
@@ -391,49 +384,10 @@
     </footer>
 
 
-    <!-- FontAwesome CDN -->
-    <script src="https://use.fontawesome.com/297671da61.js"></script>
-    <!-- Plugin JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="../js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootsnav/1.2.0/js/bootsnav.min.js"></script>
-    <script src="../js/jquery.smooth-scroll.min.js"></script>
-    <script>
-         $('a').smoothScroll();
-    </script>   
-    <!-- ふわっと表示jQuery -->      
-    <script src="../js/box-fadeup.js"></script>       
-    <!-- スクロールボタン表示jQuery -->  
-    <script>
-    $(function() {
-        var showFlag = false;
-        var topBtn = $('#page-top');    
-        topBtn.css('bottom', '-150px');
-        var showFlag = false;
-        $(window).scroll(function () {
-            if ($(this).scrollTop() > 300) {//スクロールが300に達したらボタン表示
-                if (showFlag == false) {
-                    showFlag = true;
-                    topBtn.stop().animate({'bottom' : '20px'}, 300); //スクロールボタンのmargin-bottm
-                }
-            } else {
-                if (showFlag) {
-                    showFlag = false;
-                    topBtn.stop().animate({'bottom' : '-200px'}, 300); //上に-200pxスクロールしたら消える 
-                }
-            }
-    });
-    //スクロールしてトップ
-    topBtn.click(function () {
-        $('body,html').animate({
-            scrollTop: 0
-        }, 500);
-        return false;
-    });
-    });
-    </script>    
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    <script src="/vendor/bootstrap3/js/bootstrap.min.js"></script>
+    <script src="/js/jquery.smooth-scroll.min.js"></script>
+    <script src="/js/legacy-smooth-scroll-all-ready.js"></script>
+    <script src="/js/legacy-page-top.js"></script>
   </body>
 </html>

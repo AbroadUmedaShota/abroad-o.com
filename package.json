@@ -8,6 +8,7 @@
     "serve:site": "eleventy --serve",
     "check:site": "npm run check:contracts && npm run build:site && node scripts/check-site.mjs",
     "check:ie-shims": "node --test scripts/test-ie-shim-contract-negative.mjs && npm run build:site && node scripts/check-ie-shim-contract.mjs",
+    "check:slick-largeformat": "npm run build:site && node scripts/check-slick-largeformat-ui.mjs",
     "check:local-fonts": "node --test scripts/test-local-fonts-negative.mjs && npm run build:site && node scripts/check-local-fonts.mjs && node scripts/check-local-fonts-ui.mjs",
     "check:csp-readiness": "node --test scripts/test-csp-readiness-negative.mjs scripts/test-inline-style-attribute-contract.mjs && npm run build:site && node scripts/check-csp-readiness.mjs",
     "check:inline-style-ui": "npm run build:site && node scripts/check-inline-style-attribute-ui.mjs",

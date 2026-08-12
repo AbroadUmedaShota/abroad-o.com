@@ -145,9 +145,9 @@ export function assertRoleClassSemantics(records) {
 
 const sourceRecords = () => pageFiles('site/pages').map((file) => ({ file: path.relative(path.join(root, 'site', 'pages'), file).replaceAll('\\', '/'), source: read(file) }));
 
-test('removes style attributes from generated-page sources while documenting passthrough exceptions', () => {
+test('removes style attributes from generated-page sources and passthrough HTML', () => {
   for (const file of pageFiles('site/pages')) assert.doesNotMatch(read(file), /\sstyle\s*=/i, file);
-  assert.equal((read('slick/largeformat.html').match(/\sstyle\s*=/gi) || []).length, 4);
+  assert.equal((read('slick/largeformat.html').match(/\sstyle\s*=/gi) || []).length, 0);
 });
 
 test('maps all 71 former inline declarations to role-specific class tokens exactly once', () => {
