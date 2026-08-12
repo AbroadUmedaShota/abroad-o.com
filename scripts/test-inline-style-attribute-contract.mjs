@@ -94,27 +94,35 @@ function childAnchorHref(node) {
   return href;
 }
 
-function semanticRoleMatch(role, node) {
+function hasAncestor(node, predicate) {
+  for (let ancestor = node.parentNode; ancestor; ancestor = ancestor.parentNode) {
+    if (predicate(ancestor, attributes(ancestor))) return true;
+  }
+  return false;
+}
+
+function semanticRoleMatch(role, node, file) {
   const attrs = attributes(node);
   const text = nodeText(node);
   const href = childAnchorHref(node);
   const classes = (attrs.class || '').split(/\s+/);
+  if (!roleBindings[role]?.[`${file}|${node.nodeName}`]) return false;
   switch (role) {
     case 'news-list-spacing': return node.nodeName === 'section' && attrs.id === 'news_list' && classes.includes('container');
     case 'news-detail-back-link--spaced':
     case 'news-detail-back-link--compact': return node.nodeName === 'p' && href === '../news.html' && classes.includes('news-detail-back-link');
     case 'news-article-cta': return node.nodeName === 'div' && classes.includes('text-center') && /(?:SPEED AD|Googleマップ|PR TIMES|無料で始める)/.test(text);
-    case 'news-article-date': return node.nodeName === 'p' && !href && /20(?:25|26)年/.test(text) && /アブロードアウトソーシング/.test(text);
+    case 'news-article-date': return node.nodeName === 'p' && !href && classes.every((token) => !token || token === role) && /20(?:25|26)年/.test(text) && /アブロードアウトソーシング/.test(text);
     case 'news-article-created-at': return node.nodeName === 'p' && text === '作成日：2025/12/12';
     case 'form-page-title': return node.nodeName === 'h1' && text === 'お問い合わせ・お見積もりフォーム';
     case 'about-map-embed': return node.nodeName === 'iframe' && attrs.width === '99%' && attrs.height === '400' && (attrs.src || '').startsWith('https://www.google.com/maps/embed?');
     case 'legacy-return-link': return node.nodeName === 'a' && attrs.href === 'scan.html' && text === '前の画面に戻る';
-    case 'largeformat-price-marker': return node.nodeName === 'b' && !text;
+    case 'largeformat-price-marker': return node.nodeName === 'b' && !text && ['基本料金', 'A2・B3サイズ', 'A1・B2サイズ'].includes(nodeText(node.parentNode));
     case 'microfilm-active-tab': return node.nodeName === 'a' && attrs.href === '#sampleContentA' && attrs['data-toggle'] === 'tab';
     case 'microfilm-heading-band': return node.nodeName === 'div' && classes.includes('line_orange');
-    case 'microfilm-table-heading': return ['th', 'td'].includes(node.nodeName) && ['ベース素材', '内容', '対応可否', 'サイズ', '価格/コマ', 'オプション', '補足事項', '-'].includes(text);
+    case 'microfilm-table-heading': return ['th', 'td'].includes(node.nodeName) && ['ベース素材', '内容', '対応可否', 'サイズ', '価格/コマ', 'オプション', '補足事項', '-'].includes(text) && hasAncestor(node, (ancestor, ancestorAttrs) => ancestor.nodeName === 'tr' && (ancestorAttrs.class || '').split(/\s+/).includes('active'));
     case 'microfilm-process-arrow': return node.nodeName === 'div' && classes.includes('triangle_orange');
-    case 'microfilm-process-step': return node.nodeName === 'li' && text.length > 0;
+    case 'microfilm-process-step': return node.nodeName === 'li' && text.length > 0 && hasAncestor(node, (ancestor, ancestorAttrs) => ancestor.nodeName === 'section' && ancestorAttrs.id === 'tele_mid5_orange');
     case 'scan-heading-band': return node.nodeName === 'div' && classes.includes('max-width-line_blue') && classes.includes('max-width-line');
     default: return false;
   }
@@ -123,8 +131,14 @@ function semanticRoleMatch(role, node) {
 export function assertRoleClassSemantics(records) {
   const violations = [];
   for (const { file, source } of records) visit(parse(source), (node) => {
-    const classes = attributes(node).class || '';
-    for (const role of classes.trim().split(/\s+/)) if (role in roleClassCounts && !semanticRoleMatch(role, node)) violations.push(`${file}:${node.nodeName}:${role}`);
+    const classes = (attributes(node).class || '').trim().split(/\s+/).filter(Boolean);
+    for (const role of Object.keys(roleClassCounts)) {
+      const occurrences = classes.filter((token) => token === role).length;
+      const expectedHere = semanticRoleMatch(role, node, file);
+      if (occurrences > 1) violations.push(`${file}:${node.nodeName}:${role}:duplicate`);
+      if (occurrences === 1 && !expectedHere) violations.push(`${file}:${node.nodeName}:${role}:misplaced`);
+      if (expectedHere && occurrences !== 1) violations.push(`${file}:${node.nodeName}:${role}:missing`);
+    }
   });
   assert.deepEqual(violations, []);
 }
@@ -170,6 +184,17 @@ test('rejects compact/date swaps between same-file paragraph elements', () => {
     .replace('news-detail-back-link--compact', '__swapped-role__')
     .replace('news-article-date', 'news-detail-back-link--compact')
     .replace('__swapped-role__', 'news-article-date');
+  assertRoleClassCounts(records.map(({ source }) => source));
+  assertRoleClassBindings(records);
+  assert.throws(() => assertRoleClassSemantics(records));
+});
+
+test('rejects same-role relocation to another same-file list item', () => {
+  const records = sourceRecords().map((record) => ({ ...record, source: record.source }));
+  const page = records.find(({ file }) => file === 'microfilm.html.njk');
+  page.source = page.source
+    .replace('class="microfilm-process-step"', 'class=""')
+    .replace('<li class="active">', '<li class="active microfilm-process-step">');
   assertRoleClassCounts(records.map(({ source }) => source));
   assertRoleClassBindings(records);
   assert.throws(() => assertRoleClassSemantics(records));
