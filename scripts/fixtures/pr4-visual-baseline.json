@@ -85,6 +85,26 @@
       ]
     ],
     [
+      "scan.html",
+      "#flow_section li:first-of-type h5",
+      "#flow_section li:first-of-type h4.heading-visual",
+      [
+        375,
+        768,
+        1440
+      ]
+    ],
+    [
+      "scan.html",
+      "#flow_section li:first-of-type h5 > a",
+      "#flow_section li:first-of-type h4.heading-visual > .noninteractive-text",
+      [
+        375,
+        768,
+        1440
+      ]
+    ],
+    [
       "telework.html",
       "#tele_mid3 .container > .row.box:first-of-type h5",
       "#tele_mid3 .container > .row.box:first-of-type h4",
@@ -644,6 +664,132 @@
       "geometry": {
         "width": 256,
         "height": 19.1875
+      }
+    },
+    "scan.html|#flow_section li:first-of-type h4.heading-visual|375": {
+      "style": {
+        "fontSize": "18px",
+        "fontWeight": "500",
+        "marginTop": "0px",
+        "marginRight": "0px",
+        "marginBottom": "8px",
+        "marginLeft": "0px",
+        "paddingTop": "0px",
+        "paddingRight": "0px",
+        "paddingBottom": "0px",
+        "paddingLeft": "0px",
+        "color": "rgb(33, 37, 41)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "display": "block"
+      },
+      "geometry": {
+        "width": 317,
+        "height": 64.78125
+      }
+    },
+    "scan.html|#flow_section li:first-of-type h4.heading-visual|768": {
+      "style": {
+        "fontSize": "20px",
+        "fontWeight": "500",
+        "marginTop": "0px",
+        "marginRight": "0px",
+        "marginBottom": "8px",
+        "marginLeft": "0px",
+        "paddingTop": "0px",
+        "paddingRight": "0px",
+        "paddingBottom": "0px",
+        "paddingLeft": "0px",
+        "color": "rgb(33, 37, 41)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "display": "block"
+      },
+      "geometry": {
+        "width": 662,
+        "height": 48
+      }
+    },
+    "scan.html|#flow_section li:first-of-type h4.heading-visual|1440": {
+      "style": {
+        "fontSize": "20px",
+        "fontWeight": "500",
+        "marginTop": "0px",
+        "marginRight": "0px",
+        "marginBottom": "8px",
+        "marginLeft": "0px",
+        "paddingTop": "0px",
+        "paddingRight": "0px",
+        "paddingBottom": "0px",
+        "paddingLeft": "0px",
+        "color": "rgb(33, 37, 41)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "display": "block"
+      },
+      "geometry": {
+        "width": 1082,
+        "height": 48
+      }
+    },
+    "scan.html|#flow_section li:first-of-type h4.heading-visual > .noninteractive-text|375": {
+      "style": {
+        "fontSize": "13px",
+        "fontWeight": "100",
+        "marginTop": "0px",
+        "marginRight": "0px",
+        "marginBottom": "0px",
+        "marginLeft": "0px",
+        "paddingTop": "0px",
+        "paddingRight": "0px",
+        "paddingBottom": "0px",
+        "paddingLeft": "0px",
+        "color": "rgb(0, 0, 0)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "display": "inline"
+      },
+      "geometry": {
+        "width": 313.921875,
+        "height": 38.59375
+      }
+    },
+    "scan.html|#flow_section li:first-of-type h4.heading-visual > .noninteractive-text|768": {
+      "style": {
+        "fontSize": "13px",
+        "fontWeight": "100",
+        "marginTop": "0px",
+        "marginRight": "0px",
+        "marginBottom": "0px",
+        "marginLeft": "0px",
+        "paddingTop": "0px",
+        "paddingRight": "0px",
+        "paddingBottom": "0px",
+        "paddingLeft": "0px",
+        "color": "rgb(0, 0, 0)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "display": "inline"
+      },
+      "geometry": {
+        "width": 602.34375,
+        "height": 17
+      }
+    },
+    "scan.html|#flow_section li:first-of-type h4.heading-visual > .noninteractive-text|1440": {
+      "style": {
+        "fontSize": "13px",
+        "fontWeight": "100",
+        "marginTop": "0px",
+        "marginRight": "0px",
+        "marginBottom": "0px",
+        "marginLeft": "0px",
+        "paddingTop": "0px",
+        "paddingRight": "0px",
+        "paddingBottom": "0px",
+        "paddingLeft": "0px",
+        "color": "rgb(0, 0, 0)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "display": "inline"
+      },
+      "geometry": {
+        "width": 602.34375,
+        "height": 17
       }
     },
     "telework.html|#tele_mid3 .container > .row.box:first-of-type h4|375": {

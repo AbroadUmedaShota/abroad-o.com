@@ -1300,6 +1300,15 @@ section#pre_footer .col-md-5 img {
   text-decoration: none;
   color: #000;
 }
+#flow_section h4.heading-visual {
+  font-size: 1.25rem;
+}
+#flow_section h4.heading-visual .noninteractive-text {
+  color: #000;
+  font-size: 13px!important;
+  font-weight: 100!important;
+  text-decoration: none;
+}
 @media screen and (max-width: 991px) {
   #flow_section h3 {
     font-size: 25px;
@@ -1314,7 +1323,8 @@ section#pre_footer .col-md-5 img {
   }
 } 
 @media screen and (max-width: 575px) {
-  #flow_section h5 {
+  #flow_section h5,
+  #flow_section h4.heading-visual {
       font-size: 18px;
   }
 } 
