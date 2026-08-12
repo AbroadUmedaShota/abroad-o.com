@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { assertAnalyticsOrder, assertNewsRuntimeOrder, assertNoAnalyticsScripts, assertNoInlineExecutableScripts, scriptInventory } from './lib/csp-readiness-contract.mjs';
+import { assertAnalyticsOrder, assertNewsRuntimeOrder, assertNoAnalyticsScripts, assertNoInlineExecutableScripts, assertNoInlineStyles, assertPageStyleLink, assertPageStyleSheet, scriptInventory } from './lib/csp-readiness-contract.mjs';
 
 const analytics = '<script async src="https://www.googletagmanager.com/gtag/js?id=UA-51168812-1"></script><script src="/js/analytics.js"></script>';
 const news = '<script src="/vendor/jquery/jquery.min.js"></script><script src="/vendor/bootstrap3/js/bootstrap.min.js"></script><script src="/js/jquery.smooth-scroll.min.js"></script><script src="/js/news-runtime.js"></script>';
@@ -36,4 +36,21 @@ test('rejects NEWS runtime omissions, duplication, and order changes', () => {
 });
 test('documents passthrough inline scripts without treating them as generated-page exceptions', () => {
   assert.equal(scriptInventory('<script>one()</script><script>two()</script><script>three()</script>').filter((script) => script.inline).length, 3);
+});
+test('rejects inline styles and changed page stylesheet mapping', () => {
+  const valid = '<link rel="stylesheet" href="/css/pages/form.css">';
+  assert.doesNotThrow(() => assertNoInlineStyles(valid, 'form.html'));
+  assert.doesNotThrow(() => assertPageStyleLink(valid, 'form.html'));
+  assert.throws(() => assertNoInlineStyles('<style>.x { color: red; }</style>', 'inline-style'));
+  assert.throws(() => assertPageStyleLink('', 'form.html'));
+  assert.throws(() => assertPageStyleLink(`${valid}${valid}`, 'form.html'));
+  assert.throws(() => assertPageStyleLink('<link rel="stylesheet" href="/css/pages/news-index.css">', 'form.html'));
+  assert.throws(() => assertPageStyleLink(valid, 'about.html'));
+  assert.throws(() => assertPageStyleLink('<link rel="stylesheet" href="/css/pages/form.css">', 'index.html'));
+});
+test('rejects missing or modified external page stylesheets', () => {
+  const css = '.no-link-style { color: inherit; text-decoration: none; } .no-link-style:hover, .no-link-style:active, .no-link-style:visited { color: inherit; text-decoration: none; }';
+  assert.doesNotThrow(() => assertPageStyleSheet(css, '/css/pages/legacy-no-link.css'));
+  assert.throws(() => assertPageStyleSheet('', '/css/pages/form.css'));
+  assert.throws(() => assertPageStyleSheet(`${css} .changed { display: block; }`, '/css/pages/legacy-no-link.css'));
 });

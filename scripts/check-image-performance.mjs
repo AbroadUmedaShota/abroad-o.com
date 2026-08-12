@@ -83,8 +83,8 @@ for (const file of ['style3.css', 'style.css']) {
 for (const file of ['style.css', 'style2.css', 'style3.css', 'global.css']) {
   assertTopImageCssContract(fs.readFileSync(path.join(outputRoot, file), 'utf8'), file);
 }
-const speedAdHtml = fs.readFileSync(path.join(outputRoot, 'speed-ad.html'), 'utf8');
-assertTopImageGradientCssContract(speedAdHtml, 'speed-ad.html');
+const speedAdCss = fs.readFileSync(path.join(outputRoot, 'css', 'pages', 'speed-ad.css'), 'utf8');
+assertTopImageGradientCssContract(speedAdCss, 'css/pages/speed-ad.css');
 
 const topImagePng = fs.readFileSync(path.join(outputRoot, TOP_IMAGE.pngPath));
 const topImageWebp = fs.readFileSync(path.join(outputRoot, TOP_IMAGE.webpPath));
