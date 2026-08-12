@@ -2309,12 +2309,14 @@ microfilm.html
   margin: 30px 0xp 30px 0px;
   font-size: 18px;
 }
+.film_price p { font-size: 18px; }
 /*========================================================
 largeformat.html
 ========================================================*/
 .largepaper h4 {
   font-size: 23px!important;
 }
+.largepaper h2 { font-size: 23px!important; }
 .largepaper1 h5, .largepaper1 p.heading-visual {
   margin: 30px 0px 30px;
 }
@@ -2329,6 +2331,7 @@ largeformat.html
 .largepaper h4 {
   font-size: 20px!important;
 }  
+.largepaper h2 { font-size: 20px!important; }
 }
 
 /*========================================================

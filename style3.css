@@ -1175,6 +1175,9 @@ section#pre_footer .col-md-5 img {
   font-size: 13px;
   margin-bottom: 0px;
 }
+@media screen and (max-width: 342px) {
+  .col-box2 p { font-size: 10px; }
+}
 .col-box2 img{
   width: 55%;
   padding-top: 10px;
