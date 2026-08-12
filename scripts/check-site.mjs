@@ -2,11 +2,17 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import matter from 'gray-matter';
+import { assertPageMetadata } from './lib/html-contract.mjs';
 
 const repoRoot = path.resolve(import.meta.dirname, '..');
 const outputRoot = path.join(repoRoot, '_site');
 const sourceRoot = path.join(repoRoot, 'site', 'pages');
 const publicContract = JSON.parse(fs.readFileSync(path.join(repoRoot, 'deploy', 'public-manifest.json'), 'utf8'));
+const defaultOgImageUrl = 'https://www.abroad-o.com/image/top1.png';
+const defaultOgImagePath = path.join(outputRoot, 'image', 'top1.png');
+const defaultOgImageWidth = 1990;
+const defaultOgImageHeight = 810;
 
 function walk(directory) {
   return fs.readdirSync(directory, { withFileTypes: true })
@@ -36,13 +42,35 @@ function assertSame(expected, actual, label) {
   }
 }
 
+function pngDimensions(file) {
+  const png = fs.readFileSync(file);
+  if (png.toString('ascii', 1, 4) !== 'PNG' || png.readUInt32BE(12) !== 0x49484452) {
+    throw new Error(`Expected PNG image: ${file}`);
+  }
+  return [png.readUInt32BE(16), png.readUInt32BE(20)];
+}
+
+function verifyRedirectContract() {
+  const htaccess = fs.readFileSync(path.join(repoRoot, '.htaccess'), 'utf8');
+  const canonicalRedirect = htaccess.indexOf('https://www.abroad-o.com/$1');
+  const rootIndexRedirect = htaccess.indexOf('RewriteRule ^index(?:\\.html)?$ https://www.abroad-o.com/');
+  const rootIndexRequest = htaccess.indexOf('RewriteCond %{THE_REQUEST} \\s/+index(?:\\.html)?(?:[?\\s]) [NC]');
+  const extensionlessRewrite = htaccess.indexOf('RewriteCond %{REQUEST_FILENAME}\\.html -f');
+  if (rootIndexRequest < 0 || rootIndexRedirect < 0 || canonicalRedirect < 0 || extensionlessRewrite < 0 || rootIndexRequest > rootIndexRedirect || rootIndexRedirect > canonicalRedirect || canonicalRedirect > extensionlessRewrite) {
+    throw new Error('.htaccess must canonicalize before extensionless rewrites.');
+  }
+  if (/RewriteRule[^\r\n]*https:\/\/[^\r\n]*%\{HTTP_HOST\}/i.test(htaccess)) {
+    throw new Error('.htaccess must use the hardcoded canonical host and redirect root index documents.');
+  }
+}
+
 function verifyContract(manifest) {
   const sourcePages = walk(sourceRoot).filter((file) => file.endsWith('.njk'));
   if (sourcePages.length !== 47) throw new Error(`Expected 47 generated page sources, found ${sourcePages.length}`);
 
   const htmlFiles = manifest.filter(({ path: file }) => file.endsWith('.html'));
-  if (!fs.existsSync(path.join(outputRoot, 'sitemap.xml')) || fs.existsSync(path.join(outputRoot, 'ap.xml'))) {
-    throw new Error('sitemap.xml was not copied to the public root correctly.');
+  if (!fs.existsSync(path.join(outputRoot, 'sitemap.xml')) || !fs.existsSync(path.join(outputRoot, 'robots.txt')) || fs.existsSync(path.join(outputRoot, 'ap.xml'))) {
+    throw new Error('Generated sitemap.xml or robots.txt is missing from the public root.');
   }
   const generatedFiles = htmlFiles.filter(({ path: file }) => file !== 'slick/largeformat.html');
   if (generatedFiles.length !== 47) throw new Error(`Expected 47 generated HTML files, found ${generatedFiles.length}`);
@@ -69,14 +97,48 @@ function verifyContract(manifest) {
     throw new Error('TOOL or PDF viewer HTML was published.');
   }
 
+  const sitemap = fs.readFileSync(path.join(outputRoot, 'sitemap.xml'), 'utf8');
+  const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
+  if (sitemap.includes('<lastmod>') || sitemapUrls.includes('https://www.abroad-o.com/index.html') || new Set(sitemapUrls).size !== sitemapUrls.length) {
+    throw new Error('Sitemap must contain unique canonical URLs without timestamps or index.html.');
+  }
+  if (!fs.existsSync(defaultOgImagePath)) throw new Error('Default OG image is not published.');
+  const [ogImageWidth, ogImageHeight] = pngDimensions(defaultOgImagePath);
+  if (ogImageWidth !== defaultOgImageWidth || ogImageHeight !== defaultOgImageHeight) {
+    throw new Error(`Unexpected default OG image dimensions: ${ogImageWidth}x${ogImageHeight}`);
+  }
+  const robots = fs.readFileSync(path.join(outputRoot, 'robots.txt'), 'utf8');
+  if (!/^User-agent: \*\r?\nDisallow:\s*\r?\n\r?\nSitemap: https:\/\/www\.abroad-o\.com\/sitemap\.xml\s*$/i.test(robots)) {
+    throw new Error('robots.txt does not permit crawling or point at the canonical sitemap.');
+  }
+
+  const indexableCanonicalUrls = [];
   for (const { path: file } of generatedFiles) {
     const html = fs.readFileSync(path.join(outputRoot, file), 'utf8');
-    if (!/<title>[^<]+<\/title>/i.test(html)) throw new Error(`Missing title: ${file}`);
-    if (!/<link\s+rel=["']canonical["']/i.test(html)) throw new Error(`Missing canonical: ${file}`);
+    const source = matter(fs.readFileSync(path.join(sourceRoot, `${file}.njk`), 'utf8')).data;
+    const sourceCanonicalUrl = file === 'index.html' ? 'https://www.abroad-o.com/' : `https://www.abroad-o.com/${file}`;
+    if (!source.title || !source.description || source.canonicalUrl !== sourceCanonicalUrl) throw new Error(`Invalid source metadata: ${file}`);
+    const sourceOgType = source.ogType || (file.startsWith('news/') ? 'article' : 'website');
+    const sourceOgImage = source.ogImage || defaultOgImageUrl;
+    assertPageMetadata(html, { title: source.title, noindex: source.noindex === true, meta: {
+      description: source.description, canonical: source.canonicalUrl, 'og:title': source.ogTitle || source.title,
+      'og:description': source.ogDescription || source.description, 'og:type': sourceOgType, 'og:url': source.canonicalUrl,
+      'og:image': sourceOgImage, 'og:image:width': String(ogImageWidth), 'og:image:height': String(ogImageHeight),
+      'twitter:card': 'summary_large_image', 'twitter:title': source.ogTitle || source.title,
+      'twitter:description': source.ogDescription || source.description, 'twitter:image': sourceOgImage
+    } }, file);
+    if (source.noindex === true) {
+      if (sitemapUrls.includes(source.canonicalUrl)) throw new Error(`noindex page is in sitemap: ${file}`);
+    } else {
+      indexableCanonicalUrls.push(source.canonicalUrl);
+    }
     for (const value of publicContract.forbiddenReferences) {
       if (html.includes(value)) throw new Error(`Forbidden legacy reference ${value}: ${file}`);
     }
   }
+  assertSame(indexableCanonicalUrls.sort(), sitemapUrls.sort(), 'Sitemap canonical URL set');
+  if (indexableCanonicalUrls.length !== 46) throw new Error(`Expected 46 indexable pages, found ${indexableCanonicalUrls.length}`);
+  verifyRedirectContract();
 
   const missingLinks = [];
   for (const { path: file } of htmlFiles) {

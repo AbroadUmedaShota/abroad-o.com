@@ -3,6 +3,7 @@
   "includeRootFiles": [
     "*.html",
     ".htaccess",
+    "robots.txt",
     "sitemap.xml",
     "style*.css",
     "global.css"
@@ -53,6 +54,7 @@
     "news.html",
     "recruit.html",
     "rule.html",
+    "robots.txt",
     "sample.html",
     "sample2.html",
     "scan.html",

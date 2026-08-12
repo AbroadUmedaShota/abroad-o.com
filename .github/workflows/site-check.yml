@@ -22,3 +22,23 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run check:site
       - run: npm run check:a11y
+      - name: Install and test Apache redirects
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y apache2 openssl
+          npm run build:site
+          sudo rm -rf /tmp/abroad-site
+          sudo install -d -m 755 /tmp/abroad-site
+          sudo cp -a _site/. /tmp/abroad-site/
+          sudo chmod -R a+rX /tmp/abroad-site
+          openssl req -x509 -nodes -newkey rsa:2048 -keyout /tmp/abroad.key -out /tmp/abroad.crt -subj "/CN=localhost" -days 1
+          export DOCROOT=/tmp/abroad-site CERT=/tmp/abroad.crt KEY=/tmp/abroad.key
+          apache2 -t -f "$GITHUB_WORKSPACE/scripts/apache-test/httpd.conf"
+          sudo --preserve-env=DOCROOT,CERT,KEY apache2 -f "$GITHUB_WORKSPACE/scripts/apache-test/httpd.conf" -k start
+          NODE_TLS_REJECT_UNAUTHORIZED=0 npm run check:redirects
+      - name: Stop Apache test server
+        if: always()
+        run: DOCROOT=/tmp/abroad-site CERT=/tmp/abroad.crt KEY=/tmp/abroad.key sudo --preserve-env=DOCROOT,CERT,KEY apache2 -f "$GITHUB_WORKSPACE/scripts/apache-test/httpd.conf" -k stop || true
+      - name: Show Apache test log on failure
+        if: failure()
+        run: sudo cat /tmp/abroad-apache-error.log || true

@@ -1,0 +1,8 @@
+---
+permalink: "/sitemap.xml"
+eleventyExcludeFromCollections: true
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{% for page in collections.all | sort(false, false, 'data.canonicalUrl') %}{% if page.data.canonicalUrl and not page.data.noindex %}  <url><loc>{{ page.data.canonicalUrl }}</loc></url>
+{% endif %}{% endfor %}</urlset>
