@@ -25,6 +25,7 @@ jobs:
       - run: npm run check:modern-ui
       - run: npm run check:legacy-ui
       - run: npm run check:news-form-ui
+      - run: npm run check:pr4
       - name: Install and test Apache redirects
         run: |
           sudo apt-get update
