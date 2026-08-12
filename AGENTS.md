@@ -60,7 +60,13 @@
    https://www.abroad-o.com/
    https://www.abroad-o.com/speed-ad.html
    https://www.abroad-o.com/news/news_260526.html
+   https://www.abroad-o.com/sample2.html
+   https://www.abroad-o.com/pdfjs/1c_abroad.pdf
+   https://www.abroad-o.com/pdfjs/2c_abroad.pdf
+   https://www.abroad-o.com/pdfjs/4c_abroad.pdf
    ```
+
+   `https://www.abroad-o.com/TOOL/index.html` と `https://www.abroad-o.com/pdfjs/web/viewer.html` が 404 を返すことも確認する。
 
 4. 元の作業ツリーで `git status --short` を再確認し、対象外の変更が保持されていることを確認する。
 5. 一時 worktree、ローカル一時バックアップ、今回起動して残った SSH/SCP プロセスだけを片付ける。

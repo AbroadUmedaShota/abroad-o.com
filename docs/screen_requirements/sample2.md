@@ -21,7 +21,7 @@ This page serves as a demonstration of Abroad Outsourcing Co., Inc.'s scanning c
             *   300-400dpi for general viewing.
             *   400-600dpi for enlargement or high-quality printing.
             It also explains the relationship between color/DPI and file size (e.g., black and white < grayscale ≈ full color; lower DPI < higher DPI leads to larger file sizes) and mentions the potential for moiré patterns due to the nature of optical scanning.
-        *   **Scanning Samples (Embedded PDFs):** Displays three distinct scanning samples, each embedded as a PDF viewer, allowing users to interact with the content:
+        *   **Scanning Samples (Embedded PDFs):** Displays three distinct scanning samples in the browser's built-in PDF viewer, with a direct PDF link visible as a fallback:
             *   **"①白黒2値" (1-bit Black and White):** Sample embedded from `/pdfjs/1c_abroad.pdf`.
             *   **"グレースケール" (Grayscale):** Sample embedded from `/pdfjs/2c_abroad.pdf`.
             *   **"フルカラー" (Full Color):** Sample embedded from `/pdfjs/4c_abroad.pdf`.
@@ -32,7 +32,7 @@ This page serves as a demonstration of Abroad Outsourcing Co., Inc.'s scanning c
 *   **Responsive Navigation:** The navigation bar adapts to different screen sizes, collapsing into a hamburger menu on mobile devices.
 *   **Smooth Scrolling:** Enabled for internal page links.
 *   **Scroll-to-Top Button:** A button appears upon scrolling down, allowing users to quickly return to the top of the page.
-*   **Embedded PDF Viewers:** Allows direct viewing and interaction with PDF scanning samples within the page.
+*   **Embedded PDFs:** Uses browser-native PDF display for the samples and provides a direct link when embedded display is unavailable.
 *   **Inquiry Form Link:** A direct link to `form.html` for inquiries.
 *   **Modal Window:** Includes a modal (`myModal`) for embedding Google Forms, consistent with other service pages.
 
@@ -56,4 +56,3 @@ This page serves as a demonstration of Abroad Outsourcing Co., Inc.'s scanning c
     *   `https://oss.maxcdn.com/respond/1.4.2/respond.min.js`
 *   **External Resources:**
     *   Google Web Fonts (`https://fonts.googleapis.com/css?family=Crimson+Text`)
-    *   PDF.js (implied by embedded PDF objects, though the library itself is not directly linked in the `<script>` tags, suggesting it's handled by the browser or a pre-loaded script not visible in this file).
