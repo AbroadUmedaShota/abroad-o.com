@@ -27,8 +27,8 @@ activeNav: "service"
 
         gtag('config', 'UA-51168812-1');
       </script> 
-    <!-- Bootstrap css v4.5-->
-      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <!-- Bootstrap css -->
+      <link rel="stylesheet" href="/vendor/bootstrap/bootstrap.min.css">
     <!-- 自作CSS　-->
       <link href="style3.css" rel="stylesheet">
     <!--【要個別設定】カノニカルタグ-->
@@ -47,15 +47,15 @@ activeNav: "service"
       </section> 
 
       <section id="scan_carousel">
-        <div id="carouselExampleIndicators" class="carousel slide carousel-fade" data-ride="carousel" data-interval="3000" data-pause="hover" data-touch="true">
-        <!--data-interval="スライドの速さ" data-pause="マウスホバーで一時停止" data-touch="タッチでスライド" -->
-          <ol class="carousel-indicators"><!--カルーセルの下ボタン-->
-            <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
-            <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
-            <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
-            <li data-target="#carouselExampleIndicators" data-slide-to="3"></li>
-            <li data-target="#carouselExampleIndicators" data-slide-to="4"></li>
-          </ol>
+        <div id="carouselExampleIndicators" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="3000" data-bs-pause="hover" data-bs-touch="true">
+        <!--data-bs-interval="スライドの速さ" data-bs-pause="マウスホバーで一時停止" data-bs-touch="タッチでスライド" -->
+          <div class="carousel-indicators"><!--カルーセルの下ボタン-->
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3" aria-label="Slide 4"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="4" aria-label="Slide 5"></button>
+          </div>
           <div class="carousel-inner">
             <div class="carousel-item active"><!--0-->
               <div class="container">
@@ -139,14 +139,14 @@ activeNav: "service"
             </div>
           </div>
           <!--カルーセルの左右ボタン-->
-          <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="sr-only">Previous</span><i class="fas fa-chevron-circle-left fa-2x"></i>
-          </a>
-          <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+            <span class="visually-hidden">Previous</span><i class="fas fa-chevron-circle-left fa-2x"></i>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="sr-only">Next</span><i class="fas fa-chevron-circle-right fa-2x"></i>
-          </a>
+            <span class="visually-hidden">Next</span><i class="fas fa-chevron-circle-right fa-2x"></i>
+          </button>
         </div><!--carouselExampleIndicators-->
       </section><!--カルーセル-->
  
@@ -691,22 +691,22 @@ activeNav: "service"
               <h3>弊社サービスの特徴</h3> 
             </div>
           <div class="row">
-            <div class="col-md-3 col-xs-12">
+            <div class="col-md-3 col-12">
               <h4>はじめてでも安心</h4>
               <center><img src="image/tele7.png" alt="画像"></center>
               <p>電子化コンサルタントが1からお客様のご要望をヒアリングし、最適な内容をご提案します。</p>
             </div>
-            <div class="col-md-3 col-xs-12 border-left_hidden">
+            <div class="col-md-3 col-12 border-left_hidden">
               <h4>コスト重視</h4>
               <center><img src="image/tele6.png" alt="画像"></center>
               <p>電子化コンサルタントが無駄を省いた適切な提案をするので、余計なコストがかかりません。</p> 
             </div>
-            <div class="col-md-3 col-xs-12 border-left_hidden">
+            <div class="col-md-3 col-12 border-left_hidden">
               <h4>安心の品質</h4>
               <center><img src="image/tele5.png" alt="画像"></center>
               <p>スキャニング専用のスキャナー機で、文書情報管理士の管理のもと適切な作業を行います。</p>
             </div>
-            <div class="col-md-3 col-xs-12 border-left_hidden">
+            <div class="col-md-3 col-12 border-left_hidden">
              <h4>安心のセキュリティ情報管理</h4>
               <center><a href="https://privacymark.jp/" target="_blank"><img src="image/pmark.png" alt="画像"></a></center>
               <p>プライバシーマーク取得しており、お預かり書類とデータの適切な管理を行っています。</p> 
