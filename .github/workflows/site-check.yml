@@ -21,6 +21,7 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run check:site
+      - run: npm run check:local-fonts
       - run: npm run check:csp-readiness
       - run: npm run check:csp-runtime
       - run: npm run check:page-style-ui
