@@ -903,17 +903,17 @@ section#pre_footer .col-md-5 img {
 #scan_carousel .col-md-7 {
   margin: 0px 0px 30px 0px;
 }
-#scan_carousel .col-md-7 h4 {
+#scan_carousel .col-md-7 h2, #scan_carousel .col-md-7 h4 {
   font-size: 28px;
   padding: 50px 0px 30px 0px;
   font-weight: 700;
 }
-#scan_carousel .col-md-7 h5 {
+#scan_carousel .col-md-7 h5, #scan_carousel .col-md-7 p.heading-visual {
   font-size: 15px;
   line-height: 1.5;
   padding: 15px 0px 15px 0px;
 }
-#scan_carousel .col-md-7 h6 {
+#scan_carousel .col-md-7 h6, #scan_carousel .col-md-7 p.heading-visual + p.heading-visual {
   font-size: 23px;
   padding: 15px 0px 0px 0px;
   font-weight: 700;
@@ -944,15 +944,15 @@ section#pre_footer .col-md-5 img {
     height: auto;
     margin: 30px 0px 30px -30px;
   }
-  #scan_carousel .col-md-7 h4 {
+  #scan_carousel .col-md-7 h2, #scan_carousel .col-md-7 h4 {
     font-size: 25px;
     padding: 30px 0px 10px 40px;
   }
-  #scan_carousel .col-md-7 h5 {
+  #scan_carousel .col-md-7 h5, #scan_carousel .col-md-7 p.heading-visual {
     font-size: 13px;
     padding: 10px 0px 10px 40px;
   }
-  #scan_carousel .col-md-7 h6 {
+  #scan_carousel .col-md-7 h6, #scan_carousel .col-md-7 p.heading-visual + p.heading-visual {
     font-size: 20px;
     padding: 15px 0px 0px 40px;  
   }  
@@ -963,16 +963,16 @@ section#pre_footer .col-md-5 img {
     height: auto;
     margin: 30px 0px 50px -30px;
   }
-  #scan_carousel .col-md-7 h4 {
+  #scan_carousel .col-md-7 h2, #scan_carousel .col-md-7 h4 {
     font-size: 18px;
     padding: 30px 0px 10px 0px;
   }
-  #scan_carousel .col-md-7 h5 {
+  #scan_carousel .col-md-7 h5, #scan_carousel .col-md-7 p.heading-visual {
     font-size: 13px;
     padding: 10px 0px 10px 0px;
     margin-right: -50px;    
   }
-  #scan_carousel .col-md-7 h6 {
+  #scan_carousel .col-md-7 h6, #scan_carousel .col-md-7 p.heading-visual + p.heading-visual {
     font-size: 15px;
     padding: 15px 0px 0px 0px;
     margin-right: -50px;      
@@ -984,16 +984,16 @@ section#pre_footer .col-md-5 img {
     height: auto;
     margin: 30px 0px 50px -20px;
   }
-  #scan_carousel .col-md-7 h4 {
+  #scan_carousel .col-md-7 h2, #scan_carousel .col-md-7 h4 {
     font-size: 18px;
     padding: 30px 0px 10px 0px;
   }
-  #scan_carousel .col-md-7 h5 {
+  #scan_carousel .col-md-7 h5, #scan_carousel .col-md-7 p.heading-visual {
     font-size: 13px;
     padding: 10px 0px 10px 0px;
     margin-right: -20px;    
   }
-  #scan_carousel .col-md-7 h6 {
+  #scan_carousel .col-md-7 h6, #scan_carousel .col-md-7 p.heading-visual + p.heading-visual {
     font-size: 15px;
     padding: 15px 0px 0px 0px;
     margin-right: -20px;      
@@ -1005,15 +1005,15 @@ section#pre_footer .col-md-5 img {
     height: auto;
     margin: 20px 0px 0px 55px;
   }
-  #scan_carousel .col-md-7 h4 {
+  #scan_carousel .col-md-7 h2, #scan_carousel .col-md-7 h4 {
     font-size: 18px;
     padding: 0px 0px 0px 0px;
   }
-  #scan_carousel .col-md-7 h5 {
+  #scan_carousel .col-md-7 h5, #scan_carousel .col-md-7 p.heading-visual {
     font-size: 13px;
     padding: 10px 0px 30px 0px;  
   }
-  #scan_carousel .col-md-7 h6 {
+  #scan_carousel .col-md-7 h6, #scan_carousel .col-md-7 p.heading-visual + p.heading-visual {
     font-size: 15px;
     padding: 0px 0px 20px 0px;     
   }    
@@ -1038,7 +1038,7 @@ section#pre_footer .col-md-5 img {
   margin-top: 10px;
   color: #A9A9A9;
 }
-.col-box h5 {
+.col-box h5, .col-box p.heading-visual {
   font-size: 15px;
   padding-top: 10px;
   font-weight: 700;
@@ -1047,7 +1047,7 @@ section#pre_footer .col-md-5 img {
   font-size: 13px;
   margin-bottom: 0px;
 }
-.col-box h6 {
+.col-box h6, .col-box p.heading-visual + p.heading-visual {
   font-size: 15px;  
   margin: 10px 0px 10px 0px;
 }
@@ -1081,7 +1081,7 @@ section#pre_footer .col-md-5 img {
   }    
 }
 @media screen and (min-width:768px) and (max-width: 1100px) {
-  h5.ex-font1 {
+  h5.ex-font1, p.ex-font1.heading-visual {
     font-size: 15px;
     padding: 10px 0px 0px 0px;
   }  
@@ -1090,7 +1090,7 @@ section#pre_footer .col-md-5 img {
   .icon2 span{
     margin-top: 20px
   }
-  h5.ex-font2 {
+  h5.ex-font2, p.ex-font2.heading-visual {
     padding: 10px 0px 18px 0px;
   }  
 }
@@ -1127,10 +1127,10 @@ section#pre_footer .col-md-5 img {
     font-size: 20px; 
     margin-bottom: 20px;
   }
-  .col-box h5 {
+  .col-box h5, .col-box p.heading-visual {
     font-size: 11px;
   }  
-  .col-box h6 {
+  .col-box h6, .col-box p.heading-visual + p.heading-visual {
     margin: 5px 0px 5px 0px;
   }
   .col-box button {

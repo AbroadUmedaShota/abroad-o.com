@@ -809,7 +809,7 @@ service-pack.html
 .border-box {
     border:solid 2px #000099;
 }
-.border-box h6 {
+.border-box h6, .border-box p.heading-visual {
     text-align: center;
     font-size: 20px!important;
     margin-top: 20px;
@@ -866,14 +866,14 @@ p.big-font {
     color: #fff;
     padding:3px 20px;
 }
-#service-pack1 h5 {
+#service-pack1 h3, #service-pack1 h5, #service-pack1 > .container > p.heading-visual {
     font-size: 18px;
     background-color: #000099;
     padding: 10px 0px 10px 10px;
     margin:50px 0px;
     color: #fff;
 }
-section#service-pack1 h6 {
+section#service-pack1 h4, section#service-pack1 h6, section#service-pack1 .heading-visual {
     font-weight: 700;
     font-size: 15px;
 }
@@ -890,14 +890,14 @@ section#service-pack2 h4 {
     font-size: 35px;
     margin:50px 0px;
 }
-section#service-pack2 h5 {
+section#service-pack2 h3, section#service-pack2 h5, section#service-pack2 > .container > p.heading-visual {
     font-size: 18px;
     background-color: #000099;
     padding: 10px 0px 10px 10px;
     margin:50px 0px;
     color: #fff;
 }
-section#service-pack2 h6 {
+section#service-pack2 h6, section#service-pack2 .heading-visual {
     font-weight: 700;
     font-size: 15px;
 }
@@ -2031,12 +2031,12 @@ film.html
   font-size: 35px;
   padding: 100px 0px 30px 0px;
 }
-#film_top .col-md-5 h5 {
+#film_top .col-md-5 h5, #film_top .col-md-5 p.heading-visual {
   font-size: 18px;
   line-height: 1.5;
   padding: 15px 0px 15px 0px;
 }
-#film_top .col-md-5 h6 {
+#film_top .col-md-5 h6, #film_top .col-md-5 p.heading-visual + p.heading-visual {
   font-size: 28px;
   padding: 15px 0px 0px 0px;  
 }
@@ -2048,11 +2048,11 @@ film.html
     font-size: 28px;
     padding: 20px 0px 10px 0px;
   }
-  #film_top .col-md-5 h5 {
+  #film_top .col-md-5 h5, #film_top .col-md-5 p.heading-visual {
     font-size: 13px;
     padding: 10px 0px 10px 0px;
   }
-  #film_top .col-md-5 h6 {
+  #film_top .col-md-5 h6, #film_top .col-md-5 p.heading-visual + p.heading-visual {
     font-size: 21px;
     padding: 15px 0px 0px 0px;  
   }  
@@ -2070,11 +2070,11 @@ film.html
     padding: 20px 0px 10px 0px;
     text-align: center;
   }
-  #film_top .col-md-5 h5 {
+  #film_top .col-md-5 h5, #film_top .col-md-5 p.heading-visual {
     font-size: 15px;
     padding: 10px 0px 10px 0px;
   }
-  #film_top .col-md-5 h6 {
+  #film_top .col-md-5 h6, #film_top .col-md-5 p.heading-visual + p.heading-visual {
     font-size: 21px;
     padding: 15px 0px 0px 0px;  
     text-align: center;
@@ -2095,10 +2095,10 @@ film.html
   padding: 5px 10px 5px 10px;
   margin-bottom: 20px;
 }
-.row-box h5 {
+.row-box h5, .row-box p.heading-visual {
   font-size: 20px;
 }
-.row-box h5 img {
+.row-box h5 img, .row-box p.heading-visual img {
   height: 40px;
 }
 .row-box a {
@@ -2113,10 +2113,10 @@ film.html
   margin: 20px 0px 15px 0px;
 }
 @media screen and (max-width: 991px) {
-  .row-box h5 {
+  .row-box h5, .row-box p.heading-visual {
     font-size: 15px;
   }
-  .row-box h5 img {
+  .row-box h5 img, .row-box p.heading-visual img {
     height: 30px;
   }
   .row-box p {
@@ -2131,10 +2131,10 @@ film.html
     font-size: 18px;
   }
 }
-.box-large h5 {
+.box-large h5, .box-large p.heading-visual {
   font-size: 20px;
 }
-.box-large h5 img{
+.box-large h5 img, .box-large p.heading-visual img{
   height: 40px;
   margin-left: 30px; 
 }
@@ -2158,11 +2158,11 @@ film.html
   .film_price p{
     font-size: 12px;
   }
-  .box-large h5 {
+  .box-large h5, .box-large p.heading-visual {
   margin-left: 0px;
   font-size: 15px;
   }
-  .box-large h5 img {
+  .box-large h5 img, .box-large p.heading-visual img {
     height: 30px;
     margin: 0px 0px 10px 0px;;
     
@@ -2390,7 +2390,7 @@ largeformat.html
 .legacy-submenu-toggle:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 /* #ff0000 to #b00020: 7.33:1 on white. */
 .btn-danger, .btn-danger strong, .notice-emphasis { color: #fff !important; background-color: #b00020 !important; }
-.notice-emphasis { background: transparent !important; }
+.notice-emphasis { background-color: #b00020 !important; }
 .nav-tabs > li > a[style] { color: #555 !important; }
 section#tele_mid5 li, section#tele_mid5 li .noninteractive-text, .tele-box1 span { color: #222; }
 #telework h5, #telework h5 .noninteractive-text { color: #222; }
