@@ -24,7 +24,12 @@ const requiredAssets = [
   'vendor/bootstrap/LICENSE',
   'vendor/bootstrap/POPPER-LICENSE.txt',
   'vendor/jquery/jquery.min.js',
-  'vendor/jquery/LICENSE.txt'
+  'vendor/jquery/LICENSE.txt',
+  'vendor/fontawesome/css/all.min.css',
+  'vendor/fontawesome/css/v4-shims.min.css',
+  'vendor/fontawesome/webfonts/fa-solid-900.woff2',
+  'vendor/fontawesome/webfonts/fa-regular-400.woff2',
+  'vendor/fontawesome/LICENSE.txt'
 ];
 
 for (const asset of requiredAssets) {
@@ -33,8 +38,11 @@ for (const asset of requiredAssets) {
 
 for (const pageName of modernPages) {
   const html = fs.readFileSync(path.join(outputRoot, pageName), 'utf8');
-  if (/stackpath\.bootstrapcdn\.com|code\.jquery\.com|cdn\.jsdelivr\.net\/npm\/@popperjs|data-(?:toggle|target|ride|interval|pause|slide|touch)=|\bsr-only\b|\bcol-xs-/.test(html)) {
+  if (/stackpath\.bootstrapcdn\.com|code\.jquery\.com|cdn\.jsdelivr\.net\/npm\/@popperjs|kit\.fontawesome\.com|data-(?:toggle|target|ride|interval|pause|slide|touch)=|\bsr-only\b|\bcol-xs-/.test(html)) {
     throw new Error(`${pageName} still contains a removed modern dependency or Bootstrap 4 API.`);
+  }
+  for (const stylesheet of ['/vendor/fontawesome/css/all.min.css', '/vendor/fontawesome/css/v4-shims.min.css']) {
+    if (html.split(`href="${stylesheet}"`).length !== 2) throw new Error(`${pageName} must load ${stylesheet} exactly once.`);
   }
   const jqueryIndex = html.indexOf('/vendor/jquery/jquery.min.js');
   const bootstrapIndex = html.indexOf('/vendor/bootstrap/bootstrap.bundle.min.js');
@@ -71,6 +79,9 @@ try {
       page.on('console', (message) => {
         if (message.type() === 'error') errors.push(message.text());
       });
+      page.on('request', (request) => {
+        if (new URL(request.url()).hostname === 'kit.fontawesome.com') errors.push(`Retired Font Awesome Kit request: ${request.url()}`);
+      });
       const response = await page.goto(`http://127.0.0.1:${port}/${pageName}`, { waitUntil: 'networkidle' });
       if (!response?.ok()) throw new Error(`${pageName} did not return 2xx at ${width}px.`);
       await page.waitForFunction(() => window.bootstrap?.Tooltip?.VERSION && window.jQuery?.fn?.jquery);
@@ -92,6 +103,17 @@ try {
           .filter((width) => width > 0),
         carouselHeight: document.querySelector('#carouselExampleIndicators')?.getBoundingClientRect().height
       }));
+      const iconState = await page.evaluate(() => {
+        const selectors = ['header .fas', 'footer .fa', '#title_section .fa-cog', '#scan-first .far'];
+        return selectors.filter((selector) => document.querySelector(selector)).map((selector) => {
+          const icon = document.querySelector(selector);
+          const before = getComputedStyle(icon, '::before');
+          return { selector, content: before.content, fontFamily: before.fontFamily, width: icon.getBoundingClientRect().width, height: icon.getBoundingClientRect().height };
+        });
+      });
+      if (!iconState.length || iconState.some(({ content, fontFamily }) => !content || content === 'none' || !/Font Awesome/i.test(fontFamily)) || !iconState.some(({ width: iconWidth, height: iconHeight }) => iconWidth > 0 && iconHeight > 0)) {
+        throw new Error(`${pageName} did not render local Font Awesome icons: ${JSON.stringify(iconState)}.`);
+      }
       if (versions.bootstrap !== '5.3.8' || versions.jquery !== '3.7.1') {
         throw new Error(`${pageName} loaded unexpected dependency versions: ${JSON.stringify(versions)}.`);
       }
