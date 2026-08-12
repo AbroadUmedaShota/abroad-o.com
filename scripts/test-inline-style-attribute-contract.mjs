@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
+import { parse } from 'parse5';
 
 const root = path.resolve(import.meta.dirname, '..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
@@ -37,22 +38,77 @@ export function assertRoleClassCounts(sources) {
   assert.deepEqual(countRoleClasses(sources), roleClassCounts);
 }
 
+const roleBindings = {
+  'news-list-spacing': { 'news.html.njk|section': 1 },
+  'news-detail-back-link--spaced': Object.fromEntries(['171023', '17110101', '17110102', '17110103', '171211', '18083101', '18083102', '181220', '190327', '191227', '200106', '200327', '200508', '200526', '200721', '201106', '210329', '220807', '221212', '231226', '241218'].map((date) => [`news/news_${date}.html.njk|p`, 1])),
+  'news-detail-back-link--compact': Object.fromEntries(['250827', '250908', '260526', '260615', '260616'].map((date) => [`news/news_${date}.html.njk|p`, 1])),
+  'news-article-cta': Object.fromEntries(['250827', '250908', '260526', '260615', '260616'].map((date) => [`news/news_${date}.html.njk|div`, 1])),
+  'news-article-date': Object.fromEntries(['250827', '250908', '260526', '260615', '260616'].map((date) => [`news/news_${date}.html.njk|p`, 1])),
+  'news-article-created-at': { 'news/news_251212.html.njk|p': 1 },
+  'form-page-title': { 'form.html.njk|h1': 1 },
+  'about-map-embed': { 'about.html.njk|iframe': 1 },
+  'legacy-return-link': { 'film.html.njk|a': 1, 'largeformat.html.njk|a': 1, 'microfilm.html.njk|a': 1 },
+  'largeformat-price-marker': { 'largeformat.html.njk|b': 3 },
+  'microfilm-active-tab': { 'microfilm.html.njk|a': 1 },
+  'microfilm-heading-band': { 'microfilm.html.njk|div': 4 },
+  'microfilm-table-heading': { 'microfilm.html.njk|th': 5, 'microfilm.html.njk|td': 4 },
+  'microfilm-process-arrow': { 'microfilm.html.njk|div': 2 },
+  'microfilm-process-step': { 'microfilm.html.njk|li': 6 },
+  'scan-heading-band': { 'scan.html.njk|div': 3 }
+};
+
+function visit(node, callback) {
+  callback(node);
+  for (const child of node.childNodes || []) visit(child, callback);
+}
+
+export function roleClassBindings(records) {
+  const bindings = Object.fromEntries(Object.keys(roleBindings).map((role) => [role, {}]));
+  for (const { file, source } of records) visit(parse(source), (node) => {
+    const classes = (node.attrs || []).find(({ name }) => name.toLowerCase() === 'class')?.value || '';
+    for (const token of classes.trim().split(/\s+/)) if (token in bindings) {
+      const key = `${file}|${node.nodeName}`;
+      bindings[token][key] = (bindings[token][key] || 0) + 1;
+    }
+  });
+  return bindings;
+}
+
+export function assertRoleClassBindings(records) {
+  assert.deepEqual(roleClassBindings(records), roleBindings);
+}
+
+const sourceRecords = () => pageFiles('site/pages').map((file) => ({ file: path.relative(path.join(root, 'site', 'pages'), file).replaceAll('\\', '/'), source: read(file) }));
+
 test('removes style attributes from generated-page sources while documenting passthrough exceptions', () => {
   for (const file of pageFiles('site/pages')) assert.doesNotMatch(read(file), /\sstyle\s*=/i, file);
   assert.equal((read('slick/largeformat.html').match(/\sstyle\s*=/gi) || []).length, 4);
 });
 
 test('maps all 71 former inline declarations to role-specific class tokens exactly once', () => {
-  const sources = pageFiles('site/pages').map(read);
+  const sources = sourceRecords().map(({ source }) => source);
   assert.equal(Object.values(countRoleClasses(sources)).reduce((total, count) => total + count, 0), 71);
   assertRoleClassCounts(sources);
+  assertRoleClassBindings(sourceRecords());
 });
 
 test('rejects missing, renamed, and duplicated role class tokens', () => {
-  const sources = pageFiles('site/pages').map(read);
+  const sources = sourceRecords().map(({ source }) => source);
   assert.throws(() => assertRoleClassCounts(sources.map((source) => source.replace('news-detail-back-link--spaced', ''))));
   assert.throws(() => assertRoleClassCounts(sources.map((source) => source.replace('microfilm-process-step', 'other-process-step'))));
   assert.throws(() => assertRoleClassCounts([...sources, '<div class="news-list-spacing"></div>']));
+});
+
+test('rejects a same-count role class swap or relocation', () => {
+  const records = sourceRecords();
+  const swapped = records.map((record) => ({ ...record, source: record.source }));
+  const largeformat = swapped.find(({ file }) => file === 'largeformat.html.njk');
+  largeformat.source = largeformat.source
+    .replace('legacy-return-link', '__swapped-role__')
+    .replace('largeformat-price-marker', 'legacy-return-link')
+    .replace('__swapped-role__', 'largeformat-price-marker');
+  assertRoleClassCounts(swapped.map(({ source }) => source));
+  assert.throws(() => assertRoleClassBindings(swapped));
 });
 
 test('keeps the former declarations in CSS with selectors that beat legacy rules', () => {
