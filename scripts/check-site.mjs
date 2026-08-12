@@ -4,7 +4,6 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import matter from 'gray-matter';
 import { assertPageMetadata } from './lib/html-contract.mjs';
-import { assertAccessibilityContract } from './lib/accessibility-contract.mjs';
 
 const repoRoot = path.resolve(import.meta.dirname, '..');
 const outputRoot = path.join(repoRoot, '_site');
@@ -116,10 +115,26 @@ function verifyContract(manifest) {
   const indexableCanonicalUrls = [];
   for (const { path: file } of generatedFiles) {
     const html = fs.readFileSync(path.join(outputRoot, file), 'utf8');
-    assertAccessibilityContract(html, `Generated accessibility contract ${file}`);
+    if ((html.match(/<h1\b/gi) || []).length !== 1) throw new Error(`Expected exactly one h1: ${file}`);
+    if (/<a(?=\s|>)(?![^>]*\bhref=)[^>]*>/i.test(html) || /<a[^>]*\bhref=["']{2}/i.test(html)) throw new Error(`Non-interactive anchor found: ${file}`);
+    for (const anchor of html.match(/<a\b[^>]*\btarget=["']_blank["'][^>]*>/gi) || []) {
+      if (!/\brel=["'][^"']*\bnoopener\b[^"']*\bnoreferrer\b/i.test(anchor)) throw new Error(`Unsafe target=_blank: ${file}`);
+    }
+    for (const image of html.match(/<img\b[^>]*>/gi) || []) {
+      const alt = image.match(/\balt=["']([^"']*)["']/i)?.[1];
+      if (alt === undefined || /^(?:画像|ロゴ|写真)$/i.test(alt)) throw new Error(`Missing or generic image alt: ${file}`);
+    }
+    for (const control of html.match(/\b(?:aria-controls)=["']([^"']+)["']/gi) || []) {
+      const id = control.match(/["']([^"']+)["']/)?.[1];
+      if (!new RegExp(`\\bid=["']${id}["']`).test(html)) throw new Error(`Unresolved aria-controls ${id}: ${file}`);
+    }
     const sourceTemplate = fs.readFileSync(path.join(sourceRoot, `${file}.njk`), 'utf8');
     const source = matter(sourceTemplate).data;
-    assertAccessibilityContract(sourceTemplate, `Source accessibility contract ${file}`);
+    if (/<a(?=\s|>)(?![^>]*\bhref=)[^>]*>/i.test(sourceTemplate) || /<a[^>]*\bhref=["']{2}/i.test(sourceTemplate)) throw new Error(`Source non-interactive anchor found: ${file}`);
+    if (/\btarget=["']{2}/i.test(sourceTemplate)) throw new Error(`Source empty target found: ${file}`);
+    for (const anchor of sourceTemplate.match(/<a\b[^>]*\btarget=["']_blank["'][^>]*>/gi) || []) {
+      if (!/\brel=["'][^"']*\bnoopener\b[^"']*\bnoreferrer\b/i.test(anchor)) throw new Error(`Source unsafe target=_blank: ${file}`);
+    }
     const sourceCanonicalUrl = file === 'index.html' ? 'https://www.abroad-o.com/' : `https://www.abroad-o.com/${file}`;
     if (!source.title || !source.description || source.canonicalUrl !== sourceCanonicalUrl) throw new Error(`Invalid source metadata: ${file}`);
     const sourceOgType = source.ogType || (file.startsWith('news/') ? 'article' : 'website');
