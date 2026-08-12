@@ -17,6 +17,8 @@ FileZillaの手作業に依存せず、Git管理された公開ファイルだ�
 
 `sitemap.xml` はEleventyがindexableページのcanonical URLだけから固定順序で生成する。`robots.txt` はクロールを許可し、同サイトマップを案内する。`.htaccess` はHTTP／非wwwと`/index`・`/index.html`を、クエリを保ったまま `https://www.abroad-o.com/` のcanonical URLへ1回だけ301リダイレクトする。
 
+CIはApache実環境でHTTP／HTTPS、www／apex、index、拡張子有無、クエリ、禁止URLのリダイレクト行列を検証する。
+
 含めないもの:
 
 - `.git/`, `.github/`, `.vscode/`, `.deploy/`

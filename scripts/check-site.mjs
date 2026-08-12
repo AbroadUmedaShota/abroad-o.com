@@ -2,6 +2,8 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import matter from 'gray-matter';
+import { assertPageMetadata } from './lib/html-contract.mjs';
 
 const repoRoot = path.resolve(import.meta.dirname, '..');
 const outputRoot = path.join(repoRoot, '_site');
@@ -37,18 +39,6 @@ function manifestHash(manifest) {
 function assertSame(expected, actual, label) {
   if (expected.length !== actual.length || expected.some((value, index) => value !== actual[index])) {
     throw new Error(`${label} changed.\nExpected: ${expected.join(', ')}\nActual: ${actual.join(', ')}`);
-  }
-}
-
-function metaValues(html, attribute, name) {
-  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return [...html.matchAll(new RegExp(`<meta\\s+${attribute}=["']${escaped}["']\\s+content=["']([^"']*)["']`, 'gi'))].map((match) => match[1]);
-}
-
-function assertSingleMeta(html, attribute, name, expected, file) {
-  const values = metaValues(html, attribute, name);
-  if (values.length !== 1 || (expected !== undefined && values[0] !== expected)) {
-    throw new Error(`Unexpected ${name} metadata in ${file}: ${JSON.stringify(values)}`);
   }
 }
 
@@ -124,31 +114,22 @@ function verifyContract(manifest) {
   const indexableCanonicalUrls = [];
   for (const { path: file } of generatedFiles) {
     const html = fs.readFileSync(path.join(outputRoot, file), 'utf8');
-    const titles = [...html.matchAll(/<title>([^<]+)<\/title>/gi)];
-    if (titles.length !== 1) throw new Error(`Expected exactly one title: ${file}`);
-    const canonicalUrls = [...html.matchAll(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/gi)].map((match) => match[1]);
-    const expectedCanonicalUrl = file === 'index.html' ? 'https://www.abroad-o.com/' : `https://www.abroad-o.com/${file}`;
-    if (canonicalUrls.length !== 1 || canonicalUrls[0] !== expectedCanonicalUrl) {
-      throw new Error(`Unexpected canonical URL in ${file}: ${JSON.stringify(canonicalUrls)}`);
-    }
-    const expectedOgType = file.startsWith('news/') ? 'article' : 'website';
-    assertSingleMeta(html, 'property', 'og:title', undefined, file);
-    assertSingleMeta(html, 'property', 'og:description', undefined, file);
-    assertSingleMeta(html, 'property', 'og:type', expectedOgType, file);
-    assertSingleMeta(html, 'property', 'og:url', expectedCanonicalUrl, file);
-    assertSingleMeta(html, 'property', 'og:image', defaultOgImageUrl, file);
-    assertSingleMeta(html, 'property', 'og:image:width', String(ogImageWidth), file);
-    assertSingleMeta(html, 'property', 'og:image:height', String(ogImageHeight), file);
-    assertSingleMeta(html, 'name', 'twitter:card', 'summary_large_image', file);
-    assertSingleMeta(html, 'name', 'twitter:title', undefined, file);
-    assertSingleMeta(html, 'name', 'twitter:description', undefined, file);
-    assertSingleMeta(html, 'name', 'twitter:image', defaultOgImageUrl, file);
-    const noindex = metaValues(html, 'name', 'robots');
-    if (file === 'thank.html') {
-      if (noindex.length !== 1 || noindex[0] !== 'noindex' || sitemapUrls.includes(expectedCanonicalUrl)) throw new Error('thank.html must be noindex and absent from the sitemap.');
+    const source = matter(fs.readFileSync(path.join(sourceRoot, `${file}.njk`), 'utf8')).data;
+    const sourceCanonicalUrl = file === 'index.html' ? 'https://www.abroad-o.com/' : `https://www.abroad-o.com/${file}`;
+    if (!source.title || !source.description || source.canonicalUrl !== sourceCanonicalUrl) throw new Error(`Invalid source metadata: ${file}`);
+    const sourceOgType = source.ogType || (file.startsWith('news/') ? 'article' : 'website');
+    const sourceOgImage = source.ogImage || defaultOgImageUrl;
+    assertPageMetadata(html, { title: source.title, noindex: source.noindex === true, meta: {
+      description: source.description, canonical: source.canonicalUrl, 'og:title': source.ogTitle || source.title,
+      'og:description': source.ogDescription || source.description, 'og:type': sourceOgType, 'og:url': source.canonicalUrl,
+      'og:image': sourceOgImage, 'og:image:width': String(ogImageWidth), 'og:image:height': String(ogImageHeight),
+      'twitter:card': 'summary_large_image', 'twitter:title': source.ogTitle || source.title,
+      'twitter:description': source.ogDescription || source.description, 'twitter:image': sourceOgImage
+    } }, file);
+    if (source.noindex === true) {
+      if (sitemapUrls.includes(source.canonicalUrl)) throw new Error(`noindex page is in sitemap: ${file}`);
     } else {
-      if (noindex.length !== 0) throw new Error(`Unexpected noindex: ${file}`);
-      indexableCanonicalUrls.push(expectedCanonicalUrl);
+      indexableCanonicalUrls.push(source.canonicalUrl);
     }
     for (const value of publicContract.forbiddenReferences) {
       if (html.includes(value)) throw new Error(`Forbidden legacy reference ${value}: ${file}`);
