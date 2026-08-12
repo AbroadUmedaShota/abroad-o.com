@@ -2395,7 +2395,8 @@ largeformat.html
 section#tele_mid5 li, section#tele_mid5 li .noninteractive-text, .tele-box1 span { color: #222; }
 #telework h5, #telework h5 .noninteractive-text { color: #222; }
 section#tele_mid5 h5, section#tele_mid5 h5 .noninteractive-text { color: #222 !important; }
-#form-feedback { color: #222; }
+section#tele_mid5 p.heading-visual, section#tele_mid5 p.heading-visual .noninteractive-text { color: #222 !important; }
+#form-feedback { color: #222 !important; }
 .mailto-link { color: #082E5D; font-weight: 700; text-decoration: underline; }
 @media screen and (max-width: 480px) {
   .contact-form-grid { grid-template-columns: 1fr; }
