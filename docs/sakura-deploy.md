@@ -134,3 +134,14 @@ $env:SAKURA_STAGED_RELEASE_ID = 'abroad-o-public-YYYYMMDD-HHMMSS'
 - `https://www.abroad-o.com/docs/TOOL_USAGE.md` が 404
 - `https://www.abroad-o.com/TOOL/index.html` が 404
 - `https://www.abroad-o.com/pdfjs/web/viewer.html` が 404
+# CSP Report-Only ヘッダー
+
+`.htaccess` は `Content-Security-Policy-Report-Only` と4種類の補助セキュリティヘッダーを設定する。これは違反候補を報告するだけで通信を遮断しない。HSTSは今回設定しない。`report-uri`／`report-to` の送信先も未設定であり、本番ブラウザの違反レポートは保存されない。この状態だけを根拠に強制CSPへ切り替えてはならない。
+
+このヘッダーを含む公開より前に、次の作業それぞれについて明示承認を得る。
+
+1. Sakura上の隔離した一時ディレクトリで、`Header` を1件だけ設定する最小 `.htaccess` を使い、`mod_headers` が利用可能でHTTP 500にならないことを確認する。確認後は一時ファイルを削除する。
+2. Report-Only公開後、キャッシュ回避付きの主要ページ、問い合わせフォーム、Google Maps、PDFで、レスポンスヘッダーの重複がなく、ブラウザのCSP違反イベント／コンソール違反がないことを採取する。
+3. 強制CSPへの切替は、前項の実測結果を別途レビューし、あらためて承認を得る。
+
+`Header` ディレクティブは未対応環境を黙って通さないため `<IfModule>` で囲っていない。Sakuraで未対応の場合はサイト全体が500になる可能性があるため、隔離probeを省略して本番公開しない。ローカルApache・決定論的ブラウザ検査・GitHub Actionsの成功はビルド証跡であり、Sakura上のprobe、観測、公開を許可するものではない。
