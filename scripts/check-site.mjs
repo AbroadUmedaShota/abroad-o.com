@@ -54,8 +54,9 @@ function verifyRedirectContract() {
   const htaccess = fs.readFileSync(path.join(repoRoot, '.htaccess'), 'utf8');
   const canonicalRedirect = htaccess.indexOf('https://www.abroad-o.com/$1');
   const rootIndexRedirect = htaccess.indexOf('RewriteRule ^index(?:\\.html)?$ https://www.abroad-o.com/');
+  const rootIndexRequest = htaccess.indexOf('RewriteCond %{THE_REQUEST} \\s/+index(?:\\.html)?(?:[?\\s]) [NC]');
   const extensionlessRewrite = htaccess.indexOf('RewriteCond %{REQUEST_FILENAME}\\.html -f');
-  if (rootIndexRedirect < 0 || canonicalRedirect < 0 || extensionlessRewrite < 0 || rootIndexRedirect > canonicalRedirect || canonicalRedirect > extensionlessRewrite) {
+  if (rootIndexRequest < 0 || rootIndexRedirect < 0 || canonicalRedirect < 0 || extensionlessRewrite < 0 || rootIndexRequest > rootIndexRedirect || rootIndexRedirect > canonicalRedirect || canonicalRedirect > extensionlessRewrite) {
     throw new Error('.htaccess must canonicalize before extensionless rewrites.');
   }
   if (/RewriteRule[^\r\n]*https:\/\/[^\r\n]*%\{HTTP_HOST\}/i.test(htaccess)) {

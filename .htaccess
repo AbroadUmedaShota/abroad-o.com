@@ -2,6 +2,7 @@
 RewriteEngine On
 
 # Canonicalize root documents in one hop before scheme and host redirects.
+RewriteCond %{THE_REQUEST} \s/+index(?:\.html)?(?:[?\s]) [NC]
 RewriteRule ^index(?:\.html)?$ https://www.abroad-o.com/ [R=301,L,NE]
 
 # Canonicalize scheme and host in a single redirect without reflecting Host.
