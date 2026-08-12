@@ -78,6 +78,57 @@ export function assertRoleClassBindings(records) {
   assert.deepEqual(roleClassBindings(records), roleBindings);
 }
 
+function attributes(node) {
+  return Object.fromEntries((node.attrs || []).map(({ name, value }) => [name.toLowerCase(), value]));
+}
+
+function nodeText(node) {
+  let text = '';
+  visit(node, (child) => { if (child.nodeName === '#text') text += child.value || ''; });
+  return text.replace(/\s+/g, ' ').trim();
+}
+
+function childAnchorHref(node) {
+  let href = '';
+  visit(node, (child) => { if (!href && child.nodeName === 'a') href = attributes(child).href || ''; });
+  return href;
+}
+
+function semanticRoleMatch(role, node) {
+  const attrs = attributes(node);
+  const text = nodeText(node);
+  const href = childAnchorHref(node);
+  const classes = (attrs.class || '').split(/\s+/);
+  switch (role) {
+    case 'news-list-spacing': return node.nodeName === 'section' && attrs.id === 'news_list' && classes.includes('container');
+    case 'news-detail-back-link--spaced':
+    case 'news-detail-back-link--compact': return node.nodeName === 'p' && href === '../news.html' && classes.includes('news-detail-back-link');
+    case 'news-article-cta': return node.nodeName === 'div' && classes.includes('text-center') && /(?:SPEED AD|Googleマップ|PR TIMES|無料で始める)/.test(text);
+    case 'news-article-date': return node.nodeName === 'p' && !href && /20(?:25|26)年/.test(text) && /アブロードアウトソーシング/.test(text);
+    case 'news-article-created-at': return node.nodeName === 'p' && text === '作成日：2025/12/12';
+    case 'form-page-title': return node.nodeName === 'h1' && text === 'お問い合わせ・お見積もりフォーム';
+    case 'about-map-embed': return node.nodeName === 'iframe' && attrs.width === '99%' && attrs.height === '400' && (attrs.src || '').startsWith('https://www.google.com/maps/embed?');
+    case 'legacy-return-link': return node.nodeName === 'a' && attrs.href === 'scan.html' && text === '前の画面に戻る';
+    case 'largeformat-price-marker': return node.nodeName === 'b' && !text;
+    case 'microfilm-active-tab': return node.nodeName === 'a' && attrs.href === '#sampleContentA' && attrs['data-toggle'] === 'tab';
+    case 'microfilm-heading-band': return node.nodeName === 'div' && classes.includes('line_orange');
+    case 'microfilm-table-heading': return ['th', 'td'].includes(node.nodeName) && ['ベース素材', '内容', '対応可否', 'サイズ', '価格/コマ', 'オプション', '補足事項', '-'].includes(text);
+    case 'microfilm-process-arrow': return node.nodeName === 'div' && classes.includes('triangle_orange');
+    case 'microfilm-process-step': return node.nodeName === 'li' && text.length > 0;
+    case 'scan-heading-band': return node.nodeName === 'div' && classes.includes('max-width-line_blue') && classes.includes('max-width-line');
+    default: return false;
+  }
+}
+
+export function assertRoleClassSemantics(records) {
+  const violations = [];
+  for (const { file, source } of records) visit(parse(source), (node) => {
+    const classes = attributes(node).class || '';
+    for (const role of classes.trim().split(/\s+/)) if (role in roleClassCounts && !semanticRoleMatch(role, node)) violations.push(`${file}:${node.nodeName}:${role}`);
+  });
+  assert.deepEqual(violations, []);
+}
+
 const sourceRecords = () => pageFiles('site/pages').map((file) => ({ file: path.relative(path.join(root, 'site', 'pages'), file).replaceAll('\\', '/'), source: read(file) }));
 
 test('removes style attributes from generated-page sources while documenting passthrough exceptions', () => {
@@ -90,6 +141,7 @@ test('maps all 71 former inline declarations to role-specific class tokens exact
   assert.equal(Object.values(countRoleClasses(sources)).reduce((total, count) => total + count, 0), 71);
   assertRoleClassCounts(sources);
   assertRoleClassBindings(sourceRecords());
+  assertRoleClassSemantics(sourceRecords());
 });
 
 test('rejects missing, renamed, and duplicated role class tokens', () => {
@@ -109,6 +161,18 @@ test('rejects a same-count role class swap or relocation', () => {
     .replace('__swapped-role__', 'largeformat-price-marker');
   assertRoleClassCounts(swapped.map(({ source }) => source));
   assert.throws(() => assertRoleClassBindings(swapped));
+});
+
+test('rejects compact/date swaps between same-file paragraph elements', () => {
+  const records = sourceRecords().map((record) => ({ ...record, source: record.source }));
+  const article = records.find(({ file }) => file === 'news/news_250827.html.njk');
+  article.source = article.source
+    .replace('news-detail-back-link--compact', '__swapped-role__')
+    .replace('news-article-date', 'news-detail-back-link--compact')
+    .replace('__swapped-role__', 'news-article-date');
+  assertRoleClassCounts(records.map(({ source }) => source));
+  assertRoleClassBindings(records);
+  assert.throws(() => assertRoleClassSemantics(records));
 });
 
 test('keeps the former declarations in CSS with selectors that beat legacy rules', () => {
