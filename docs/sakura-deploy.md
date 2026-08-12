@@ -11,7 +11,9 @@ FileZillaの手作業に依存せず、Git管理された公開ファイルだ�
 含めるもの:
 
 - `_site/`に生成されたルートHTMLとNEWS記事
-- `_site/`へコピーされた`.htaccess`、CSS、画像、JavaScript、PDF.js、`slick/`、`TOOL/`
+- `_site/`へコピーされた`.htaccess`、CSS、画像、JavaScript、`slick/`、および `pdfjs/` 配下の3 PDF（`1c_abroad.pdf`、`2c_abroad.pdf`、`4c_abroad.pdf`）
+
+`TOOL/` と PDF.js viewer（`pdfjs/build/`、`pdfjs/web/`、`pdfjs/LICENSE`）は公開しない。PDF閲覧はブラウザ組込み機能で行う。
 
 含めないもの:
 
@@ -71,7 +73,7 @@ FileZillaの保存情報から `SAKURA_HOST`, `SAKURA_USER`, `SAKURA_REMOTE_DIR`
 .\scripts\deploy-sakura.ps1 -Mode Deploy -UseFileZillaConfig
 ```
 
-FileZillaがFTP/21番で保存されていても、このデプロイスクリプトはバックアップと復元を安全に行うためSSH/SCPを使う。FTPパスワードは表示・利用しない。
+FileZillaがFTP/21番で保存されていても、このデプロイスクリプトは公開前バックアップと公開反映にSSH/SCPを使う。復元はsanitized backup と restoration contract の独立検証が完了するまで停止中である。FTPパスワードは表示・利用しない。
 
 ## GitHub Actions
 
@@ -98,26 +100,13 @@ GitHub repository secrets:
 
 ## バックアップと復元
 
-`Restore` は緊急用のバックアップ展開であり、現在の公開物のうちバックアップに存在しないファイルを削除しない。通常の安全ロールバック手順として扱わず、対象manifestとの差分確認と明示承認がある場合だけ利用する。
+`Restore` と `RestoreSafe` は、sanitized backup と復元契約が実装され、独立検証されるまで停止中である。旧 `TOOL/` や PDF.js viewer を復活させるおそれがあるため、実行しない。
 
 `Deploy` は `Preflight`、`Stage`、限定 `Promote` の順で実行する。Preflightは読み取り専用で、公開ディレクトリがシンボリックリンクでないこと、公開ファイルに未知の追加物がないこと、パッケージ・現行バックアップ・作業領域を確保できる空き容量があることを確認する。未知のリモートファイルが1件でもある場合は反映を中止する。manifestに追加されたファイルや、明示した削除allowlist上のファイルはこの照合で許可する。
 
 `Stage` は公開tarballをホームディレクトリに置くだけで、公開ディレクトリを変更しない。`Promote` はmanifest記載ファイルだけを上書きし、公開ルートや管理ディレクトリを一括削除しない。反映前に `~/abroad-o-backups/abroad-o-before-<timestamp>.tgz` を作り、manifestのSHA-256を操作証跡として出力する。
 
 これらのモードはSSH/SCP鍵認証が必須である。FileZillaにFTP/21の設定しかない場合は、このスクリプトで接続・公開しない。FTPパスワードの読取り、表示、またはFTPへのフォールバックは行わない。
-
-直近の本番反映時バックアップ:
-
-```text
-/home/abroad-o/abroad-o-backups/abroad-o-before-20260526-225613.tgz
-```
-
-復元する場合:
-
-```powershell
-$env:SAKURA_BACKUP_FILE = "/home/abroad-o/abroad-o-backups/abroad-o-before-YYYYMMDD-HHMMSS.tgz"
-.\scripts\deploy-sakura.ps1 -Mode Restore
-```
 
 段階操作を個別に実行する場合は、`Stage` の出力したrelease IDを `Promote` に渡す。Promoteはrelease metadata内のtarball SHA-256とmanifest SHA-256を再照合するため、別パッケージのmanifestでの反映はできない。
 
@@ -136,5 +125,8 @@ $env:SAKURA_STAGED_RELEASE_ID = 'abroad-o-public-YYYYMMDD-HHMMSS'
 - `https://www.abroad-o.com/speed-ad.html` が 200
 - `https://www.abroad-o.com/news/news_260526.html` が 200
 - `https://www.abroad-o.com/news/news_260615.html` が 200
-- `https://www.abroad-o.com/TOOL/index.html` が 200
+- `https://www.abroad-o.com/sample2.html` が 200
+- `https://www.abroad-o.com/pdfjs/1c_abroad.pdf`、`2c_abroad.pdf`、`4c_abroad.pdf` が 200
 - `https://www.abroad-o.com/docs/TOOL_USAGE.md` が 404
+- `https://www.abroad-o.com/TOOL/index.html` が 404
+- `https://www.abroad-o.com/pdfjs/web/viewer.html` が 404

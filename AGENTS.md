@@ -60,12 +60,17 @@
    https://www.abroad-o.com/
    https://www.abroad-o.com/speed-ad.html
    https://www.abroad-o.com/news/news_260526.html
-   https://www.abroad-o.com/TOOL/index.html
+   https://www.abroad-o.com/sample2.html
+   https://www.abroad-o.com/pdfjs/1c_abroad.pdf
+   https://www.abroad-o.com/pdfjs/2c_abroad.pdf
+   https://www.abroad-o.com/pdfjs/4c_abroad.pdf
    ```
+
+   `https://www.abroad-o.com/TOOL/index.html` と `https://www.abroad-o.com/pdfjs/web/viewer.html` が 404 を返すことも確認する。
 
 4. 元の作業ツリーで `git status --short` を再確認し、対象外の変更が保持されていることを確認する。
 5. 一時 worktree、ローカル一時バックアップ、今回起動して残った SSH/SCP プロセスだけを片付ける。
 
 ## ロールバック
 
-公開内容に問題がある場合は、`/www/abroad-o-backups/` に保存した対象ファイルを確認し、元の公開パスへ再アップロードする。その後、キャッシュ回避付き URL で本文まで再確認する。
+sanitized backup と restoration contract が実装され、独立検証されるまで、`Restore`、`RestoreSafe`、およびバックアップからの手動復元は実行しない。旧 `TOOL/` や PDF.js viewer を再公開する可能性があるため、復元は fail-closed とする。

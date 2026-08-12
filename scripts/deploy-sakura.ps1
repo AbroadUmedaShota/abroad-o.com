@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("Package", "DryRun", "Audit", "Preflight", "Stage", "Promote", "Deploy", "Verify", "Restore")]
+    [ValidateSet("Package", "DryRun", "Audit", "Preflight", "Stage", "Promote", "Deploy", "Verify", "Restore", "RestoreSafe")]
     [string]$Mode = "DryRun",
 
     [string]$ConfigPath = "deploy/sakura-public-files.json",
@@ -273,6 +273,30 @@ function Assert-DeployContract {
         if ($paths -contains $path) { throw "Delete allowlist path is still in the deployment manifest: $path" }
         if ($path -in @('.htaccess', 'sitemap.xml')) { throw "Protected path cannot be deleted: $path" }
     }
+    $allowedDeletePrefixes = @('TOOL/', 'pdfjs/build/', 'pdfjs/web/')
+    foreach ($prefix in @($Config.deletePrefixes)) {
+        if ($prefix -notmatch '^[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*/$' -or $prefix -notin $allowedDeletePrefixes) {
+            throw "Unsafe delete allowlist prefix: $prefix"
+        }
+        if ($prefix -eq 'pdfjs/' -or $prefix -eq '/') { throw "Broad delete prefix is not allowed: $prefix" }
+        if ($paths | Where-Object { $_.StartsWith($prefix, [StringComparison]::Ordinal) }) {
+            throw "Delete allowlist prefix is still in the deployment manifest: $prefix"
+        }
+    }
+    foreach ($protected in @($Config.protectedPaths)) {
+        $protectedPath = [string]$protected.path
+        if ($protectedPath -notmatch '^pdfjs/[124]c_abroad\.pdf$' -or -not ($paths -contains $protectedPath)) {
+            throw "Protected PDF path is missing or invalid: $protectedPath"
+        }
+        $localPath = Join-Path $Package.StagingDir $protectedPath
+        if ((Get-Item -LiteralPath $localPath).Length -ne [int64]$protected.bytes) {
+            throw "Protected PDF byte count changed: $protectedPath"
+        }
+        $actualHash = (Get-FileHash -LiteralPath $localPath -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ($actualHash -ne ([string]$protected.sha256).ToLowerInvariant()) {
+            throw "Protected PDF SHA-256 changed: $protectedPath"
+        }
+    }
 }
 
 function Assert-RemoteInput {
@@ -287,6 +311,7 @@ function Invoke-RemotePreflight {
     param([object]$Package, [string]$RemoteDirectory, [object]$Config)
 
     $manifestBody = (Get-Content -LiteralPath $Package.ManifestPath) -join "`n"
+    $deletePrefixBody = (@($Config.deletePrefixes) -join "`n")
     $stagingBytes = (Get-ChildItem -LiteralPath $Package.StagingDir -Recurse -File | Measure-Object -Property Length -Sum).Sum
     $script = @"
 set -eu
@@ -313,15 +338,27 @@ if [ "`$available" -lt "`$required" ]; then
 fi
 expected=`$(mktemp)
 deletable=`$(mktemp)
+delete_prefixes=`$(mktemp)
 allowed=`$(mktemp)
 actual=`$(mktemp)
-trap 'rm -f "`$expected" "`$deletable" "`$allowed" "`$actual"' EXIT
+trap 'rm -f "`$expected" "`$deletable" "`$delete_prefixes" "`$allowed" "`$actual"' EXIT
 cat > "`$expected" <<'CODEX_MANIFEST'
 $manifestBody
 CODEX_MANIFEST
 cat > "`$deletable" <<'CODEX_DELETE_PATHS'
 $(@($Config.deletePaths) -join "`n")
 CODEX_DELETE_PATHS
+cat > "`$delete_prefixes" <<'CODEX_DELETE_PREFIXES'
+$deletePrefixBody
+CODEX_DELETE_PREFIXES
+while IFS= read -r prefix; do
+  [ -n "`$prefix" ] || continue
+  case "`$prefix" in TOOL/|pdfjs/build/|pdfjs/web/) ;; *) echo "Unsafe delete prefix: `$prefix" >&2; exit 1 ;; esac
+  test "`$prefix" != 'pdfjs/' && test "`$prefix" != '/'
+  if [ -d "`$REMOTE_DIR/`$prefix" ]; then
+    (cd "`$REMOTE_DIR" && find "`$prefix" -type f -printf '%p\n') >> "`$deletable"
+  fi
+done < "`$delete_prefixes"
 (cd "`$REMOTE_DIR" && find . -type f -printf '%P\n' | LC_ALL=C sort) > "`$actual"
 cat "`$expected" "`$deletable" | LC_ALL=C sort -u > "`$allowed"
 unknown=`$(comm -23 "`$actual" "`$allowed" || true)
@@ -339,6 +376,7 @@ function Invoke-RemotePromote {
     param([object]$Package, [string]$RemoteDirectory, [string]$RemotePackage, [string]$RemoteBackup, [object]$Config)
 
     $manifestBody = (Get-Content -LiteralPath $Package.ManifestPath) -join "`n"
+    $deletePrefixBody = (@($Config.deletePrefixes) -join "`n")
     $script = @"
 set -eu
 REMOTE_DIR='$RemoteDirectory'
@@ -382,6 +420,14 @@ while IFS= read -r path; do
 done <<'CODEX_DELETE_PATHS'
 $(@($Config.deletePaths) -join "`n")
 CODEX_DELETE_PATHS
+while IFS= read -r prefix; do
+  [ -n "`$prefix" ] || continue
+  case "`$prefix" in TOOL/|pdfjs/build/|pdfjs/web/) ;; *) echo "Unsafe delete prefix: `$prefix" >&2; exit 1 ;; esac
+  test "`$prefix" != 'pdfjs/' && test "`$prefix" != '/'
+  rm -rf "`$REMOTE_DIR/`$prefix"
+done <<'CODEX_DELETE_PREFIXES'
+$deletePrefixBody
+CODEX_DELETE_PREFIXES
 rm -f "`$REMOTE_PACKAGE"
 echo "Promote completed: backup=`$REMOTE_BACKUP manifestSha256=$($Package.ManifestSha256)"
 "@
@@ -714,24 +760,7 @@ if ($Mode -eq "Verify") {
 }
 
 if ($Mode -eq "Restore") {
-    if (-not $BackupFile) {
-        throw "BackupFile or SAKURA_BACKUP_FILE is required for Restore."
-    }
-    $remoteDirValue = Get-RemoteDir
-    $restoreScript = @"
-set -eu
-REMOTE_DIR='$remoteDirValue'
-BACKUP_FILE='$BackupFile'
-if [ ! -f "`$BACKUP_FILE" ]; then
-  echo "Backup file not found: `$BACKUP_FILE" >&2
-  exit 1
-fi
-mkdir -p "`$REMOTE_DIR"
-tar -xzf "`$BACKUP_FILE" -C "`$REMOTE_DIR"
-echo "Restored from `$BACKUP_FILE"
-"@
-    Invoke-RemoteScript -Script $restoreScript
-    exit 0
+    throw "Restore is disabled for this migration because it can reintroduce retired TOOL/PDF.js files."
 }
 
 $package = New-DeployPackage -RepoRoot $repoRoot -Config $config -WorkDirPath $workDirFullPath
@@ -743,7 +772,11 @@ Write-Host "Files: $($package.FileCount)"
 
 Assert-DeployContract -Package $package -Config $config
 
-$excludedChecks = @("docs/TOOL_USAGE.md", "data/chatwork.sqlite", "issue_body.md", "issue_comment_body.md", "pr_body.md")
+if ($Mode -eq "RestoreSafe") {
+    throw "RestoreSafe is disabled until a sanitized pre-change backup format and remote restoration procedure are independently validated."
+}
+
+$excludedChecks = @("data/chatwork.sqlite", "issue_body.md", "issue_comment_body.md", "pr_body.md")
 $manifestText = Get-Content -Path $package.ManifestPath
 foreach ($path in $excludedChecks) {
     if ($manifestText -contains $path) {
