@@ -33,6 +33,14 @@
   document.addEventListener('keydown', (event) => { if (event.key === 'Escape') toggles.filter((toggle) => toggle.getAttribute('aria-expanded') === 'true').forEach((toggle) => close(toggle, true)); });
   const syncSlickFocus = () => document.querySelectorAll('.slick-slide').forEach((slide) => {
     const hidden = slide.getAttribute('aria-hidden') === 'true';
+    if (hidden) {
+      if (!slide.hasAttribute('data-pr4-tabindex')) slide.setAttribute('data-pr4-tabindex', slide.getAttribute('tabindex') || '');
+      slide.setAttribute('tabindex', '-1');
+    } else if (slide.hasAttribute('data-pr4-tabindex')) {
+      const value = slide.getAttribute('data-pr4-tabindex');
+      value ? slide.setAttribute('tabindex', value) : slide.removeAttribute('tabindex');
+      slide.removeAttribute('data-pr4-tabindex');
+    }
     slide.querySelectorAll('a, button, input, select, textarea, [tabindex]').forEach((element) => {
       if (hidden) {
         if (!element.hasAttribute('data-pr4-tabindex')) element.setAttribute('data-pr4-tabindex', element.getAttribute('tabindex') || '0');

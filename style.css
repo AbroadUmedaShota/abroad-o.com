@@ -2393,6 +2393,8 @@ largeformat.html
 .notice-emphasis { background: transparent !important; }
 .nav-tabs > li > a[style] { color: #555 !important; }
 section#tele_mid5 li, section#tele_mid5 li .noninteractive-text, .tele-box1 span { color: #222; }
+#telework h5, #telework h5 .noninteractive-text { color: #222; }
+section#tele_mid5 h5, section#tele_mid5 h5 .noninteractive-text { color: #222 !important; }
 #form-feedback { color: #222; }
 .mailto-link { color: #082E5D; font-weight: 700; text-decoration: underline; }
 @media screen and (max-width: 480px) {

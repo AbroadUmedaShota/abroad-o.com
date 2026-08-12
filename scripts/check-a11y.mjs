@@ -49,7 +49,7 @@ try {
       console.log('sample2 PDF iframe responses and screenshot passed.');
     }
     const results = await new AxeBuilder({ page }).analyze();
-    console.log(`Axe details ${pagePath}: ${results.violations.map((violation) => `${violation.id}/${violation.impact}`).join(', ') || 'none'}`);
+    console.log(`Axe details ${pagePath}: ${results.violations.map((violation) => `${violation.id}/${violation.impact}: ${violation.nodes.map((node) => node.html).join(' | ')}`).join(', ') || 'none'}`);
     for (const violation of results.violations.filter((violation) => ['critical', 'serious'].includes(violation.impact))) {
       critical.push(`${pagePath}: ${violation.id} (${violation.nodes.length} nodes)`);
     }
