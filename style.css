@@ -2367,14 +2367,13 @@ largeformat.html
 
 /* PR4: valid form structure, retaining the former label/control proportions. */
 .contact-form-grid {
-  display: grid;
-  grid-template-columns: 30% 70%;
+  display: block;
   width: 100%;
 }
-.contact-form-grid > .form-group { display: grid; grid-template-columns: minmax(9rem, 1fr) minmax(0, 3fr); gap: .5rem 1rem; align-items: start; }
+.contact-form-grid > .form-group { display: grid; grid-template-columns: 30% 70%; gap: .5rem 0; align-items: start; width: 100%; }
 .contact-form-grid > .form-group label { grid-column: 1; }
 .contact-form-grid > .form-group .form-control { grid-column: 2; }
-.contact-form-grid > .form-group .error-message { grid-column: 2; }
+.contact-form-grid > .form-group .error-message { grid-column: 2; grid-row: 2; }
 @media screen and (max-width: 767px) { .contact-form-grid > .form-group { grid-template-columns: 1fr; } .contact-form-grid > .form-group label, .contact-form-grid > .form-group .form-control, .contact-form-grid > .form-group .error-message { grid-column: 1; } }
 .contact-form-grid > .form-group > label { grid-column: 1; padding: 8px; }
 .contact-form-grid > .form-group > input,
