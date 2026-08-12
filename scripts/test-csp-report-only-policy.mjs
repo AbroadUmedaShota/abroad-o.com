@@ -21,7 +21,7 @@ test('rejects removals for each exercised external directive allowance', () => {
   const remove = (directive, source) => cspReportOnly.replace(new RegExp(`(${directive}[^;]*) ${source.replaceAll('.', '\\.')}`), '$1');
   for (const [directive, source] of [
     ['script-src', 'https://www.google-analytics.com'], ['img-src', 'https://www.google-analytics.com'], ['connect-src', 'https://www.google-analytics.com'],
-    ['script-src', 'https://www.googletagmanager.com'], ['img-src', 'https://www.googletagmanager.com'], ['connect-src', 'https://www.googletagmanager.com'],
+    ['script-src', 'https://www.googletagmanager.com'], ['img-src', 'https://www.googletagmanager.com'],
     ['script-src', 'https://challenges.cloudflare.com'], ['frame-src', 'https://challenges.cloudflare.com'],
     ['connect-src', 'https://abroad-o-contact-form.abroad-o.workers.dev'], ['frame-src', 'https://www.google.com']
   ]) assert.throws(() => assertCspReportOnly(remove(directive, source)), `${directive} must retain ${source}`);

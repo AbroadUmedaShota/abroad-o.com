@@ -13,7 +13,7 @@ assert.equal(pages.length, 48);
 assert.ok(fs.readFileSync(path.join(root, '.htaccess')).equals(fs.readFileSync(path.join(output, '.htaccess'))), 'Generated .htaccess must be byte-identical.');
 const negativeCases = [
   ['ga-script', 'script-src', 'https://www.google-analytics.com'], ['ga-image', 'img-src', 'https://www.google-analytics.com'], ['ga-connect', 'connect-src', 'https://www.google-analytics.com'],
-  ['gtm-script', 'script-src', 'https://www.googletagmanager.com'], ['gtm-image', 'img-src', 'https://www.googletagmanager.com'], ['gtm-connect', 'connect-src', 'https://www.googletagmanager.com'],
+  ['gtm-script', 'script-src', 'https://www.googletagmanager.com'], ['gtm-image', 'img-src', 'https://www.googletagmanager.com'],
   ['turnstile-script', 'script-src', 'https://challenges.cloudflare.com'], ['turnstile-frame', 'frame-src', 'https://challenges.cloudflare.com'],
   ['worker-connect', 'connect-src', 'https://abroad-o-contact-form.abroad-o.workers.dev'], ['maps-frame', 'frame-src', 'https://www.google.com']
 ];
@@ -31,7 +31,6 @@ const server = http.createServer((request, response) => {
       'ga-connect': "fetch('https://www.google-analytics.com/collect?negative=1')",
       'gtm-script': "const node=document.createElement('script');node.src='https://www.googletagmanager.com/gtag/js?negative=1';document.head.append(node)",
       'gtm-image': "new Image().src='https://www.googletagmanager.com/gtm.gif?negative=1'",
-      'gtm-connect': "fetch('https://www.googletagmanager.com/gtm-connect?negative=1')",
       'turnstile-script': "const node=document.createElement('script');node.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';document.head.append(node)",
       'turnstile-frame': "const node=document.createElement('iframe');node.src='https://challenges.cloudflare.com/turnstile/mock-frame';document.body.append(node)",
       'worker-connect': "fetch('https://abroad-o-contact-form.abroad-o.workers.dev/config')",
@@ -58,8 +57,8 @@ const allowedExternal = new Map([
     ? { type: 'text/javascript', body: "fetch('https://www.google-analytics.com/collect');new Image().src='https://www.google-analytics.com/collect?v=1';window.__gaFixtureLoaded=true;" }
     : url.pathname === '/collect' ? { type: 'image/gif', body: 'GIF89a' } : null],
   ['www.googletagmanager.com', (url) => url.pathname === '/gtag/js'
-    ? { type: 'text/javascript', body: "const script=document.createElement('script');script.src='https://www.google-analytics.com/analytics.js';document.head.append(script);fetch('https://www.googletagmanager.com/gtm-connect');new Image().src='https://www.googletagmanager.com/gtm.gif?id=GTM-test';window.__gtmFixtureLoaded=true;" }
-    : ['/gtm-connect', '/gtm.gif'].includes(url.pathname) ? { type: url.pathname.endsWith('.gif') ? 'image/gif' : 'text/plain', body: url.pathname.endsWith('.gif') ? 'GIF89a' : 'ok' } : null],
+    ? { type: 'text/javascript', body: "const script=document.createElement('script');script.src='https://www.google-analytics.com/analytics.js';document.head.append(script);new Image().src='https://www.googletagmanager.com/gtm.gif?id=GTM-test';window.__gtmFixtureLoaded=true;" }
+    : url.pathname === '/gtm.gif' ? { type: 'image/gif', body: 'GIF89a' } : null],
   ['challenges.cloudflare.com', (url) => url.pathname === '/turnstile/v0/api.js' ? { type: 'text/javascript', body: "window.turnstile={render:(target,options)=>{const frame=document.createElement('iframe');frame.src='https://challenges.cloudflare.com/turnstile/mock-frame';document.querySelector(target).append(frame);options.callback('mock-token');return 1},reset:()=>{}};" } : url.pathname === '/turnstile/mock-frame' ? { type: 'text/html', body: '<!doctype html><title>turnstile mock</title>' } : null],
   ['www.google.com', (url) => url.pathname === '/maps/embed' ? { type: 'text/html', body: '<!doctype html><title>map mock</title>' } : null],
   ['abroad-o-contact-form.abroad-o.workers.dev', (url) => url.pathname === '/config' ? { type: 'application/json', body: JSON.stringify({ turnstileSiteKey: 'test-key' }) } : url.pathname === '/submit' ? { type: 'application/json', body: JSON.stringify({ ok: true }) } : null]
@@ -159,7 +158,7 @@ try {
   const styleFailures = await instrument(style, styleRequests, styleViolations, styleConsole); await style.goto(`${base}/about.html`); await style.evaluate(() => { document.body.style.color = 'red'; }); await style.waitForTimeout(150);
   assert.deepEqual(await style.evaluate(() => window.__cspViolations), [], 'Direct style property must not create a CSP violation.'); await style.evaluate(() => document.body.setAttribute('style', 'color: blue')); await style.waitForFunction(() => window.__cspViolations.length === 1);
   await style.waitForTimeout(50); assert.deepEqual(await style.evaluate(() => window.__cspViolations), [{ directive: 'style-src-attr', blocked: 'inline' }]); assert.deepEqual(styleViolations, [{ directive: 'style-src-attr', blocked: 'inline' }]); assert.deepEqual(styleFailures, []); await style.close();
-  for (const expected of ['https://www.google-analytics.com/analytics.js', 'https://www.google-analytics.com/collect', 'https://www.googletagmanager.com/gtag/js', 'https://www.googletagmanager.com/gtm.gif', 'https://www.googletagmanager.com/gtm-connect']) assert.ok(allRequests.has(expected), `Approved external request was not exercised: ${expected}`);
+  for (const expected of ['https://www.google-analytics.com/analytics.js', 'https://www.google-analytics.com/collect', 'https://www.googletagmanager.com/gtag/js', 'https://www.googletagmanager.com/gtm.gif']) assert.ok(allRequests.has(expected), `Approved external request was not exercised: ${expected}`);
   }
   if (scope !== 'positive') for (const [name, directive, source] of negativeCases) {
     const page = await browser.newPage(); const requests = []; const violations = []; const consoleCsp = [];

@@ -1,4 +1,4 @@
-export const cspReportOnly = "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self'; style-src-attr 'none'; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self'; connect-src 'self' https://abroad-o-contact-form.abroad-o.workers.dev https://www.google-analytics.com https://www.googletagmanager.com; frame-src 'self' https://www.google.com https://challenges.cloudflare.com; frame-ancestors 'self'; form-action 'self'";
+export const cspReportOnly = "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self'; style-src-attr 'none'; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self'; connect-src 'self' https://abroad-o-contact-form.abroad-o.workers.dev https://www.google-analytics.com; frame-src 'self' https://www.google.com https://challenges.cloudflare.com; frame-ancestors 'self'; form-action 'self'";
 
 export const cspDirectiveSources = Object.freeze({
   'default-src': ["'self'"], 'base-uri': ["'self'"], 'object-src': ["'none'"],
@@ -6,7 +6,7 @@ export const cspDirectiveSources = Object.freeze({
   'style-src': ["'self'"], 'style-src-attr': ["'none'"],
   'img-src': ["'self'", 'data:', 'https://www.google-analytics.com', 'https://www.googletagmanager.com'],
   'font-src': ["'self'"],
-  'connect-src': ["'self'", 'https://abroad-o-contact-form.abroad-o.workers.dev', 'https://www.google-analytics.com', 'https://www.googletagmanager.com'],
+  'connect-src': ["'self'", 'https://abroad-o-contact-form.abroad-o.workers.dev', 'https://www.google-analytics.com'],
   'frame-src': ["'self'", 'https://www.google.com', 'https://challenges.cloudflare.com'],
   'frame-ancestors': ["'self'"], 'form-action': ["'self'"]
 });
