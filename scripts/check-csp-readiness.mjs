@@ -6,6 +6,7 @@ const repoRoot = path.resolve(import.meta.dirname, '..');
 const outputRoot = path.join(repoRoot, '_site');
 const sourceRoots = [path.join(repoRoot, 'site', 'pages'), path.join(repoRoot, 'site', '_includes', 'partials')];
 const analyticsPages = new Set(['about.html', 'aggregate.html', 'edit.html', 'film.html', 'form.html', 'index.html', 'input.html', 'largeformat.html', 'microfilm.html', 'recruit.html', 'rule.html', 'sample.html', 'sample2.html', 'scan.html', 'service-pack.html', 'service.html', 'speed-ad.html', 'telework.html', 'thank.html']);
+const analyticsScript = fs.readFileSync(path.join(outputRoot, 'js', 'analytics.js'), 'utf8');
 
 function walk(directory) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -33,7 +34,7 @@ for (const file of generatedFiles) {
   styleTags += styles.styleTags;
   styleAttributes += styles.styleAttributes;
   if (analyticsPages.has(relative)) {
-    assertAnalyticsOrder(html, relative);
+    assertAnalyticsOrder(html, analyticsScript, relative);
     analyticsCount += 1;
   } else if (scriptInventory(html).some((script) => script.src === '/js/analytics.js')) {
     throw new Error(`Analytics was added outside the existing page set: ${relative}`);
