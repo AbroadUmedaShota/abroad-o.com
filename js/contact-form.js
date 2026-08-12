@@ -42,6 +42,7 @@
     function setFeedback(message, isError) {
         formFeedback.textContent = message;
         formFeedback.style.color = isError ? 'red' : '';
+        formFeedback.setAttribute('role', isError ? 'alert' : 'status');
     }
 
     function setFieldError(field, errorElement, hasError) {

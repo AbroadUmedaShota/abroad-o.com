@@ -30,8 +30,9 @@
                     </li>
                     <!-- SERVICE -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="/service.html" id="serviceDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">SERVICE</a>
-                        <div class="dropdown-menu" aria-labelledby="serviceDropdown">
+                        <a class="nav-link" href="/service.html">SERVICE</a>
+                        <button class="nav-submenu-toggle" type="button" id="serviceDropdown" aria-controls="serviceSubmenu" aria-expanded="false" aria-label="SERVICE のサブメニューを開く"><span aria-hidden="true">▾</span></button>
+                        <div class="dropdown-menu" id="serviceSubmenu" aria-labelledby="serviceDropdown">
                             <a class="dropdown-item" href="/input.html">データ入力サービス</a>
                             <a class="dropdown-item" href="/aggregate.html">データ集計・分析サービス</a>
                             <a class="dropdown-item" href="/scan.html">スキャニングサービス</a>
@@ -45,10 +46,11 @@
                     </li>
                     <!-- ABOUT -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="/about.html" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">ABOUT</a>
-                        <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
-                            <a class="dropdown-item" href="/rule.html">プライバシーポリシー</a>
-                            <a class="dropdown-item" href="/recruit.html">リクルート</a>
+                        <a class="nav-link" href="/about.html">ABOUT</a>
+                        <button class="nav-submenu-toggle" type="button" id="aboutDropdown" aria-controls="aboutSubmenu" aria-expanded="false" aria-label="ABOUT のサブメニューを開く"><span aria-hidden="true">▾</span></button>
+                        <ul class="dropdown-menu" id="aboutSubmenu" aria-labelledby="aboutDropdown">
+                            <li><a class="dropdown-item" href="/rule.html">プライバシーポリシー</a></li>
+                            <li><a class="dropdown-item" href="/recruit.html">リクルート</a></li>
                         </ul>
                     </li>
                     <!-- CONTACT -->

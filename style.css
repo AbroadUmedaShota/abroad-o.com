@@ -549,6 +549,16 @@ service.html
     margin-top: 0px;
     padding-top: 90px;
 }
+/* CONTACT remains a section landmark while retaining the former title band. */
+#contact-title {
+    height: 200px;
+    background-image: url(image/top1.png);
+    background-attachment: fixed;
+}
+#contact-title h2 {
+    margin-top: 0px;
+    padding-top: 90px;
+}
 #service_detail h3 {
     text-align: center;
     margin: 50px 0px 50px 0px;
@@ -597,6 +607,13 @@ service.html
         height: 150px;
     }
     #title_top h2 {
+        padding-top: 60px;
+        font-size: 25px;
+    }
+    #contact-title {
+        height: 150px;
+    }
+    #contact-title h2 {
         padding-top: 60px;
         font-size: 25px;
     }
@@ -697,14 +714,15 @@ input.html
     color: #fff;
     padding: 5px 0px;
 }
-#text-how h3 {
+#text-how > h2 {
     text-align: center;
     background-color: #000099;
     color: #fff;
     font-size: 18px;
     padding: 5px 0px;
+    margin: 20px 0px 10px;
 }
-#text-how h4 {
+#text-how > h3 {
     margin-top: 30px;
 }
 #text-how .col-md-2 {
@@ -801,7 +819,7 @@ scan.html
 /*========================================================
 service-pack.html
 ========================================================*/
-#service-pack1 h4 {
+#service-pack1 > .container > h2, #service-pack1 h4 {
     text-align: center;
     font-size: 35px;
     margin:50px 0px;
@@ -809,7 +827,7 @@ service-pack.html
 .border-box {
     border:solid 2px #000099;
 }
-.border-box h6 {
+.border-box h6, .border-box p.heading-visual {
     text-align: center;
     font-size: 20px!important;
     margin-top: 20px;
@@ -866,16 +884,22 @@ p.big-font {
     color: #fff;
     padding:3px 20px;
 }
-#service-pack1 h5 {
+#service-pack1 h3, #service-pack1 h5, #service-pack1 > .container > p.heading-visual {
     font-size: 18px;
     background-color: #000099;
     padding: 10px 0px 10px 10px;
     margin:50px 0px;
     color: #fff;
 }
-section#service-pack1 h6 {
+section#service-pack1 h4, section#service-pack1 h6, section#service-pack1 .heading-visual {
     font-weight: 700;
     font-size: 15px;
+}
+section#service-pack1 .no-list > h4 {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.1;
+    margin: 10px 0px;
 }
 section#service-pack1 ul {
     list-style-type: none;    
@@ -885,21 +909,41 @@ section#service-pack1 ul {
 }
 
 /*--------------------------------------------------*/
-section#service-pack2 h4 {
+section#service-pack2 > .container > h2, section#service-pack2 h4 {
     text-align: center;
     font-size: 35px;
     margin:50px 0px;
 }
-section#service-pack2 h5 {
+section#service-pack2 h3, section#service-pack2 h5, section#service-pack2 > .container > p.heading-visual {
     font-size: 18px;
     background-color: #000099;
     padding: 10px 0px 10px 10px;
     margin:50px 0px;
     color: #fff;
 }
-section#service-pack2 h6 {
+section#service-pack2 h6, section#service-pack2 .heading-visual {
     font-weight: 700;
     font-size: 15px;
+}
+section#service-pack2 > .container > h2.heading-visual {
+    background-color: #000099;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.1;
+    margin: 50px 0px;
+    padding: 10px 0px 10px 10px;
+    text-align: left;
+}
+section#service-pack2 .fontsize12 > h3.heading-visual,
+section#service-pack2 > .container > h3.heading-visual {
+    background: transparent;
+    color: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.1;
+    margin: 10px 0px;
+    padding: 0;
 }
 section#service-pack2 ul {
     list-style-type: none;    
@@ -933,7 +977,7 @@ section#service-pack2 .pack-img p {
     }
 }
 @media screen and (max-width: 991px) {
-    section#service-pack1 h4 {
+    section#service-pack1 > .container > h2, section#service-pack1 h4 {
         font-size: 30px;
     }
     .large-font {
@@ -982,6 +1026,16 @@ section#photo_top h6 {
     line-height: 50px;
     margin:50px 0px;
 }
+/* Retain Bootstrap 3 h4/h5 metrics after restoring a meaningful outline. */
+section#photo_top > .container > h2,
+section#photo_top .col-md-5 > h3.heading-visual,
+section#photo_top .container.fade-in > h2.heading-visual {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.1;
+    margin: 10px 0px;
+}
+section#photo_top > .container > h2 { font-size: 18px; }
 .top-img-margin {
     margin:30px 0px 30px;
     text-align: center;
@@ -1038,18 +1092,20 @@ aggregate.html
 /*========================================================
 sample.html 
 ========================================================*/
-section#sample h3 {
+section#sample h3:not(.heading-visual) {
     margin:70px 0px 50px 0px;
     border-bottom: solid 1px #000;
 }
-section#sample h4 {
+section#sample h4,
+section#sample #text-price > h2 {
     font-size: 20px;
     margin:30px 0px 30px 0px;
     background-color: #000099;    
     color: #fff;    
     padding: 10px 5px;    
 }
-section#sample h5 {
+section#sample h5,
+section#sample .aggregate-card-title {
     background-color: #BAD3FF;
     font-size: 16px;
     padding: 8px 5px;
@@ -1058,6 +1114,12 @@ section#sample h5 {
 section#sample h6 {
     margin:30px 0px 0px 0px;
 }
+/* Preserve the legacy visual hierarchy after restoring semantic heading levels. */
+section#sample .sample-subsection { background-color: #BAD3FF; border-bottom: 0; font-size: 16px; padding: 8px 5px; margin: 30px 0px; }
+section#sample .sample-example { background: transparent; border: 0; color: inherit; font-size: .67em; font-weight: bolder; padding: 0; margin:30px 0px 0px 0px; }
+section#sample #tape > h2 { background-color: #000099; color: #fff; font-size: 20px; font-weight: 500; line-height: 1.1; margin: 30px 0; padding: 10px 5px; }
+section#sample h3.sample-subsection { font-weight: 500; line-height: 1.1; }
+section#sample h4.sample-example { font-size: 12px; line-height: 1.1; }
 section#sample i {
     display:inline-block;
     border:solid 1px #AAAAAA;
@@ -1173,6 +1235,9 @@ section#title_top2 h2 {
 #tabref-ContentC .image-back h4 {
     padding-top: 50px!important;
 }
+#tabref-ContentC h2 { padding: 0px 0px 30px 30px; }
+#tabref-ContentC .image-back h2 { padding-top: 50px!important; }
+#tabref-ContentC .image-back h2 { font-size: 18px; font-weight: 500; margin: 10px 0px; }
 #tabref-ContentC .image-back p {
     font-size: 16px;
 }
@@ -1219,6 +1284,7 @@ section#about_top .tab-pane u {
     #tabref-ContentC .image-back h4 {
         padding-top: 30px!important;
     }
+    #tabref-ContentC .image-back h2 { padding-top: 30px!important; }
     #tabref-ContentC .image-back p {
         margin-top: -60px;
         font-size: 13px;
@@ -1236,6 +1302,7 @@ section#about_top .tab-pane u {
     #tabref-ContentC .image-back h4 {
         display: none; 
     }
+    #tabref-ContentC .image-back h2 { display: none; }
     #tabref-ContentC .image-back p {
         display: none          
     }
@@ -1415,9 +1482,13 @@ section#thank_top .thank {
     padding: 40px 80px 60px 80px;
        
 }
-section#thank_top .thank h4{
+section#thank_top .thank h4,
+section#thank_top .thank h2{
     padding: 10px 0px 20px 0px;
     font-size: 23px;
+    font-weight: 500;
+    line-height: 1.1;
+    margin: 10px 0;
 }
 section#thank_top .thank p{
     font-weight: 600;
@@ -1433,7 +1504,8 @@ section#thank_top .thank {
 }    
 }
 @media screen and (max-width: 743px) {
-section#thank_top .thank h4{
+section#thank_top .thank h4,
+section#thank_top .thank h2{
     font-size: 18px;
 }    
 }
@@ -1747,12 +1819,12 @@ section#micro_top h3 {
 telework.html 
 ========================================================*/
 
-section#tele_top h3 {
+section#tele_top h3, section#tele_top h2 {
   font-size: 35px;
   margin: 50px 0px 30px 0px;
 }
 @media screen and (max-width: 780px) {
-section#tele_top h3{
+section#tele_top h3, section#tele_top h2{
   font-size: 25px;
 }  
 }
@@ -1888,12 +1960,12 @@ section#tele_mid3 .box {
   color: #fff;
   padding: 10px 5px;
 }
-section#tele_mid3 .box h5{
+section#tele_mid3 .box h4, section#tele_mid3 .box h5, section#tele_mid3 .box p.heading-visual{
   font-weight: 700;
   font-size: 20px;
 }
 @media screen and (max-width: 780px) {
-  section#tele_mid3 .box h5{
+  section#tele_mid3 .box h4, section#tele_mid3 .box h5, section#tele_mid3 .box p.heading-visual{
     font-size: 18px;
 } 
 }
@@ -1961,7 +2033,7 @@ section#tele_mid5 h3{
   margin-top: -130px;
   margin-bottom: 100px;
 }
-section#tele_mid5 h5 {
+section#tele_mid5 h4, section#tele_mid5 h5, section#tele_mid5 p.heading-visual {
   font-size: 18px;
   font-weight: 700;
 }
@@ -2027,16 +2099,17 @@ film.html
 #film_top .col-md-5 {
   margin: 0px 0px 15px 0px;
 }
-#film_top .col-md-5 h4 {
+#film_top .col-md-5 h2, #film_top .col-md-5 h4 {
   font-size: 35px;
   padding: 100px 0px 30px 0px;
+  margin: 10px 0px;
 }
-#film_top .col-md-5 h5 {
+#film_top .col-md-5 h5, #film_top .col-md-5 p.heading-visual {
   font-size: 18px;
   line-height: 1.5;
   padding: 15px 0px 15px 0px;
 }
-#film_top .col-md-5 h6 {
+#film_top .col-md-5 h6, #film_top .col-md-5 p.heading-visual + p.heading-visual {
   font-size: 28px;
   padding: 15px 0px 0px 0px;  
 }
@@ -2044,15 +2117,15 @@ film.html
   #film_top .col-md-7 img {
   width: 100%;  
   }
-  #film_top .col-md-5 h4 {
+  #film_top .col-md-5 h2, #film_top .col-md-5 h4 {
     font-size: 28px;
     padding: 20px 0px 10px 0px;
   }
-  #film_top .col-md-5 h5 {
+  #film_top .col-md-5 h5, #film_top .col-md-5 p.heading-visual {
     font-size: 13px;
     padding: 10px 0px 10px 0px;
   }
-  #film_top .col-md-5 h6 {
+  #film_top .col-md-5 h6, #film_top .col-md-5 p.heading-visual + p.heading-visual {
     font-size: 21px;
     padding: 15px 0px 0px 0px;  
   }  
@@ -2065,16 +2138,16 @@ film.html
   #film_top .col-md-7 img {
     width: 80%;  
   }  
-  #film_top .col-md-5 h4 {
+  #film_top .col-md-5 h2, #film_top .col-md-5 h4 {
     font-size: 28px;
     padding: 20px 0px 10px 0px;
     text-align: center;
   }
-  #film_top .col-md-5 h5 {
+  #film_top .col-md-5 h5, #film_top .col-md-5 p.heading-visual {
     font-size: 15px;
     padding: 10px 0px 10px 0px;
   }
-  #film_top .col-md-5 h6 {
+  #film_top .col-md-5 h6, #film_top .col-md-5 p.heading-visual + p.heading-visual {
     font-size: 21px;
     padding: 15px 0px 0px 0px;  
     text-align: center;
@@ -2095,17 +2168,19 @@ film.html
   padding: 5px 10px 5px 10px;
   margin-bottom: 20px;
 }
-.row-box h5 {
+.row-box h5, .row-box p.heading-visual {
   font-size: 20px;
 }
-.row-box h5 img {
+.row-box h5 img, .row-box p.heading-visual img {
   height: 40px;
 }
-.row-box a {
+.row-box a,
+.row-box .box > span {
   display: block;
   text-align: center;
 }
-.row-box a img {
+.row-box a img,
+.row-box .box > span > img {
   width: 80%;
 }
 .row-box p {
@@ -2113,10 +2188,10 @@ film.html
   margin: 20px 0px 15px 0px;
 }
 @media screen and (max-width: 991px) {
-  .row-box h5 {
+  .row-box h5, .row-box p.heading-visual {
     font-size: 15px;
   }
-  .row-box h5 img {
+  .row-box h5 img, .row-box p.heading-visual img {
     height: 30px;
   }
   .row-box p {
@@ -2124,25 +2199,28 @@ film.html
   }  
 }
 @media screen and (max-width: 767px) {
-  .row-box a img {
+  .row-box a img,
+  .row-box .box > span > img {
     width: 80%
   }
   .line_orange h3 {
     font-size: 18px;
   }
 }
-.box-large h5 {
+.box-large h5, .box-large p.heading-visual {
   font-size: 20px;
 }
-.box-large h5 img{
+.box-large h5 img, .box-large p.heading-visual img{
   height: 40px;
   margin-left: 30px; 
 }
-.box-large a {
+.box-large a,
+.box-large > span {
   display: block;
   text-align: center;  
 }
-.box-large a img {
+.box-large a img,
+.box-large > span > img {
   width: 80%;
 }
 .box-large p {
@@ -2152,17 +2230,17 @@ film.html
   background-color: #FFEBCD;
 }
 @media screen and (max-width: 767px) {
-  #film_table tr td,tr{
+  #film_table tr td{
     font-size: 12px;
   }
-  .film_price p{
+  .film_price > p.heading-visual{
     font-size: 12px;
   }
-  .box-large h5 {
+  .box-large h5, .box-large p.heading-visual {
   margin-left: 0px;
   font-size: 15px;
   }
-  .box-large h5 img {
+  .box-large h5 img, .box-large p.heading-visual img {
     height: 30px;
     margin: 0px 0px 10px 0px;;
     
@@ -2264,7 +2342,8 @@ section#tele_mid5_orange a {
 /*========================================================
 microfilm.html 
 ========================================================*/
-.micro_box a {
+.micro_box a,
+.micro_box .noninteractive-text {
   font-size: 15px;
 }
 .micro_box p {
@@ -2302,20 +2381,23 @@ microfilm.html
   border: solid 1px #000;
   padding: 5px 10px; 
 }
-.middle1 a img {
+.middle1 a img,
+.middle1 span > img {
   width: 70%;
 }
 .film_price h6 {
   margin: 30px 0xp 30px 0px;
   font-size: 18px;
 }
+.film_price > p.heading-visual { font-size: 18px; }
 /*========================================================
 largeformat.html
 ========================================================*/
 .largepaper h4 {
   font-size: 23px!important;
 }
-.largepaper1 h5 {
+.largepaper h2 { font-size: 23px!important; }
+.largepaper1 h5, .largepaper1 p.heading-visual {
   margin: 30px 0px 30px;
 }
 .largepaper2 {
@@ -2329,6 +2411,7 @@ largeformat.html
 .largepaper h4 {
   font-size: 20px!important;
 }  
+.largepaper h2 { font-size: 20px!important; }
 }
 
 /*========================================================
@@ -2363,4 +2446,63 @@ largeformat.html
 @media screen and (max-width: 415px) {
 }
 @media screen and (max-width: 410px) {
+}
+
+/* PR4: valid form structure while retaining the former stacked layout. */
+.contact-form-grid {
+  display: block;
+  width: 100%;
+}
+.contact-form-grid > .form-group {
+  display: block;
+  margin-bottom: 15px;
+  width: 100%;
+}
+.contact-form-grid > .form-group > label {
+  display: block;
+  margin-bottom: .5rem;
+  padding: 0;
+}
+.contact-form-grid > .form-group > .form-control {
+  display: block;
+  width: 100%;
+}
+.contact-form-grid > .form-group > .error-message { margin-bottom: 0; }
+.contact-form-grid > .honeypot { display: none; }
+.nav-item.dropdown { display: flex; align-items: center; }
+.nav-submenu-toggle,
+.legacy-submenu-toggle { border: 0; background: transparent; color: inherit; padding: .5rem; }
+.legacy-submenu-toggle {
+  color: #fff;
+  height: 50px;
+  left: calc(50% + 26px);
+  padding: 15px 6px;
+  position: absolute;
+  top: 0;
+  z-index: 1;
+}
+#header_nav li.dropdown { position: relative; }
+@media screen and (max-width: 767px) {
+  .legacy-submenu-toggle { left: auto; right: 0; }
+}
+.nav-submenu-toggle:focus-visible,
+.legacy-submenu-toggle:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+/* #ff0000 to #b00020: 7.33:1 on white. */
+.btn-danger, .btn-danger strong, .notice-emphasis { color: #fff !important; background-color: #b00020 !important; }
+.notice-emphasis { background-color: #b00020 !important; }
+.nav-tabs > li > a[style] { color: #555 !important; }
+section#tele_mid5 li, section#tele_mid5 li .noninteractive-text, .tele-box1 span { color: #222; }
+#telework h5, #telework h5 .noninteractive-text { color: #222; }
+section#tele_mid5 h4, section#tele_mid5 h5, section#tele_mid5 h4 .noninteractive-text, section#tele_mid5 h5 .noninteractive-text { color: #222 !important; }
+section#tele_mid5 p.heading-visual, section#tele_mid5 p.heading-visual .noninteractive-text { color: #222 !important; }
+#form-feedback { color: #222 !important; }
+.mailto-link { color: #082E5D; font-weight: 700; text-decoration: underline; }
+/* PR4: constrain legacy fixed-width telework graphics without clipping the page. */
+@media screen and (max-width: 400px) {
+  section#tele_top img,
+  .tele-box1 img,
+  section#tele_mid2 img {
+    max-width: 100%;
+    height: auto;
+  }
 }

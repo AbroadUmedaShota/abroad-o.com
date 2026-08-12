@@ -6,7 +6,7 @@ import AxeBuilder from '@axe-core/playwright';
 
 const repoRoot = path.resolve(import.meta.dirname, '..');
 const outputRoot = path.join(repoRoot, '_site');
-const pages = ['/', '/speed-ad.html', '/news/news_260526.html', '/sample2.html'];
+const pages = ['/', '/scan.html', '/film.html', '/largeformat.html', '/microfilm.html', '/telework.html', '/form.html', '/speed-ad.html', '/news/news_260526.html', '/sample2.html'];
 
 const server = http.createServer((request, response) => {
   const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
@@ -27,7 +27,8 @@ try {
   const critical = [];
   for (const pagePath of pages) {
     const page = await context.newPage();
-    const response = await page.goto(`http://127.0.0.1:${port}${pagePath}`, { waitUntil: 'networkidle' });
+    await page.route('**/*', (route) => ['127.0.0.1', 'localhost'].includes(new URL(route.request().url()).hostname) ? route.continue() : route.fulfill({ status: 204, body: '' }));
+    const response = await page.goto(`http://127.0.0.1:${port}${pagePath}`, { waitUntil: 'domcontentloaded' });
     if (!response || !response.ok()) {
       throw new Error(`Accessibility target did not return 2xx: ${pagePath} (${response?.status() ?? 'no response'})`);
     }
@@ -48,13 +49,14 @@ try {
       console.log('sample2 PDF iframe responses and screenshot passed.');
     }
     const results = await new AxeBuilder({ page }).analyze();
-    for (const violation of results.violations.filter((violation) => violation.impact === 'critical')) {
+    console.log(`Axe details ${pagePath}: ${results.violations.map((violation) => `${violation.id}/${violation.impact}: ${violation.nodes.map((node) => node.html).join(' | ')}`).join(', ') || 'none'}`);
+    for (const violation of results.violations.filter((violation) => ['critical', 'serious'].includes(violation.impact))) {
       critical.push(`${pagePath}: ${violation.id} (${violation.nodes.length} nodes)`);
     }
-    console.log(`Axe ${pagePath}: ${results.violations.length} total violations, ${results.violations.filter((violation) => violation.impact === 'critical').length} critical.`);
+    console.log(`Axe ${pagePath}: ${results.violations.length} total violations, ${results.violations.filter((violation) => ['critical', 'serious'].includes(violation.impact)).length} serious/critical.`);
     await page.close();
   }
-  if (critical.length) throw new Error(`Critical accessibility violations:\n${critical.join('\n')}`);
+  if (critical.length) throw new Error(`Serious or critical accessibility violations:\n${critical.join('\n')}`);
 } finally {
   await context.close();
   await browser.close();

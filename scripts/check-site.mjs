@@ -4,6 +4,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import matter from 'gray-matter';
 import { assertPageMetadata } from './lib/html-contract.mjs';
+import { assertAccessibilityContract } from './lib/accessibility-contract.mjs';
 
 const repoRoot = path.resolve(import.meta.dirname, '..');
 const outputRoot = path.join(repoRoot, '_site');
@@ -115,7 +116,10 @@ function verifyContract(manifest) {
   const indexableCanonicalUrls = [];
   for (const { path: file } of generatedFiles) {
     const html = fs.readFileSync(path.join(outputRoot, file), 'utf8');
-    const source = matter(fs.readFileSync(path.join(sourceRoot, `${file}.njk`), 'utf8')).data;
+    assertAccessibilityContract(html, `Generated accessibility contract ${file}`);
+    const sourceTemplate = fs.readFileSync(path.join(sourceRoot, `${file}.njk`), 'utf8');
+    const source = matter(sourceTemplate).data;
+    assertAccessibilityContract(sourceTemplate, `Source accessibility contract ${file}`);
     const sourceCanonicalUrl = file === 'index.html' ? 'https://www.abroad-o.com/' : `https://www.abroad-o.com/${file}`;
     if (!source.title || !source.description || source.canonicalUrl !== sourceCanonicalUrl) throw new Error(`Invalid source metadata: ${file}`);
     const sourceOgType = source.ogType || (file.startsWith('news/') ? 'article' : 'website');

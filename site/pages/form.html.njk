@@ -101,8 +101,8 @@ headerContactLabel: "お問い合わせフォーム"
             color: #ff0000;  /*必須アイコンの色を #ff0000 に変更 */
         }
         .badge-danger {
-            color: white !important;
-            background-color: red !important;
+            color: #fff !important;
+            background-color: #b00020 !important;
         }
 
         .scroll-spy {
@@ -114,6 +114,7 @@ headerContactLabel: "お問い合わせフォーム"
             border: solid 1px #C0C0C0;
             margin-bottom: 15px;
         }
+        .scroll-spy:focus { outline: 3px solid #082E5D; outline-offset: 2px; }
         .scroll-spy p {
             padding: 10px 10px 10px 10px;
         }
@@ -164,7 +165,7 @@ headerContactLabel: "お問い合わせフォーム"
             border-color: #f00;
         }
         .error-message {
-            color: #f00;
+            color: #b00020;
             display: none; /* 初期状態では非表示 */
         }
         .error-message.error-visible {
@@ -300,11 +301,7 @@ headerContactLabel: "お問い合わせフォーム"
                 <form method="post" id="contactForm" data-contact-api="https://abroad-o-contact-form.abroad-o.workers.dev" novalidate>
                     <!-- フォームテーブル -->
                    <div id="form-tbl" class="form-group">
-                        <table id="form" class="table" style="width: 100%;">
-                            <colgroup>
-                                <col style="width: 30%;">
-                                <col style="width: 70%;">
-                            </colgroup>
+                        <div id="form" class="contact-form-grid">
                             <!-- フォーム入力項目 -->
                             <div class="form-group">
                                 <label for="enterprise" class="must"><span class="badge badge-danger">必須</span> 企業名</label>
@@ -323,8 +320,8 @@ headerContactLabel: "お問い合わせフォーム"
 
                             <div class="form-group">
                                 <label for="email" class="must"><span class="badge badge-danger">必須</span> メールアドレス</label>
-                                <input type="email" id="email" name="email" class="form-control" required maxlength="254" placeholder="例：info@abroad-o.com" title="正しいメールアドレスを入力してください。">
-                                <span class="error-message">正しいメールアドレスを入力してください。</span>
+                                <input type="email" id="email" name="email" class="form-control" required maxlength="254" placeholder="例：info@abroad-o.com" title="正しいメールアドレスを入力してください。" aria-describedby="email-error" aria-invalid="false">
+                                <span id="email-error" class="error-message" role="alert" aria-live="assertive">正しいメールアドレスを入力してください。</span>
                             </div>
 
                             <!-- ハニーポットフィールドの追加 -->
@@ -335,8 +332,8 @@ headerContactLabel: "お問い合わせフォーム"
 
                             <div class="form-group">
                                 <label for="phone" class="must"><span class="badge badge-danger">必須</span> 電話番号</label>
-                                <input type="tel" id="phone" name="phone" class="form-control" required maxlength="30" pattern="^[0-9+() -]{7,30}$" placeholder="例：03-5835-0250" title="電話番号の形式が正しくありません。例：03-5835-0250">
-                                <span class="error-message">電話番号の形式が正しくありません。</span>
+                                <input type="tel" id="phone" name="phone" class="form-control" required maxlength="30" pattern="^[0-9+() -]{7,30}$" placeholder="例：03-5835-0250" title="電話番号の形式が正しくありません。例：03-5835-0250" aria-describedby="phone-error" aria-invalid="false">
+                                <span id="phone-error" class="error-message" role="alert" aria-live="assertive">電話番号の形式が正しくありません。</span>
                             </div>
 
                             <div class="form-group">
@@ -348,10 +345,10 @@ headerContactLabel: "お問い合わせフォーム"
                                  <label for="inquiry_details" class="must"><span class="badge badge-danger">必須</span> お問い合わせ内容</label>
                                  <textarea id="inquiry_details" name="inquiryDetails" class="form-control" required maxlength="4000"></textarea>
                             </div>
-                        </table>
+                        </div>
                     </div>
                      <!-- 個人情報取り扱いに関する記述 -->
-                     <div class="scroll-spy">
+                     <div class="scroll-spy" tabindex="0" aria-label="お問い合わせにおける個人情報の取扱いについて">
                         <p>「お問い合わせにおける個人情報の取扱いについて」</p>
                         <ul>
                             <li>（１）事業者の氏名または名称
@@ -362,7 +359,7 @@ headerContactLabel: "お問い合わせフォーム"
                             <li>（２）個人情報保護管理者（若しくはその代理人）の氏名又は職名、所属及び連絡先
                                 <ul>
                                     <li>個人情報保護管理者：林 剛之</li>
-                                    <li>電子メール：info@abroad-o.com</li>
+                                    <li>電子メール：<a href="mailto:info@abroad-o.com">info@abroad-o.com</a></li>
                                     <li>電話番号：03-5835-0250</li>
                                 </ul>
                             </li>
@@ -437,11 +434,11 @@ headerContactLabel: "お問い合わせフォーム"
                     <div id="messageBox" class="message-box">個人情報の取扱について同意をお願いします。</div>
                     <!-- 同意チェックボックス -->
                     <div class="form-group consent-container">
-                        <label for="consent">
-                            <input type="checkbox" id="consent" name="consent" required><span>個人情報の取扱について同意する。</span>
+                        <label for="consent" id="consent-label">
+                            <input type="checkbox" id="consent" name="consent" required aria-labelledby="consent-label" aria-describedby="form-feedback"><span>個人情報の取扱について同意する。</span>
                         </label>
                     </div>
-                    <div id="turnstile-container" class="turnstile-container" aria-label="bot対策の確認"></div>
+                    <div id="turnstile-container" class="turnstile-container" role="group" aria-label="bot対策の確認"></div>
                     <noscript><p class="msg">送信にはJavaScriptが必要です。利用できない場合は、下記メールアドレスまたは電話番号からお問い合わせください。</p></noscript>
                     <!-- 送信ボタン -->
                     <div class="form-group mt-4 text-center">
@@ -449,9 +446,9 @@ headerContactLabel: "お問い合わせフォーム"
                     </div>
                 </form>
                 <!-- フォームフィードバックエリア -->
-                <div id="form-feedback" class="mt-3" aria-live="polite"></div>
+                <div id="form-feedback" class="mt-3" role="status" aria-live="polite" aria-atomic="true"></div>
                  <!-- エラー時の問い合わせ先 -->
-                 <p class="mt-4">※送信後エラー画面になる場合や2営業日経ってもご連絡がない場合は、お手数ではございますが、こちらのメールアドレス<a href="mailto:info@abroad-o.com?subject=お問い合わせフォームページより&body=【貴社名】%0D%0A【ご担当者様】%0D%0A【電話番号】%0D%0A【お問い合わせ内容】">info@abroad-o.com</a>でお問い合わせ下さい。</p>
+                 <p class="mt-4">※送信後エラー画面になる場合や2営業日経ってもご連絡がない場合は、お手数ではございますが、<a class="mailto-link" href="mailto:info@abroad-o.com?subject=お問い合わせフォームページより&body=【貴社名】%0D%0A【ご担当者様】%0D%0A【電話番号】%0D%0A【お問い合わせ内容】">お問い合わせ用メールアドレス（info@abroad-o.com）</a>をご利用ください。</p>
             </div>
         </section>
     </main>

@@ -56,6 +56,7 @@ try {
     if (!response?.ok()) throw new Error(`${pageName} did not return HTTP 200 at ${width}px.`);
     await page.waitForFunction(() => window.jQuery?.fn?.jquery === '3.7.1' && Boolean(window.jQuery?.fn?.collapse));
     const metrics = await page.evaluate(() => ({ overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth, header: document.querySelector('header')?.getBoundingClientRect().height || 0, body: document.body.getBoundingClientRect().height, container: Math.max(0, ...[...document.querySelectorAll('.container')].map((node) => node.getBoundingClientRect().width)) }));
+    if (writeScreenshots && (width === 375 || pageName === 'form.html') && ['news.html', 'news/news_171023.html', 'news/news_17110101.html', 'form.html', 'thank.html'].includes(pageName)) { fs.mkdirSync(path.join(root, '.deploy', 'pr3c-news-form'), { recursive: true }); const suffix = pageName === 'form.html' ? `-${width}` : ''; await page.screenshot({ path: path.join(root, '.deploy', 'pr3c-news-form', `${pageName.replaceAll('/', '-').replace('.html', '')}${suffix}.png`), fullPage: true }); }
     if (!metrics.body || !metrics.header || metrics.overflow > 1) throw new Error(`${pageName} geometry/overflow contract failed at ${width}px: ${JSON.stringify(metrics)}.`);
     const reference = baseline[pageName]?.[width];
     if (!reference) throw new Error(`Missing base 654b193 geometry baseline for ${pageName} at ${width}px.`);
@@ -74,7 +75,6 @@ try {
       glyph.remove(); icon.remove(); return value;
     });
     if (!icons.glyph.font.includes('Glyphicons') || ['none', 'normal'].includes(icons.glyph.content) || !icons.fontAwesome.font.includes('Font Awesome') || ['none', 'normal'].includes(icons.fontAwesome.content) || !icons.fontAwesome.code) throw new Error(`${pageName} did not render local Glyphicons/Font Awesome: ${JSON.stringify(icons)}.`);
-    if (writeScreenshots && width === 375 && ['news.html', 'news/news_171023.html', 'news/news_17110101.html', 'form.html', 'thank.html'].includes(pageName)) { fs.mkdirSync(path.join(root, '.deploy', 'pr3c-news-form'), { recursive: true }); await page.screenshot({ path: path.join(root, '.deploy', 'pr3c-news-form', `${pageName.replaceAll('/', '-').replace('.html', '')}.png`), fullPage: true }); }
     if (width === 375) { await page.locator('.navbar-toggle').click(); await page.waitForFunction(() => document.querySelector('.navbar-main-collapse')?.classList.contains('in')); }
     if (lightbox.has(pageName)) { const trigger = page.locator('[data-lightbox]').first(); await trigger.click(); await page.waitForFunction(() => document.querySelector('#lightbox')?.style.display !== 'none' && document.querySelector('.lb-image')?.naturalWidth > 0); await page.locator('.lb-close').click(); await page.waitForFunction(() => document.querySelector('#lightbox')?.style.display === 'none'); }
     if (errors.length || localFailures.length) throw new Error(`${pageName} browser/local-asset failure: ${[...errors, ...localFailures].join('\n')}`);
