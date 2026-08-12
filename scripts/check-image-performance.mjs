@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { assertImageFileDimensions, assertImagePerformanceContract, assertIntrinsicImageStyle, assertTopImagePreloadContract } from './lib/image-performance-contract.mjs';
+import { assertImageFileDimensions, assertImagePerformanceContract, assertIntrinsicImageStyle, assertTopImageCssContract, assertTopImageGradientCssContract, assertTopImagePreloadContract } from './lib/image-performance-contract.mjs';
+import { TOP_IMAGE, assertTopImageAlphaMetadata, assertTopImageQuality, assertTopImageWebp, generateTopImageWebp } from './lib/top-image-derivative.mjs';
 
 const repoRoot = path.resolve(import.meta.dirname, '..');
 const outputRoot = path.join(repoRoot, '_site');
@@ -79,4 +80,25 @@ for (const file of ['style3.css', 'style.css']) {
   assertIntrinsicImageStyle(fs.readFileSync(path.join(outputRoot, file), 'utf8'), file);
 }
 
-console.log(`Image performance contract passed: ${cases.length} image pages and ${generatedHtmlFiles.length} generated preload pages.`);
+for (const file of ['style.css', 'style2.css', 'style3.css', 'global.css']) {
+  assertTopImageCssContract(fs.readFileSync(path.join(outputRoot, file), 'utf8'), file);
+}
+const speedAdHtml = fs.readFileSync(path.join(outputRoot, 'speed-ad.html'), 'utf8');
+assertTopImageGradientCssContract(speedAdHtml, 'speed-ad.html');
+
+const topImagePng = fs.readFileSync(path.join(outputRoot, TOP_IMAGE.pngPath));
+const topImageWebp = fs.readFileSync(path.join(outputRoot, TOP_IMAGE.webpPath));
+await assertTopImageWebp(topImageWebp);
+await assertTopImageAlphaMetadata(topImagePng, topImageWebp);
+const regeneratedTopImageWebp = await generateTopImageWebp(topImagePng);
+if (!regeneratedTopImageWebp.equals(topImageWebp)) {
+  throw new Error(`Committed ${TOP_IMAGE.webpPath} differs from the deterministic generator output`);
+}
+await assertTopImageWebp(regeneratedTopImageWebp, 'generated top1.webp');
+const regeneratedTopImageWebpSecondPass = await generateTopImageWebp(topImagePng);
+if (!regeneratedTopImageWebp.equals(regeneratedTopImageWebpSecondPass)) {
+  throw new Error(`The ${TOP_IMAGE.webpPath} generator is not byte-reproducible across two runs`);
+}
+const topImageMetrics = await assertTopImageQuality(topImagePng, topImageWebp);
+
+console.log(`Image performance contract passed: ${cases.length} image pages and ${generatedHtmlFiles.length} generated preload pages. top1.webp=${topImageWebp.length} bytes, meanAbs=${topImageMetrics.meanAbsoluteDifference.toFixed(4)}, PSNR=${topImageMetrics.psnr.toFixed(4)}, globalSSIM=${topImageMetrics.globalSsim.toFixed(6)}, maxAlphaDiff=${topImageMetrics.maxAlphaDifference}.`);

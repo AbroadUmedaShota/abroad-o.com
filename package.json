@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build:site": "node scripts/build-site.mjs",
+    "generate:image-derivatives": "node scripts/generate-image-derivatives.mjs",
     "serve:site": "eleventy --serve",
     "check:site": "npm run check:contracts && npm run build:site && node scripts/check-site.mjs",
     "check:contracts": "node --test scripts/test-html-contract.mjs",
@@ -27,6 +28,7 @@
     "gray-matter": "4.0.3",
     "jquery": "3.7.1",
     "lightbox2": "2.12.0",
-    "parse5": "8.0.1"
+    "parse5": "8.0.1",
+    "sharp": "0.35.3"
   }
 }

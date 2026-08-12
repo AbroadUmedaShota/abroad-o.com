@@ -51,6 +51,7 @@ header
 }
 #header_top {
     background-image: url(image/top1.png);
+    background-image: image-set(url("image/top1.webp") type("image/webp") 1x, url("image/top1.png") type("image/png") 1x);
     background-attachment: fixed;
     background-position: middle;
     padding: 10px 0;
