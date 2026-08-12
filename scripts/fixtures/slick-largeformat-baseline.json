@@ -15,6 +15,6 @@
     "bodyHeight": 5600,
     "largestContainer": 1170,
     "returnLink": { "color": "rgb(204, 204, 204)" },
-    "cta": { "display": "inline-block", "fontSize": "13px" }
+    "cta": { "display": "inline-block", "fontSize": "18px" }
   }
 }
