@@ -20,6 +20,7 @@ export default function (eleventyConfig) {
     'node_modules/bootstrap/dist/css/bootstrap.min.css': 'vendor/bootstrap/bootstrap.min.css',
     'node_modules/bootstrap/dist/js/bootstrap.bundle.min.js': 'vendor/bootstrap/bootstrap.bundle.min.js',
     'node_modules/bootstrap/LICENSE': 'vendor/bootstrap/LICENSE',
+    'node_modules/@popperjs/core/LICENSE.md': 'vendor/bootstrap/POPPER-LICENSE.txt',
     'node_modules/jquery/dist/jquery.min.js': 'vendor/jquery/jquery.min.js',
     'node_modules/jquery/LICENSE.txt': 'vendor/jquery/LICENSE.txt'
   });

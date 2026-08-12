@@ -11,10 +11,18 @@ const overflowBaseline = {
   index: { 375: 25, 768: 25, 1440: 25 },
   scan: { 375: 9, 768: 0, 1440: 0 }
 };
+const containerWidths = { 375: 375, 768: 720, 1440: 1140 };
+const headerHeights = { 375: 224.8, 768: 143, 1440: 143 };
+const bodyHeights = {
+  index: { 375: 5161.9, 768: 3827.8, 1440: 4054.8 },
+  scan: { 375: 6695.0, 768: 5285.7, 1440: 5262.0 }
+};
+const carouselHeights = { 375: 446.1, 768: 308, 1440: 370 };
 const requiredAssets = [
   'vendor/bootstrap/bootstrap.min.css',
   'vendor/bootstrap/bootstrap.bundle.min.js',
   'vendor/bootstrap/LICENSE',
+  'vendor/bootstrap/POPPER-LICENSE.txt',
   'vendor/jquery/jquery.min.js',
   'vendor/jquery/LICENSE.txt'
 ];
@@ -76,6 +84,14 @@ try {
         slick: window.jQuery?.fn?.slick !== undefined,
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth
       }));
+      const measurements = await page.evaluate(() => ({
+        headerHeight: document.querySelector('header').getBoundingClientRect().height,
+        bodyHeight: document.body.getBoundingClientRect().height,
+        containerWidths: [...document.querySelectorAll('.container')]
+          .map((container) => container.getBoundingClientRect().width)
+          .filter((width) => width > 0),
+        carouselHeight: document.querySelector('#carouselExampleIndicators')?.getBoundingClientRect().height
+      }));
       if (versions.bootstrap !== '5.3.8' || versions.jquery !== '3.7.1') {
         throw new Error(`${pageName} loaded unexpected dependency versions: ${JSON.stringify(versions)}.`);
       }
@@ -86,38 +102,58 @@ try {
           .slice(0, 10));
         throw new Error(`${pageName} overflow worsened at ${width}px: ${versions.overflow}px (baseline ${overflowBaseline[pageKey][width]}px). ${JSON.stringify(overflowNodes)}`);
       }
+      if (Math.abs(measurements.headerHeight - headerHeights[width]) > 2) {
+        throw new Error(`${pageName} header height changed at ${width}px: ${measurements.headerHeight}px (baseline ${headerHeights[width]}px).`);
+      }
+      if (measurements.containerWidths.some((containerWidth) => Math.abs(containerWidth - containerWidths[width]) > 1)) {
+        throw new Error(`${pageName} container width changed at ${width}px: ${measurements.containerWidths.join(', ')}px (baseline ${containerWidths[width]}px).`);
+      }
+      const bodyTolerance = bodyHeights[pageKey][width] * 0.03;
+      if (Math.abs(measurements.bodyHeight - bodyHeights[pageKey][width]) > bodyTolerance) {
+        throw new Error(`${pageName} body height changed at ${width}px: ${measurements.bodyHeight}px (baseline ${bodyHeights[pageKey][width]}px ±${bodyTolerance.toFixed(1)}px).`);
+      }
+      if (pageKey === 'scan' && Math.abs(measurements.carouselHeight - carouselHeights[width]) > 5) {
+        throw new Error(`scan.html carousel height changed at ${width}px: ${measurements.carouselHeight}px (baseline ${carouselHeights[width]}px ±5px).`);
+      }
       if (pageKey === 'index') {
         if (!versions.slick) throw new Error('index.html did not initialize Slick.');
         if (width === 375) {
           const toggler = page.locator('.navbar-toggler');
           await toggler.click();
-          await page.waitForTimeout(400);
-          if (!(await page.locator('#navbarSupportedContent').evaluate((node) => node.classList.contains('show')))) {
-            throw new Error('Mobile navigation did not open.');
-          }
+          await page.waitForFunction(() => {
+            const collapse = document.querySelector('#navbarSupportedContent');
+            const toggle = document.querySelector('.navbar-toggler');
+            return collapse?.classList.contains('show') && !collapse.classList.contains('collapsing') && toggle?.getAttribute('aria-expanded') === 'true';
+          });
           await toggler.click();
-          await page.waitForTimeout(400);
-          if (await page.locator('#navbarSupportedContent').evaluate((node) => node.classList.contains('show'))) {
-            throw new Error('Mobile navigation did not close.');
-          }
+          await page.waitForFunction(() => {
+            const collapse = document.querySelector('#navbarSupportedContent');
+            const toggle = document.querySelector('.navbar-toggler');
+            return !collapse?.classList.contains('show') && !collapse?.classList.contains('collapsing') && toggle?.getAttribute('aria-expanded') === 'false';
+          });
           await toggler.click();
-          await page.waitForTimeout(400);
+          await page.waitForFunction(() => {
+            const collapse = document.querySelector('#navbarSupportedContent');
+            const toggle = document.querySelector('.navbar-toggler');
+            return collapse?.classList.contains('show') && !collapse.classList.contains('collapsing') && toggle?.getAttribute('aria-expanded') === 'true';
+          });
           const serviceDropdown = page.locator('#serviceDropdown');
           await serviceDropdown.click();
-          if (!(await page.locator('[aria-labelledby="serviceDropdown"]').evaluate((node) => node.classList.contains('show'))) || await serviceDropdown.getAttribute('aria-expanded') !== 'true') {
-            throw new Error('Mobile service dropdown did not open.');
-          }
+          await page.waitForFunction(() => document.querySelector('[aria-labelledby="serviceDropdown"]')?.classList.contains('show') && document.querySelector('#serviceDropdown')?.getAttribute('aria-expanded') === 'true');
           await serviceDropdown.click();
-          if (await page.locator('[aria-labelledby="serviceDropdown"]').evaluate((node) => node.classList.contains('show')) || await serviceDropdown.getAttribute('aria-expanded') !== 'false') {
-            throw new Error('Mobile service dropdown did not close.');
-          }
+          await page.waitForFunction(() => !document.querySelector('[aria-labelledby="serviceDropdown"]')?.classList.contains('show') && document.querySelector('#serviceDropdown')?.getAttribute('aria-expanded') === 'false');
+          await page.keyboard.press('Escape');
+          await page.locator('#navbarSupportedContent').evaluate((node) => window.bootstrap.Collapse.getOrCreateInstance(node).hide());
+          await page.waitForFunction(() => {
+            const collapse = document.querySelector('#navbarSupportedContent');
+            return !collapse?.classList.contains('show') && !collapse?.classList.contains('collapsing');
+          });
         }
         if (width === 1440) {
           await page.locator('#serviceDropdown').hover();
-          await page.waitForTimeout(350);
-          if (!(await page.locator('[aria-labelledby="serviceDropdown"]').isVisible())) {
-            throw new Error('Desktop service dropdown did not open on hover.');
-          }
+          await page.waitForFunction(() => document.querySelector('[aria-labelledby="serviceDropdown"]')?.checkVisibility());
+          await page.mouse.move(0, 0);
+          await page.waitForFunction(() => !document.querySelector('[aria-labelledby="serviceDropdown"]')?.checkVisibility());
         }
       }
       if (pageKey === 'scan') {
@@ -131,6 +167,12 @@ try {
         await page.waitForFunction(() => document.querySelector('.carousel-indicators .active')?.getAttribute('data-bs-slide-to') === '3');
         if (await page.locator('.carousel-indicators .active').getAttribute('data-bs-slide-to') !== '3') {
           throw new Error('Scan carousel indicator did not select its slide.');
+        }
+        if (await page.locator('.carousel-indicators .active').getAttribute('data-bs-slide-to') !== '0') {
+          await Promise.all([
+            page.waitForFunction(() => document.querySelector('.carousel-indicators .active')?.getAttribute('data-bs-slide-to') === '0'),
+            page.evaluate(() => window.bootstrap.Carousel.getOrCreateInstance(document.querySelector('#carouselExampleIndicators')).to(0))
+          ]);
         }
       }
       if (errors.length) throw new Error(`${pageName} browser console errors at ${width}px:\n${errors.join('\n')}`);

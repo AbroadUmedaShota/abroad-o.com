@@ -582,10 +582,17 @@ section#service .btn-default {
   --bs-btn-hover-border-color: #000;
 }
 
-/* Bootstrap 5 keeps a smaller default gutter than the Bootstrap 4 layout. */
+/* Restore the legacy 18px half-gutter used by the existing full-width content. */
 main .container,
 main .container-fluid {
   --bs-gutter-x: 36px;
+}
+
+/* Bootstrap 5 adds a 1400px container breakpoint; retain the Bootstrap 4 width. */
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1140px;
+  }
 }
 section#service .btn-default:hover{
   background-color: #000099;   
