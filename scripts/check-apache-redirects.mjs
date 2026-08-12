@@ -1,19 +1,16 @@
 import httpRequest from 'node:http';
 import httpsRequest from 'node:https';
+import { securityHeaders } from './lib/csp-report-only-policy.mjs';
 
 const http = process.env.APACHE_HTTP_ORIGIN || 'http://127.0.0.1:18080';
 const https = process.env.APACHE_HTTPS_ORIGIN || 'https://127.0.0.1:18443';
 const canonical = 'https://www.abroad-o.com';
-const expectedHeaders = {
-  'content-security-policy-report-only': "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self'; style-src-attr 'none'; img-src 'self' data: https://www.googletagmanager.com; font-src 'self'; connect-src 'self' https://abroad-o-contact-form.abroad-o.workers.dev https://www.google-analytics.com https://www.googletagmanager.com; frame-src 'self' https://www.google.com https://challenges.cloudflare.com; frame-ancestors 'self'; form-action 'self'",
-  'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin', 'x-frame-options': 'SAMEORIGIN',
-  'permissions-policy': 'accelerometer=(), autoplay=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()'
-};
+const expectedHeaders = securityHeaders;
 const redirectPaths = [['/', `${canonical}/`], ['/index', `${canonical}/`], ['/index.html', `${canonical}/`], ['/index?x=1', `${canonical}/?x=1`], ['/index.html?x=1', `${canonical}/?x=1`], ['/about.html', `${canonical}/about.html`], ['/about.html?x=1', `${canonical}/about.html?x=1`]];
 const redirects = (origin, hosts) => hosts.flatMap((host) => redirectPaths.map(([pathname, location]) => [origin, host, pathname, 301, location]));
 const cases = [
   ...redirects(http, ['abroad-o.com', 'www.abroad-o.com']), ...redirects(https, ['abroad-o.com']),
-  [https, 'www.abroad-o.com', '/', 200], [https, 'www.abroad-o.com', '/?x=1', 200], [https, 'www.abroad-o.com', '/about.html', 200], [https, 'www.abroad-o.com', '/about.html?x=1', 200], [https, 'www.abroad-o.com', '/about', 200],
+  [https, 'www.abroad-o.com', '/', 200, undefined, 'text/html'], [https, 'www.abroad-o.com', '/?x=1', 200], [https, 'www.abroad-o.com', '/about.html', 200], [https, 'www.abroad-o.com', '/about.html?x=1', 200], [https, 'www.abroad-o.com', '/about', 200, undefined, 'text/html'], [https, 'www.abroad-o.com', '/sample2', 200, undefined, 'text/html'], [https, 'www.abroad-o.com', '/pdfjs/1c_abroad.pdf', 200, undefined, 'application/pdf'],
   [https, 'www.abroad-o.com', '/index', 301, `${canonical}/`], [https, 'www.abroad-o.com', '/index.html', 301, `${canonical}/`], [https, 'www.abroad-o.com', '/index?x=1', 301, `${canonical}/?x=1`], [https, 'www.abroad-o.com', '/index.html?x=1', 301, `${canonical}/?x=1`], [https, 'www.abroad-o.com', '/TOOL/index.html', 404]
 ];
 
@@ -30,9 +27,13 @@ function request(origin, host, pathname) {
   });
 }
 
-for (const [origin, host, pathname, status, location] of cases) {
+for (const [origin, host, pathname, status, location, contentType] of cases) {
   const response = await request(origin, host, pathname);
   if (response.statusCode !== status || (location && response.headers.location !== location)) throw new Error(`Redirect contract failed: ${host}${pathname}: ${response.statusCode} ${response.headers.location}`);
-  if (origin === https) for (const [header, value] of Object.entries(expectedHeaders)) if (response.headers[header] !== value) throw new Error(`Missing or changed ${header} on ${host}${pathname}.`);
+  for (const [header, value] of Object.entries(expectedHeaders)) {
+    const values = response.rawHeaders.flatMap((rawValue, index) => index % 2 === 0 && rawValue.toLowerCase() === header ? [response.rawHeaders[index + 1]] : []);
+    if (values.length !== 1 || values[0] !== value) throw new Error(`Missing, duplicated, or changed ${header} on ${origin} ${host}${pathname}.`);
+  }
+  if (contentType && !response.headers['content-type']?.startsWith(contentType)) throw new Error(`Wrong Content-Type on ${host}${pathname}: ${response.headers['content-type']}`);
 }
 console.log('Apache redirect matrix passed.');

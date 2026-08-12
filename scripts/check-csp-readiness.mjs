@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { assertAnalyticsOrder, assertNewsRuntimeOrder, assertNoAnalyticsScripts, assertNoInlineEventAttributes, assertNoInlineExecutableScripts, assertNoInlineStyles, assertPageStyleLink, assertPageStyleSheet, pageStyleSheetPaths, scriptInventory, styleInventory } from './lib/csp-readiness-contract.mjs';
+import { cspReportOnly } from './lib/csp-report-only-policy.mjs';
 
 const repoRoot = path.resolve(import.meta.dirname, '..');
 const outputRoot = path.join(repoRoot, '_site');
@@ -8,6 +9,8 @@ const sourceRoots = [path.join(repoRoot, 'site', 'pages'), path.join(repoRoot, '
 const passthroughSource = path.join(repoRoot, 'slick', 'largeformat.html');
 const analyticsPages = new Set(['about.html', 'aggregate.html', 'edit.html', 'film.html', 'form.html', 'index.html', 'input.html', 'largeformat.html', 'microfilm.html', 'recruit.html', 'rule.html', 'sample.html', 'sample2.html', 'scan.html', 'service-pack.html', 'service.html', 'speed-ad.html', 'telework.html', 'thank.html', 'slick/largeformat.html']);
 const analyticsScript = fs.readFileSync(path.join(outputRoot, 'js', 'analytics.js'), 'utf8');
+if (!fs.readFileSync(path.join(repoRoot, '.htaccess')).equals(fs.readFileSync(path.join(outputRoot, '.htaccess')))) throw new Error('Generated .htaccess differs from source.');
+if (!fs.readFileSync(path.join(outputRoot, '.htaccess'), 'utf8').includes(cspReportOnly)) throw new Error('Generated .htaccess lacks the approved CSP header.');
 
 function walk(directory) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
