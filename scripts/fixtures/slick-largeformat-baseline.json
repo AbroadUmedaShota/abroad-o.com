@@ -1,0 +1,20 @@
+{
+  "sourceCommit": "aecab53",
+  "sourcePath": "slick/largeformat.html",
+  "375": {
+    "overflow": 0,
+    "header": { "height": 167.4375 },
+    "bodyHeight": 7640.453125,
+    "largestContainer": 371.25,
+    "returnLink": { "color": "rgb(204, 204, 204)" },
+    "cta": { "display": "inline-block", "fontSize": "13px" }
+  },
+  "1440": {
+    "overflow": 0,
+    "header": { "height": 140.09375 },
+    "bodyHeight": 5600,
+    "largestContainer": 1170,
+    "returnLink": { "color": "rgb(204, 204, 204)" },
+    "cta": { "display": "inline-block", "fontSize": "13px" }
+  }
+}

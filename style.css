@@ -2547,6 +2547,7 @@ largeformat.html
   color: #fff !important;
 }
 #film_top ul.nav-tabs > li > a.legacy-return-link { color: #555 !important; }
+#film_top ul.nav-tabs > li > a.slick-largeformat-return-link { color: #CCCCCC !important; }
 #film_table .largeformat-price-marker { color: #f00; }
 .line_orange.microfilm-heading-band { background-color: #BBBBBB; }
 #film_top .table .microfilm-table-heading { background-color: #EEEEEE; }

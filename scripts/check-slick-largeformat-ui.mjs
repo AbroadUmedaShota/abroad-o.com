@@ -3,11 +3,12 @@ import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import { chromium } from '@playwright/test';
+import { assertSlickGeometry, assertSlickRuntimeRequests } from './lib/slick-largeformat-contract.mjs';
 
 const root = path.resolve(import.meta.dirname, '..');
 const output = path.join(root, '_site');
 const file = 'slick/largeformat.html';
-const baseline = JSON.parse(fs.readFileSync(path.join(root, 'scripts', 'fixtures', 'legacy-ui-baseline.json'), 'utf8')).largeformat;
+const baseline = JSON.parse(fs.readFileSync(path.join(root, 'scripts', 'fixtures', 'slick-largeformat-baseline.json'), 'utf8'));
 const localAssets = [
   '/vendor/jquery/jquery.min.js', '/vendor/bootstrap3/css/bootstrap.min.css', '/vendor/bootstrap3/js/bootstrap.min.js',
   '/vendor/fontawesome/css/all.min.css', '/vendor/fontawesome/css/v4-shims.min.css', '/js/jquery.smooth-scroll.min.js',
@@ -21,10 +22,6 @@ const server = http.createServer((request, response) => {
   const types = { '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript', '.jpg': 'image/jpeg', '.png': 'image/png', '.woff': 'font/woff', '.woff2': 'font/woff2' };
   response.writeHead(200, { 'content-type': types[path.extname(target).toLowerCase()] || 'application/octet-stream' }).end(fs.readFileSync(target));
 });
-
-function ratio(actual, expected) {
-  return Math.abs(actual - expected) / expected;
-}
 
 const html = fs.readFileSync(path.join(output, file), 'utf8');
 assert.match(html, /<link rel="canonical" href="https:\/\/www\.abroad-o\.com\/largeformat\.html">/);
@@ -41,7 +38,17 @@ try {
   for (const width of [375, 1440]) {
     const page = await browser.newPage({ viewport: { width, height: 900 } });
     const errors = [];
+    const externalOrigins = [];
+    const localFailures = [];
     page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
+    page.on('request', (request) => {
+      const url = new URL(request.url());
+      if (!['127.0.0.1', 'localhost'].includes(url.hostname)) externalOrigins.push(url.origin);
+    });
+    page.on('requestfailed', (request) => {
+      const url = new URL(request.url());
+      if (['127.0.0.1', 'localhost'].includes(url.hostname)) localFailures.push(url.pathname);
+    });
     await page.route('**/*', (route) => {
       const hostname = new URL(route.request().url()).hostname;
       if (['127.0.0.1', 'localhost'].includes(hostname)) return route.continue();
@@ -56,6 +63,8 @@ try {
       header: document.querySelector('header')?.getBoundingClientRect().height || 0,
       body: document.body.getBoundingClientRect().height,
       container: Math.max(...[...document.querySelectorAll('.container')].map((node) => node.getBoundingClientRect().width)),
+      returnLink: { color: getComputedStyle(document.querySelector('.slick-largeformat-return-link')).color },
+      cta: (() => { const node = document.querySelector('.btn_center a.btn-danger'); const style = getComputedStyle(node); return { display: style.display, fontSize: style.fontSize }; })(),
       fonts: (() => {
         const glyph = document.createElement('span'); glyph.className = 'glyphicon glyphicon-triangle-right';
         const icon = document.createElement('i'); icon.className = 'fa fa-phone-square'; document.body.append(glyph, icon);
@@ -64,10 +73,7 @@ try {
       })()
     }));
     const expected = baseline[width];
-    assert.equal(geometry.overflow, 0, `horizontal overflow at ${width}px`);
-    assert.ok(ratio(geometry.header, expected.headerHeight) <= 0.03, `header geometry changed at ${width}px`);
-    assert.ok(ratio(geometry.body, expected.bodyHeight) <= 0.03, `body geometry changed at ${width}px`);
-    assert.ok(ratio(geometry.container, Math.max(...expected.containerWidths)) <= 0.03, `container geometry changed at ${width}px`);
+    assertSlickGeometry(geometry, expected);
     assert.match(geometry.fonts.glyph, /Glyphicons/); assert.notEqual(geometry.fonts.glyphContent, 'none');
     assert.match(geometry.fonts.fa, /Font Awesome/); assert.ok(geometry.fonts.faCode);
     if (width === 375) {
@@ -83,14 +89,17 @@ try {
     await page.evaluate(() => window.scrollTo(0, 400));
     await page.waitForFunction(() => Number.parseFloat(window.jQuery('#page-top').css('bottom')) === 20);
     await page.screenshot({ path: path.join(screenshots, `largeformat-${width}.png`), fullPage: true });
+    assertSlickRuntimeRequests({ externalOrigins, localFailures, localAssets: [{ path: 'page assets', bytes: 1 }] });
     assert.deepEqual(errors, [], `browser console errors at ${width}px`);
     await page.close();
   }
+  const assets = [];
   for (const asset of localAssets) {
     const response = await fetch(`${base}${asset}`);
     assert.ok(response.ok, `${asset} did not return HTTP 200`);
-    assert.ok((await response.arrayBuffer()).byteLength > 0, `${asset} was empty`);
+    assets.push({ path: asset, bytes: (await response.arrayBuffer()).byteLength });
   }
+  assertSlickRuntimeRequests({ externalOrigins: ['https://www.googletagmanager.com'], localFailures: [], localAssets: assets });
   console.log('slick/largeformat.html CSP and UI contract passed at 375px and 1440px.');
 } finally {
   await browser.close();
