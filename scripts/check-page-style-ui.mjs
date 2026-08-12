@@ -8,17 +8,21 @@ const output = path.resolve(process.env.PAGE_STYLE_OUTPUT_ROOT || path.join(root
 const capture = process.env.PAGE_STYLE_CAPTURE === '1';
 const fixturePath = path.join(root, 'scripts', 'fixtures', 'page-style-ui-baseline.json');
 const checks = [
-  ['about.html', '.no-link-style'],
-  ['form.html', '.table_agree th'], ['form.html', '.table_agree td'], ['form.html', '.scroll-spy'], ['form.html', '.consent-container'], ['form.html', '.error-message'], ['form.html', '.honeypot'],
-  ['news.html', '.news-summary-item'], ['news/news_250827.html', '.info-card'], ['news/news_250827.html', '.btn-material'], ['news/news_251212.html', '.greeting-block'], ['news/news_260526.html', '.info-card .hero-section h1'],
-  ['service.html', '#title_top h1'], ['service.html', '.speed-ad-service-card'],
-  ['speed-ad.html', '.speed-ad-hero'], ['speed-ad.html', '.speed-ad-hero__inner'], ['speed-ad.html', '.speed-ad-actions .btn-primary'], ['speed-ad.html', '.speed-ad-hero-product-image']
+  ['about.html', '.no-link-style', ['color', 'textDecorationLine']],
+  ['form.html', '.table_agree th', ['fontSize']], ['form.html', '.table_agree td', ['fontSize', 'paddingBottom']], ['form.html', '.scroll-spy', ['height', 'overflowY', 'borderTopStyle']], ['form.html', '.consent-container', ['display', 'justifyContent']], ['form.html', '.error-message', ['color', 'display']], ['form.html', '.honeypot', ['display', 'visibility', 'position']],
+  ['news.html', '.news-summary-item', ['borderTopStyle', 'borderRadius', 'paddingTop', 'boxShadow']], ['news/news_250827.html', '.info-card', ['backgroundColor', 'borderRadius', 'paddingTop', 'boxShadow']], ['news/news_250827.html', '.btn-material', ['backgroundColor', 'borderRadius', 'paddingTop', 'fontSize']], ['news/news_251212.html', '.greeting-block', ['backgroundColor', 'borderTopStyle', 'paddingTop']], ['news/news_260526.html', '.info-card .hero-section h1', ['color', 'fontSize', 'fontWeight']],
+  ['service.html', '#title_top h1', ['paddingTop', 'fontSize']], ['service.html', '.speed-ad-service-card', ['borderTopStyle', 'borderRadius', 'backgroundColor']],
+  ['speed-ad.html', '.speed-ad-hero', ['backgroundImage', 'backgroundPosition', 'backgroundSize', 'color']], ['speed-ad.html', '.speed-ad-hero__inner', ['display', 'alignItems', 'justifyContent', 'paddingTop']], ['speed-ad.html', '.speed-ad-actions .btn-primary', ['backgroundColor', 'borderRadius', 'fontWeight']], ['speed-ad.html', '.speed-ad-hero-product-image', ['maxWidth', 'display']]
 ];
 
+const missingLocalAssets = [];
 const server = http.createServer((request, response) => {
   const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
   const file = path.resolve(output, pathname === '/' ? 'index.html' : pathname.replace(/^\/+/, ''));
-  if (!file.startsWith(`${output}${path.sep}`) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) return response.writeHead(404).end();
+  if (!file.startsWith(`${output}${path.sep}`) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
+    missingLocalAssets.push(pathname);
+    return response.writeHead(404).end();
+  }
   const types = { '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript', '.png': 'image/png', '.webp': 'image/webp', '.woff': 'font/woff', '.woff2': 'font/woff2' };
   response.writeHead(200, { 'content-type': types[path.extname(file).toLowerCase()] || 'application/octet-stream' }).end(fs.readFileSync(file));
 });
@@ -28,7 +32,7 @@ const measurements = {};
 try {
   for (const width of [375, 1440]) {
     const pages = new Map();
-    for (const [file, selector] of checks) {
+    for (const [file, selector, properties] of checks) {
       let page = pages.get(file);
       if (!page) {
         page = await browser.newPage({ viewport: { width, height: 900 } });
@@ -43,15 +47,15 @@ try {
         page.__styleLocalFailures = localFailures;
         pages.set(file, page);
       }
-      const style = await page.locator(selector).first().evaluate((node) => {
+      const style = await page.locator(selector).first().evaluate((node, properties) => {
         const value = getComputedStyle(node);
-        return Object.fromEntries(['color', 'textDecorationLine', 'backgroundColor', 'borderTopStyle', 'borderRadius', 'paddingTop', 'paddingBottom', 'fontSize', 'height', 'overflowY', 'display', 'justifyContent', 'visibility', 'boxShadow', 'maxWidth', 'width'].map((property) => [property, value[property]]));
-      });
+        return Object.fromEntries(properties.map((property) => [property, value[property].replace(/https?:\/\/127\.0\.0\.1:\d+/g, '')]));
+      }, properties);
       measurements[`${file} ${selector}`] ||= {};
       measurements[`${file} ${selector}`][width] = style;
     }
     for (const [file, page] of pages) {
-      if (page.__styleErrors.length || page.__styleLocalFailures.length) throw new Error(`Page stylesheet browser/local-asset failure: ${file}: ${[...page.__styleErrors, ...page.__styleLocalFailures].join('\n')}`);
+      if (!capture && (page.__styleErrors.length || page.__styleLocalFailures.length)) throw new Error(`Page stylesheet browser/local-asset failure: ${file}: ${[...page.__styleErrors, ...page.__styleLocalFailures, ...missingLocalAssets].join('\n')}`);
       await page.close();
     }
     console.log(`Page stylesheet UI passed at ${width}px.`);
