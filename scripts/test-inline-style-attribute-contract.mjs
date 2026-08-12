@@ -6,18 +6,53 @@ import test from 'node:test';
 const root = path.resolve(import.meta.dirname, '..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const pageFiles = (directory) => fs.readdirSync(path.join(root, directory), { withFileTypes: true }).flatMap((entry) => entry.isDirectory() ? pageFiles(path.join(directory, entry.name)) : [path.join(directory, entry.name)]).filter((file) => file.endsWith('.njk'));
+const roleClassCounts = {
+  'news-list-spacing': 1,
+  'news-detail-back-link--spaced': 21,
+  'news-detail-back-link--compact': 5,
+  'news-article-cta': 5,
+  'news-article-date': 5,
+  'news-article-created-at': 1,
+  'form-page-title': 1,
+  'about-map-embed': 1,
+  'legacy-return-link': 3,
+  'largeformat-price-marker': 3,
+  'microfilm-active-tab': 1,
+  'microfilm-heading-band': 4,
+  'microfilm-table-heading': 9,
+  'microfilm-process-arrow': 2,
+  'microfilm-process-step': 6,
+  'scan-heading-band': 3
+};
+
+export function countRoleClasses(sources) {
+  const counts = Object.fromEntries(Object.keys(roleClassCounts).map((name) => [name, 0]));
+  for (const source of sources) for (const match of source.matchAll(/\bclass\s*=\s*"([^"]*)"/gi)) {
+    for (const token of match[1].trim().split(/\s+/)) if (token in counts) counts[token] += 1;
+  }
+  return counts;
+}
+
+export function assertRoleClassCounts(sources) {
+  assert.deepEqual(countRoleClasses(sources), roleClassCounts);
+}
 
 test('removes style attributes from generated-page sources while documenting passthrough exceptions', () => {
   for (const file of pageFiles('site/pages')) assert.doesNotMatch(read(file), /\sstyle\s*=/i, file);
   assert.equal((read('slick/largeformat.html').match(/\sstyle\s*=/gi) || []).length, 4);
 });
 
-test('maps every former inline declaration to its role-specific class', () => {
-  const expected = [
-    ['site/pages/news.html.njk', 'news-list-spacing'], ['site/pages/news/news_171023.html.njk', 'news-detail-back-link--spaced'], ['site/pages/news/news_250827.html.njk', 'news-detail-back-link--compact'], ['site/pages/news/news_250827.html.njk', 'news-article-cta'], ['site/pages/news/news_250827.html.njk', 'news-article-date'], ['site/pages/news/news_251212.html.njk', 'news-article-created-at'],
-    ['site/pages/form.html.njk', 'form-page-title'], ['site/pages/about.html.njk', 'about-map-embed'], ['site/pages/film.html.njk', 'legacy-return-link'], ['site/pages/largeformat.html.njk', 'largeformat-price-marker'], ['site/pages/microfilm.html.njk', 'microfilm-active-tab'], ['site/pages/microfilm.html.njk', 'microfilm-heading-band'], ['site/pages/microfilm.html.njk', 'microfilm-table-heading'], ['site/pages/microfilm.html.njk', 'microfilm-process-arrow'], ['site/pages/microfilm.html.njk', 'microfilm-process-step'], ['site/pages/scan.html.njk', 'scan-heading-band']
-  ];
-  for (const [file, className] of expected) assert.match(read(file), new RegExp(`class="[^"]*\\b${className}\\b`), `${file}: ${className}`);
+test('maps all 71 former inline declarations to role-specific class tokens exactly once', () => {
+  const sources = pageFiles('site/pages').map(read);
+  assert.equal(Object.values(countRoleClasses(sources)).reduce((total, count) => total + count, 0), 71);
+  assertRoleClassCounts(sources);
+});
+
+test('rejects missing, renamed, and duplicated role class tokens', () => {
+  const sources = pageFiles('site/pages').map(read);
+  assert.throws(() => assertRoleClassCounts(sources.map((source) => source.replace('news-detail-back-link--spaced', ''))));
+  assert.throws(() => assertRoleClassCounts(sources.map((source) => source.replace('microfilm-process-step', 'other-process-step'))));
+  assert.throws(() => assertRoleClassCounts([...sources, '<div class="news-list-spacing"></div>']));
 });
 
 test('keeps the former declarations in CSS with selectors that beat legacy rules', () => {
