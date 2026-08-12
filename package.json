@@ -7,6 +7,7 @@
     "serve:site": "eleventy --serve",
     "check:site": "npm run check:contracts && npm run build:site && node scripts/check-site.mjs",
     "check:contracts": "node --test scripts/test-html-contract.mjs",
+    "inventory:heading-skips": "node scripts/inventory-heading-skips.mjs",
     "check:redirects": "node scripts/check-apache-redirects.mjs",
     "check:a11y": "npm run build:site && node scripts/check-a11y.mjs",
     "check:modern-ui": "npm run build:site && node scripts/check-modern-ui.mjs",
