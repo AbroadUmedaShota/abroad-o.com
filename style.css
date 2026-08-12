@@ -2152,7 +2152,7 @@ film.html
   background-color: #FFEBCD;
 }
 @media screen and (max-width: 767px) {
-  #film_table tr td,tr{
+  #film_table tr td{
     font-size: 12px;
   }
   .film_price p{
@@ -2363,4 +2363,41 @@ largeformat.html
 @media screen and (max-width: 415px) {
 }
 @media screen and (max-width: 410px) {
+}
+
+/* PR4: valid form structure, retaining the former label/control proportions. */
+.contact-form-grid {
+  display: grid;
+  grid-template-columns: 30% 70%;
+  width: 100%;
+}
+.contact-form-grid > .form-group { display: contents; }
+.contact-form-grid > .form-group > label { grid-column: 1; padding: 8px; }
+.contact-form-grid > .form-group > input,
+.contact-form-grid > .form-group > textarea,
+.contact-form-grid > .form-group > .error-message { grid-column: 2; }
+.contact-form-grid > .form-group > .error-message { margin-bottom: 8px; }
+.contact-form-grid > .honeypot { display: none; }
+.nav-item.dropdown { display: flex; align-items: center; }
+.nav-submenu-toggle,
+.legacy-submenu-toggle { border: 0; background: transparent; color: inherit; padding: .5rem; }
+.legacy-submenu-toggle { padding: 15px 5px; }
+.nav-submenu-toggle:focus-visible,
+.legacy-submenu-toggle:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+@media screen and (max-width: 480px) {
+  .contact-form-grid { grid-template-columns: 1fr; }
+  .contact-form-grid > .form-group > label,
+  .contact-form-grid > .form-group > input,
+  .contact-form-grid > .form-group > textarea,
+  .contact-form-grid > .form-group > .error-message { grid-column: 1; }
+}
+
+/* PR4: constrain legacy fixed-width telework graphics without clipping the page. */
+@media screen and (max-width: 400px) {
+  section#tele_top img,
+  .tele-box1 img,
+  section#tele_mid2 img {
+    max-width: 100%;
+    height: auto;
+  }
 }

@@ -300,11 +300,7 @@ headerContactLabel: "お問い合わせフォーム"
                 <form method="post" id="contactForm" data-contact-api="https://abroad-o-contact-form.abroad-o.workers.dev" novalidate>
                     <!-- フォームテーブル -->
                    <div id="form-tbl" class="form-group">
-                        <table id="form" class="table" style="width: 100%;">
-                            <colgroup>
-                                <col style="width: 30%;">
-                                <col style="width: 70%;">
-                            </colgroup>
+                        <div id="form" class="contact-form-grid">
                             <!-- フォーム入力項目 -->
                             <div class="form-group">
                                 <label for="enterprise" class="must"><span class="badge badge-danger">必須</span> 企業名</label>
@@ -323,8 +319,8 @@ headerContactLabel: "お問い合わせフォーム"
 
                             <div class="form-group">
                                 <label for="email" class="must"><span class="badge badge-danger">必須</span> メールアドレス</label>
-                                <input type="email" id="email" name="email" class="form-control" required maxlength="254" placeholder="例：info@abroad-o.com" title="正しいメールアドレスを入力してください。">
-                                <span class="error-message">正しいメールアドレスを入力してください。</span>
+                                <input type="email" id="email" name="email" class="form-control" required maxlength="254" placeholder="例：info@abroad-o.com" title="正しいメールアドレスを入力してください。" aria-describedby="email-error" aria-invalid="false">
+                                <span id="email-error" class="error-message" role="alert" aria-live="assertive">正しいメールアドレスを入力してください。</span>
                             </div>
 
                             <!-- ハニーポットフィールドの追加 -->
@@ -335,8 +331,8 @@ headerContactLabel: "お問い合わせフォーム"
 
                             <div class="form-group">
                                 <label for="phone" class="must"><span class="badge badge-danger">必須</span> 電話番号</label>
-                                <input type="tel" id="phone" name="phone" class="form-control" required maxlength="30" pattern="^[0-9+() -]{7,30}$" placeholder="例：03-5835-0250" title="電話番号の形式が正しくありません。例：03-5835-0250">
-                                <span class="error-message">電話番号の形式が正しくありません。</span>
+                                <input type="tel" id="phone" name="phone" class="form-control" required maxlength="30" pattern="^[0-9+() -]{7,30}$" placeholder="例：03-5835-0250" title="電話番号の形式が正しくありません。例：03-5835-0250" aria-describedby="phone-error" aria-invalid="false">
+                                <span id="phone-error" class="error-message" role="alert" aria-live="assertive">電話番号の形式が正しくありません。</span>
                             </div>
 
                             <div class="form-group">
@@ -348,7 +344,7 @@ headerContactLabel: "お問い合わせフォーム"
                                  <label for="inquiry_details" class="must"><span class="badge badge-danger">必須</span> お問い合わせ内容</label>
                                  <textarea id="inquiry_details" name="inquiryDetails" class="form-control" required maxlength="4000"></textarea>
                             </div>
-                        </table>
+                        </div>
                     </div>
                      <!-- 個人情報取り扱いに関する記述 -->
                      <div class="scroll-spy">
@@ -437,8 +433,8 @@ headerContactLabel: "お問い合わせフォーム"
                     <div id="messageBox" class="message-box">個人情報の取扱について同意をお願いします。</div>
                     <!-- 同意チェックボックス -->
                     <div class="form-group consent-container">
-                        <label for="consent">
-                            <input type="checkbox" id="consent" name="consent" required><span>個人情報の取扱について同意する。</span>
+                        <label for="consent" id="consent-label">
+                            <input type="checkbox" id="consent" name="consent" required aria-labelledby="consent-label" aria-describedby="form-feedback"><span>個人情報の取扱について同意する。</span>
                         </label>
                     </div>
                     <div id="turnstile-container" class="turnstile-container" aria-label="bot対策の確認"></div>
@@ -449,7 +445,7 @@ headerContactLabel: "お問い合わせフォーム"
                     </div>
                 </form>
                 <!-- フォームフィードバックエリア -->
-                <div id="form-feedback" class="mt-3" aria-live="polite"></div>
+                <div id="form-feedback" class="mt-3" role="status" aria-live="polite" aria-atomic="true"></div>
                  <!-- エラー時の問い合わせ先 -->
                  <p class="mt-4">※送信後エラー画面になる場合や2営業日経ってもご連絡がない場合は、お手数ではございますが、こちらのメールアドレス<a href="mailto:info@abroad-o.com?subject=お問い合わせフォームページより&body=【貴社名】%0D%0A【ご担当者様】%0D%0A【電話番号】%0D%0A【お問い合わせ内容】">info@abroad-o.com</a>でお問い合わせ下さい。</p>
             </div>

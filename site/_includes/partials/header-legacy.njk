@@ -20,16 +20,16 @@
       <nav class="navbar navbar-custom navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse" aria-controls="legacyNavbarContent" aria-expanded="false" aria-label="ナビゲーションを開く">
             <i class="fa fa-bars"></i>
           </button>
-        <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
+        <div class="collapse navbar-collapse navbar-right navbar-main-collapse" id="legacyNavbarContent">
         <!-- カスタムナビゲーション -->
           <ul class="nav navbar-nav shade">
             <li class="top_down"><a class="page-scroll" href="/index.html">HOME</a></li>
             <li class="dropdown">
-              <a href="/service.html" class="button" aria-expanded="false">SERVICE<b class="caret"></b></a>
-              <ul class="dropdown-menu" role="menu">
+              <a href="/service.html" class="button">SERVICE</a><button type="button" class="legacy-submenu-toggle" id="legacyServiceDropdown" aria-controls="legacyServiceSubmenu" aria-expanded="false" aria-label="SERVICE のサブメニューを開く"><b class="caret" aria-hidden="true"></b></button>
+              <ul class="dropdown-menu" id="legacyServiceSubmenu" role="menu" aria-labelledby="legacyServiceDropdown">
                 <li class="not_top"><a href="/input.html">データ入力サービス</a></li>
                 <li><a href="/aggregate.html">データ集計・分析サービス</a></li>
                 <li><a href="/scan.html">スキャニングサービス</a></li>
@@ -39,8 +39,8 @@
             </li>
             <li><a class="page-scroll" href="/news.html">NEWS</a></li>
             <li class="dropdown">
-              <a href="/about.html" class="button" aria-expanded="false">ABOUT<b class="caret"></b></a>
-              <ul class="dropdown-menu" role="menu">
+              <a href="/about.html" class="button">ABOUT</a><button type="button" class="legacy-submenu-toggle" id="legacyAboutDropdown" aria-controls="legacyAboutSubmenu" aria-expanded="false" aria-label="ABOUT のサブメニューを開く"><b class="caret" aria-hidden="true"></b></button>
+              <ul class="dropdown-menu" id="legacyAboutSubmenu" role="menu" aria-labelledby="legacyAboutDropdown">
                 <li class="not_top not_border"><a href="/rule.html">プライバシーポリシー</a></li>
                 <li class="not_top not_border"><a href="/recruit.html">リクルート</a></li>
               </ul>
