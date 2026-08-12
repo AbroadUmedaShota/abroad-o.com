@@ -6,6 +6,7 @@ canonicalUrl: "https://www.abroad-o.com/news/news_18083101.html"
 layoutVariant: "legacy"
 activeNav: "news"
 scriptsVariant: "news"
+useLightbox: true
 tags: ["newsArticle"]
 newsOrder: "20180831"
 displayDate: "2018/08/31"
@@ -16,7 +17,7 @@ summaryClass: ""
 {% extends "layouts/site.njk" %}
 
 {% block headExtras %}
-    <link href="../css/bootstrap.css" rel="stylesheet">
+    {% include "partials/styles-legacy-core.njk" %}
     <link href="../style.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>

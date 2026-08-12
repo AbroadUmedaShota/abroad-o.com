@@ -1,0 +1,422 @@
+{
+  "news.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 5324.25,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 4593.40625,
+      "container": 1170
+    }
+  },
+  "news/news_171023.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1202.421875,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1176.984375,
+      "container": 1170
+    }
+  },
+  "news/news_17110101.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1294.171875,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1275.171875,
+      "container": 1170
+    }
+  },
+  "news/news_17110102.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1153.421875,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1286.5,
+      "container": 1170
+    }
+  },
+  "news/news_17110103.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1133.421875,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1236.5,
+      "container": 1170
+    }
+  },
+  "news/news_171211.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1389.828125,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1244.390625,
+      "container": 1170
+    }
+  },
+  "news/news_18083101.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1140.78125,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1187.96875,
+      "container": 1170
+    }
+  },
+  "news/news_18083102.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1140.78125,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1187.96875,
+      "container": 1170
+    }
+  },
+  "news/news_181220.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1229.828125,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1144.390625,
+      "container": 1170
+    }
+  },
+  "news/news_190327.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1341.828125,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1174.390625,
+      "container": 1170
+    }
+  },
+  "news/news_191227.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1229.828125,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1144.390625,
+      "container": 1170
+    }
+  },
+  "news/news_200106.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1109.828125,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1084.390625,
+      "container": 1170
+    }
+  },
+  "news/news_200327.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1935.21875,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1474.390625,
+      "container": 1170
+    }
+  },
+  "news/news_200508.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1965.21875,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1504.390625,
+      "container": 1170
+    }
+  },
+  "news/news_200526.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1987.21875,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1534.390625,
+      "container": 1170
+    }
+  },
+  "news/news_200721.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1217.953125,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1117.125,
+      "container": 1170
+    }
+  },
+  "news/news_201106.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1349.828125,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1234.390625,
+      "container": 1170
+    }
+  },
+  "news/news_210329.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1199.828125,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1174.390625,
+      "container": 1170
+    }
+  },
+  "news/news_220807.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1199.828125,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1174.390625,
+      "container": 1170
+    }
+  },
+  "news/news_221212.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1229.828125,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1144.390625,
+      "container": 1170
+    }
+  },
+  "news/news_231226.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1289.828125,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1174.390625,
+      "container": 1170
+    }
+  },
+  "news/news_241218.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1577.4375,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1283.59375,
+      "container": 1170
+    }
+  },
+  "news/news_250827.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1652.75,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1192.984375,
+      "container": 1170
+    }
+  },
+  "news/news_250908.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1679.75,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1219.984375,
+      "container": 1170
+    }
+  },
+  "news/news_251212.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1295.828125,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1048.984375,
+      "container": 1170
+    }
+  },
+  "news/news_260526.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1671.34375,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1238.515625,
+      "container": 1170
+    }
+  },
+  "news/news_260615.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1738.34375,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1238.515625,
+      "container": 1170
+    }
+  },
+  "news/news_260616.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1919.265625,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1355.75,
+      "container": 1170
+    }
+  },
+  "form.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1421.28125,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1337.140625,
+      "container": 1170
+    }
+  },
+  "thank.html": {
+    "375": {
+      "overflow": 0,
+      "header": 167.4375,
+      "body": 1185.03125,
+      "container": 371.25
+    },
+    "1440": {
+      "overflow": 0,
+      "header": 140.09375,
+      "body": 1128.390625,
+      "container": 1170
+    }
+  }
+}
