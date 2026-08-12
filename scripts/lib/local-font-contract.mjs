@@ -51,3 +51,21 @@ export function assertFontAssets(repoRoot, outputRoot) {
     if (!fs.existsSync(source) || !fs.existsSync(published) || !fs.readFileSync(published).equals(fs.readFileSync(source))) throw new Error(`Missing or changed OFL license: ${license}`);
   }
 }
+
+export function assertFontObservation(observation) {
+  const expectedPaths = [...observation.expectedPaths].sort();
+  const actualPaths = [...observation.responses].sort();
+  if (observation.externalFonts.length || expectedPaths.length !== actualPaths.length || expectedPaths.some((value, index) => value !== actualPaths[index])) {
+    throw new Error(`Local font network contract failed: ${JSON.stringify(observation)}`);
+  }
+  for (const expected of observation.expectedFaces) {
+    const face = observation.faces.find((candidate) => candidate.family.replaceAll('"', '') === expected.family && Number(candidate.weight) === expected.weight);
+    if (!face) throw new Error(`Missing face: ${expected.family} ${expected.weight}.`);
+    if (face.status !== 'loaded') throw new Error(`Corrupt or error face: ${expected.family} ${expected.weight} is ${face.status}.`);
+  }
+  for (const visible of observation.visible) {
+    if (!visible.family.includes(visible.expectedFamily) || Number(visible.weight) !== visible.expectedWeight) {
+      throw new Error(`Fallback-only rendering or wrong weight: ${JSON.stringify(visible)}.`);
+    }
+  }
+}
