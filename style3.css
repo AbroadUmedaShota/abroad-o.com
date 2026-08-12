@@ -1415,3 +1415,12 @@ section#service2 .col-md-4 h2 {
     font-size: 17px;
   }
 }
+/* PR4 modern submenu control; the primary links remain links. */
+.nav-item.dropdown { display: flex; align-items: center; }
+.nav-submenu-toggle { border: 0; background: transparent; color: inherit; padding: .5rem; }
+.nav-submenu-toggle:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.slick-slider { overflow: hidden; }
+@media screen and (max-width: 767px) {
+  #feature_section .row { margin-left: 0; margin-right: 0; }
+  #carouselExampleIndicators { overflow: hidden; }
+}
