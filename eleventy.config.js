@@ -24,6 +24,20 @@ export default function (eleventyConfig) {
     'node_modules/jquery/dist/jquery.min.js': 'vendor/jquery/jquery.min.js',
     'node_modules/jquery/LICENSE.txt': 'vendor/jquery/LICENSE.txt'
   });
+  eleventyConfig.addPassthroughCopy({
+    'node_modules/bootstrap3/dist/css/bootstrap.min.css': 'vendor/bootstrap3/css/bootstrap.min.css',
+    'node_modules/bootstrap3/dist/js/bootstrap.min.js': 'vendor/bootstrap3/js/bootstrap.min.js',
+    'node_modules/bootstrap3/fonts': 'vendor/bootstrap3/fonts',
+    'node_modules/bootstrap3/LICENSE': 'vendor/bootstrap3/LICENSE',
+    'node_modules/@fortawesome/fontawesome-free/css/all.min.css': 'vendor/fontawesome/css/all.min.css',
+    'node_modules/@fortawesome/fontawesome-free/css/v4-shims.min.css': 'vendor/fontawesome/css/v4-shims.min.css',
+    'node_modules/@fortawesome/fontawesome-free/webfonts': 'vendor/fontawesome/webfonts',
+    'node_modules/@fortawesome/fontawesome-free/LICENSE.txt': 'vendor/fontawesome/LICENSE.txt',
+    'node_modules/lightbox2/dist/css/lightbox.min.css': 'vendor/lightbox2/css/lightbox.min.css',
+    'node_modules/lightbox2/dist/js/lightbox.min.js': 'vendor/lightbox2/js/lightbox.min.js',
+    'node_modules/lightbox2/dist/images': 'vendor/lightbox2/images',
+    'node_modules/lightbox2/LICENSE': 'vendor/lightbox2/LICENSE'
+  });
   eleventyConfig.addCollection('newsArticles', (collectionApi) =>
     collectionApi
       .getFilteredByTag('newsArticle')

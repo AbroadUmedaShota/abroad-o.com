@@ -22,7 +22,7 @@ activeNav: "service"
 
       gtag('config', 'UA-51168812-1');
     </script>
-    <link href="css/bootstrap.css" rel="stylesheet">
+    {% include "partials/styles-legacy-core.njk" %}
     <link href="style.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -254,16 +254,7 @@ activeNav: "service"
 {% endblock %}
 
 {% block scripts %}
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <!-- Bootstrap JS -->
-    <script src="js/bootstrap.min.js"></script>
-    <!-- FontAwesome CDN -->
-    <script src="https://use.fontawesome.com/90388fa9b8.js"></script>
-    <!-- Plugin JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootsnav/1.2.0/js/bootsnav.min.js"></script>
-    <script src="js/jquery.smooth-scroll.min.js"></script>
+{% include "partials/scripts-legacy-core.njk" %}
     <!-- Custom Theme JavaScript -->
     <script src="js/custom.js"></script>
     <script>
