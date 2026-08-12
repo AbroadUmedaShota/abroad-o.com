@@ -42,6 +42,7 @@ test('rejects inline styles and changed page stylesheet mapping', () => {
   assert.doesNotThrow(() => assertNoInlineStyles(valid, 'form.html'));
   assert.doesNotThrow(() => assertPageStyleLink(valid, 'form.html'));
   assert.throws(() => assertNoInlineStyles('<style>.x { color: red; }</style>', 'inline-style'));
+  assert.throws(() => assertNoInlineStyles('<div style="color: red"></div>', 'inline-style-attribute'));
   assert.throws(() => assertPageStyleLink('', 'form.html'));
   assert.throws(() => assertPageStyleLink(`${valid}${valid}`, 'form.html'));
   assert.throws(() => assertPageStyleLink('<link rel="stylesheet" href="/css/pages/news-index.css">', 'form.html'));

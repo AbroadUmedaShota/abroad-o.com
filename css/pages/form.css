@@ -1,4 +1,7 @@
 /* form.html 専用のスタイル */
+        .form-page-title {
+            text-align: center;
+        }
         #form {
             border-collapse: collapse;
             margin: 1em 0;

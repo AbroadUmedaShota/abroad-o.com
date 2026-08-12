@@ -43,6 +43,46 @@ iframe
 iframe {
     border:solid 0px #fff;
 }
+
+/* CSP-ready replacements for legacy page-specific inline declarations. */
+.about-map-embed {
+    border: 0;
+}
+.legacy-return-link {
+    color: #555555;
+}
+.largeformat-price-marker {
+    color: #f00;
+}
+.microfilm-active-tab {
+    background-color: #595959;
+    color: #fff !important;
+}
+.microfilm-heading-band {
+    background-color: #BBBBBB;
+}
+.microfilm-table-heading {
+    background-color: #EEEEEE;
+}
+.microfilm-process-arrow {
+    border-top: solid 100px #BBBBBB;
+}
+.microfilm-process-step {
+    background-color: #EEEEEE;
+    border-left: solid 6px #BBBBBB;
+}
+.news-detail-back-link--spaced {
+    margin-top: 30px;
+}
+.news-detail-back-link--compact {
+    margin-bottom: 15px;
+}
+.news-article-cta {
+    margin-top: 30px;
+}
+.news-article-date {
+    text-align: right;
+}
 /*========================================================
 header
 ========================================================*/
@@ -2500,7 +2540,21 @@ largeformat.html
 /* #ff0000 to #b00020: 7.33:1 on white. */
 .btn-danger, .btn-danger strong, .notice-emphasis { color: #fff !important; background-color: #b00020 !important; }
 .notice-emphasis { background-color: #b00020 !important; }
-.nav-tabs > li > a[style] { color: #555 !important; }
+#film_top ul.nav-tabs > li.active > a.microfilm-active-tab,
+#film_top ul.nav-tabs > li.active > a.microfilm-active-tab:hover,
+#film_top ul.nav-tabs > li.active > a.microfilm-active-tab:focus {
+  background-color: #595959;
+  color: #fff !important;
+}
+#film_top ul.nav-tabs > li > a.legacy-return-link { color: #555 !important; }
+#film_table .largeformat-price-marker { color: #f00; }
+.line_orange.microfilm-heading-band { background-color: #BBBBBB; }
+#film_top .table .microfilm-table-heading { background-color: #EEEEEE; }
+.triangle_orange.microfilm-process-arrow { border-top-color: #BBBBBB; }
+section#tele_mid5_orange ul li.microfilm-process-step {
+  background-color: #EEEEEE;
+  border-left-color: #BBBBBB;
+}
 section#tele_mid5 li, section#tele_mid5 li .noninteractive-text, .tele-box1 span { color: #222; }
 #telework h5, #telework h5 .noninteractive-text { color: #222; }
 section#tele_mid5 h4, section#tele_mid5 h5, section#tele_mid5 h4 .noninteractive-text, section#tele_mid5 h5 .noninteractive-text { color: #222 !important; }
