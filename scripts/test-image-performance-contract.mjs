@@ -21,6 +21,7 @@ test('accepts the top image preload on an opted-in page', () => assert.doesNotTh
 test('accepts no top image preload on an opted-out page', () => assert.doesNotThrow(() => assertTopImagePreloadContract('', false, 'no preload')));
 for (const [name, html, expected] of [
   ['duplicateTopPreload', `${topImagePreload}${topImagePreload}`, true],
+  ['pngAndWebpTopPreload', `${topImagePreload}<link rel="preload" as="image" href="/image/top1.png" fetchpriority="high">`, true],
   ['missingFetchPriority', topImagePreload.replace(' fetchpriority="high"', ''), true],
   ['missingWebpType', topImagePreload.replace(' type="image/webp"', ''), true],
   ['wrongAs', topImagePreload.replace('as="image"', 'as="script"'), true],
@@ -33,12 +34,13 @@ for (const [name, html, expected] of [
 test('accepts the intrinsic image height rule', () => assert.doesNotThrow(() => assertIntrinsicImageStyle('.image-intrinsic { width: 100%; height: auto; }')));
 test('rejects a missing intrinsic image height rule', () => assert.throws(() => assertIntrinsicImageStyle('.image-intrinsic { height: 100%; }')));
 
-const topImageCss = `:root { --abroad-top-image: image-set(url("image/top1.webp") type("image/webp") 1x, url("image/top1.png") type("image/png") 1x); }\n#top { background-image: url(image/top1.png); background-image: var(--abroad-top-image); }`;
+const topImageCss = `#top { background-image: url(image/top1.png); background-image: image-set(url("image/top1.webp") type("image/webp") 1x, url("image/top1.png") type("image/png") 1x); }`;
 test('accepts paired PNG/WebP top image backgrounds', () => assert.doesNotThrow(() => assertTopImageCssContract(topImageCss)));
-test('rejects an unpaired PNG top image background', () => assert.throws(() => assertTopImageCssContract(topImageCss.replace(' background-image: var(--abroad-top-image);', ''))));
-const topImageGradientCss = `:root { --abroad-top-image: image-set(url("image/top1.webp") type("image/webp") 1x, url("image/top1.png") type("image/png") 1x); }\n.one { background-image: linear-gradient(red, blue), url(image/top1.png); background-image: linear-gradient(red, blue), var(--abroad-top-image); }\n.two { background: linear-gradient(red, blue), url(image/top1.png); background: linear-gradient(red, blue), var(--abroad-top-image); }`;
+test('rejects an unpaired PNG top image background', () => assert.throws(() => assertTopImageCssContract(topImageCss.replace(/ background-image: image-set[^;]+;/, ''))));
+test('rejects image-set hidden in a custom property because unsupported browsers lose the PNG fallback', () => assert.throws(() => assertTopImageCssContract(':root { --top: image-set(url("image/top1.webp") type("image/webp") 1x, url("image/top1.png") type("image/png") 1x); } #top { background-image: url(image/top1.png); background-image: var(--top); }')));
+const topImageGradientCss = `.one { background-image: linear-gradient(red, blue), url(image/top1.png); background-image: linear-gradient(red, blue), image-set(url("image/top1.webp") type("image/webp") 1x, url("image/top1.png") type("image/png") 1x); }\n.two { background: linear-gradient(red, blue), url(image/top1.png); background: linear-gradient(red, blue), image-set(url("image/top1.webp") type("image/webp") 1x, url("image/top1.png") type("image/png") 1x); }`;
 test('accepts paired PNG/WebP top image gradients', () => assert.doesNotThrow(() => assertTopImageGradientCssContract(topImageGradientCss)));
-test('rejects a missing WebP top image gradient', () => assert.throws(() => assertTopImageGradientCssContract(topImageGradientCss.replace('background-image: linear-gradient(red, blue), var(--abroad-top-image);', ''))));
+test('rejects a missing WebP top image gradient', () => assert.throws(() => assertTopImageGradientCssContract(topImageGradientCss.replace(/background-image: linear-gradient\(red, blue\), image-set[^;]+;/, ''))));
 test('rejects a changed alpha channel separately from RGB-only quality metrics', () => assert.throws(() => assertAlphaDifference(1)));
 test('rejects mismatched alpha metadata', async () => {
   const [png, webp] = await Promise.all([

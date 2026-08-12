@@ -26,10 +26,6 @@ body.fadeout::after {
 /*========================================================
 共通　カスタムボタン設定（上に戻るボタン）
 ========================================================*/
-:root {
-    --abroad-top-image: image-set(url("image/top1.webp") type("image/webp") 1x, url("image/top1.png") type("image/png") 1x);
-}
-
 #page-top {
     position: fixed;    
     right: 20px;
@@ -75,7 +71,7 @@ header_top
 ========================================================*/
 section#header_top {
     background-image: url(image/top1.png);    
-    background-image: var(--abroad-top-image);
+    background-image: image-set(url("image/top1.webp") type("image/webp") 1x, url("image/top1.png") type("image/png") 1x);
     background-attachment: fixed;    
 }
 section#header_top img {

@@ -88,16 +88,19 @@ export function assertImagePerformanceContract(html, expectations, label = 'HTML
 }
 
 export function assertTopImagePreloadContract(html, expected, label = 'HTML') {
-  const matches = preloadNodes(html).filter((attrs) => {
+  const topImagePreloads = preloadNodes(html).filter((attrs) => {
     const relTokens = (attrs.get('rel') || '').toLowerCase().split(/\s+/).filter(Boolean);
-    return relTokens.includes('preload') && attrs.get('href') === '/image/top1.webp';
+    return relTokens.includes('preload') && ['/image/top1.webp', '/image/top1.png'].includes(attrs.get('href'));
   });
   if (!expected) {
-    if (matches.length) throw new Error(`Unexpected top image preload in ${label}`);
+    if (topImagePreloads.length) throw new Error(`Unexpected top image preload in ${label}`);
     return;
   }
-  if (matches.length !== 1) throw new Error(`Expected exactly one top image preload in ${label}, found ${matches.length}`);
-  const attrs = matches[0];
+  if (topImagePreloads.length !== 1) throw new Error(`Expected exactly one top image preload in ${label}, found ${topImagePreloads.length}`);
+  const attrs = topImagePreloads[0];
+  if (attrs.get('href') !== '/image/top1.webp') {
+    throw new Error(`Expected the WebP top image preload in ${label}, found ${attrs.get('href')}`);
+  }
   const relTokens = (attrs.get('rel') || '').toLowerCase().split(/\s+/).filter(Boolean);
   if (relTokens.length !== 1 || relTokens[0] !== 'preload') {
     throw new Error(`Unexpected rel on top image preload in ${label}: ${attrs.get('rel') ?? '(missing)'}`);
@@ -109,21 +112,18 @@ export function assertTopImagePreloadContract(html, expected, label = 'HTML') {
 
 export function assertTopImageCssContract(css, label = 'CSS') {
   const activeCss = css.replaceAll(/\/\*[\s\S]*?\*\//g, '');
-  if (!/:root\s*\{[^}]*--abroad-top-image\s*:\s*image-set\(\s*url\((?:"|')?image\/top1\.webp(?:"|')?\)\s+type\((?:"|')image\/webp(?:"|')\)\s+1x\s*,\s*url\((?:"|')?image\/top1\.png(?:"|')?\)\s+type\((?:"|')image\/png(?:"|')\)\s+1x\s*\)[^}]*\}/.test(activeCss)) {
-    throw new Error(`Missing WebP image-set custom property in ${label}`);
-  }
-  const fallback = /background-image\s*:\s*url\(image\/top1\.png\)\s*;\s*background-image\s*:\s*var\(--abroad-top-image\)\s*;/g;
+  const fallback = /background-image\s*:\s*url\(image\/top1\.png\)\s*;\s*background-image\s*:\s*image-set\(\s*url\((?:"|')?image\/top1\.webp(?:"|')?\)\s+type\((?:"|')image\/webp(?:"|')?\)\s+1x\s*,\s*url\((?:"|')?image\/top1\.png(?:"|')?\)\s+type\((?:"|')image\/png(?:"|')?\)\s+1x\s*\)\s*;/g;
   const fallbackMatches = [...activeCss.matchAll(fallback)];
   const pngReferences = [...activeCss.matchAll(/background-image\s*:\s*url\(image\/top1\.png\)\s*;/g)];
   if (!pngReferences.length || fallbackMatches.length !== pngReferences.length) {
-    throw new Error(`Every active PNG top image background must have a following WebP custom-property fallback in ${label}`);
+    throw new Error(`Every active PNG top image background must have a following direct WebP image-set declaration in ${label}`);
   }
 }
 
 export function assertTopImageGradientCssContract(css, label = 'CSS') {
   const activeCss = css.replaceAll(/\/\*[\s\S]*?\*\//g, '');
   const pngGradients = [...activeCss.matchAll(/background(?:-image)?\s*:\s*linear-gradient\([^;]+?\),\s*url\(image\/top1\.png\)\s*;/g)];
-  const webpGradients = [...activeCss.matchAll(/background(?:-image)?\s*:\s*linear-gradient\([^;]+?\),\s*var\(--abroad-top-image\)\s*;/g)];
+  const webpGradients = [...activeCss.matchAll(/background(?:-image)?\s*:\s*linear-gradient\([^;]+?\),\s*image-set\(\s*url\((?:"|')?image\/top1\.webp(?:"|')?\)\s+type\((?:"|')image\/webp(?:"|')?\)\s+1x\s*,\s*url\((?:"|')?image\/top1\.png(?:"|')?\)\s+type\((?:"|')image\/png(?:"|')?\)\s+1x\s*\)\s*;/g)];
   if (pngGradients.length !== 2 || webpGradients.length !== 2) {
     throw new Error(`Expected two PNG/WebP gradient top image fallbacks in ${label}, found ${pngGradients.length}/${webpGradients.length}`);
   }
