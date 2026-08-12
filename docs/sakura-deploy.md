@@ -134,3 +134,6 @@ $env:SAKURA_STAGED_RELEASE_ID = 'abroad-o-public-YYYYMMDD-HHMMSS'
 - `https://www.abroad-o.com/docs/TOOL_USAGE.md` が 404
 - `https://www.abroad-o.com/TOOL/index.html` が 404
 - `https://www.abroad-o.com/pdfjs/web/viewer.html` が 404
+# CSP Report-Only headers
+
+`.htaccess` ships a CSP Report-Only policy and companion headers. No report endpoint is configured, so browser reports are not retained. Verifying the live Apache `mod_headers` response or observing production browser reports requires explicit approval; GitHub Actions covers the local Apache integration contract.
