@@ -27,7 +27,6 @@ const generatedFiles = htmlFiles.filter((file) => path.relative(outputRoot, file
 if (generatedFiles.length !== 47) throw new Error(`Expected 47 generated HTML files, found ${generatedFiles.length}`);
 
 let styleTags = 0;
-let styleAttributes = 0;
 let analyticsCount = 0;
 let newsRuntimeCount = 0;
 for (const file of generatedFiles) {
@@ -38,7 +37,6 @@ for (const file of generatedFiles) {
   assertPageStyleLink(html, relative);
   const styles = styleInventory(html);
   styleTags += styles.styleTags;
-  styleAttributes += styles.styleAttributes;
   if (analyticsPages.has(relative)) {
     assertAnalyticsOrder(html, analyticsScript, relative);
     analyticsCount += 1;
@@ -53,13 +51,15 @@ for (const file of generatedFiles) {
 if (analyticsCount !== 19) throw new Error(`Expected analytics on 19 pages, found ${analyticsCount}`);
 if (newsRuntimeCount !== 28) throw new Error(`Expected NEWS runtime on 28 pages, found ${newsRuntimeCount}`);
 if (styleTags !== 0) throw new Error(`Expected 0 generated inline style tags, found ${styleTags}`);
-if (styleAttributes !== 71) throw new Error(`Expected 71 generated style attributes, found ${styleAttributes}`);
 for (const href of pageStyleSheetPaths()) {
   assertPageStyleSheet(fs.readFileSync(path.join(outputRoot, href.slice(1)), 'utf8'), href);
 }
 
 const passthrough = path.join(outputRoot, 'slick', 'largeformat.html');
-const passthroughInline = scriptInventory(fs.readFileSync(passthrough, 'utf8')).filter((script) => script.inline).length;
+const passthroughHtml = fs.readFileSync(passthrough, 'utf8');
+const passthroughInline = scriptInventory(passthroughHtml).filter((script) => script.inline).length;
+const passthroughStyles = styleInventory(passthroughHtml).styleAttributes;
 if (passthroughInline !== 3) throw new Error(`Expected 3 documented passthrough inline scripts, found ${passthroughInline}`);
+if (passthroughStyles !== 4) throw new Error(`Expected 4 documented passthrough style attributes, found ${passthroughStyles}`);
 console.log(`CSP script readiness passed: 47 generated pages, 0 inline executable scripts; passthrough slick/largeformat.html: ${passthroughInline} documented exceptions.`);
-console.log(`CSP style readiness passed: 0 inline style tags, ${styleAttributes} style attributes (report-only), 10 exact external page stylesheets.`);
+console.log(`CSP style readiness passed: 0 generated inline style tags/attributes; passthrough slick/largeformat.html: ${passthroughStyles} documented style-attribute exceptions; 10 exact external page stylesheets.`);

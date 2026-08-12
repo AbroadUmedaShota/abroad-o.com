@@ -29,10 +29,10 @@ export const pageStyleSheets = new Map([
 
 const pageStyleFingerprints = new Map([
   ['/css/pages/legacy-no-link.css', '2092c2908856'],
-  ['/css/pages/form.css', '86fa3f92bdcd'],
-  ['/css/pages/news-index.css', 'b6b87ee4c690'],
+  ['/css/pages/form.css', 'ba4675b242e1'],
+  ['/css/pages/news-index.css', '160cf5669050'],
   ['/css/pages/news-office-move.css', '4c4fcc77f120'],
-  ['/css/pages/news-251212.css', 'e7702985e3d8'],
+  ['/css/pages/news-251212.css', '96762581c2b4'],
   ['/css/pages/news-260526.css', '330eec19dbf8'],
   ['/css/pages/news-260615.css', '742a7665333f'],
   ['/css/pages/news-260616.css', '5a684272925a'],
@@ -90,8 +90,8 @@ export function assertPageStyleLink(html, file) {
 }
 
 export function assertNoInlineStyles(html, file) {
-  const { styleTags } = styleInventory(html);
-  if (styleTags) throw new Error(`Inline style remains in ${file}: ${styleTags}`);
+  const { styleTags, styleAttributes } = styleInventory(html);
+  if (styleTags || styleAttributes) throw new Error(`Inline styles remain in ${file}: ${styleTags} style tags, ${styleAttributes} style attributes`);
 }
 
 export function assertPageStyleSheet(css, href) {

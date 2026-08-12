@@ -51,7 +51,10 @@
             color: #fff;
             text-decoration: none;
         }
-        .news-detail-back-link {
+.news-detail-back-link {
             margin-top: 20px;
+            margin-bottom: 8px;
+        }
+        .news-article-created-at {
             margin-bottom: 8px;
         }

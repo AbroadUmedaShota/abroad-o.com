@@ -29,7 +29,7 @@ scriptsVariant: "news"
       <h1>NEWS</h1>
     </div><!--container-->
   </section>
-  <section id="news_list" class="container" style="margin-top: 30px;">
+  <section id="news_list" class="container news-list-spacing">
 {% for article in collections.newsArticles %}
     <article class="news-summary-item{% if article.data.summaryClass %} {{ article.data.summaryClass }}{% endif %}">
       <p class="news-date">{{ article.data.displayDate }}</p>
