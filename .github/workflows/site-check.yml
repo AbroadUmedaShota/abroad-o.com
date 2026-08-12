@@ -22,6 +22,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run check:site
       - run: npm run check:a11y
+      - run: npm run check:modern-ui
       - name: Install and test Apache redirects
         run: |
           sudo apt-get update

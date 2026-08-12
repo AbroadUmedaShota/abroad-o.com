@@ -15,7 +15,8 @@
     "js",
     "news",
     "pdfjs",
-    "slick"
+    "slick",
+    "vendor"
   ],
   "excludeNames": [
     ".git",
@@ -37,7 +38,8 @@
     "js",
     "news",
     "pdfjs",
-    "slick"
+    "slick",
+    "vendor"
   ],
   "managedRootFiles": [
     ".htaccess",

@@ -6,7 +6,8 @@
     "js",
     "news",
     "pdfjs",
-    "slick"
+    "slick",
+    "vendor"
   ],
   "managedRootFiles": [
     ".htaccess",

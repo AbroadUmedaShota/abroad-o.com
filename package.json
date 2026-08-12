@@ -8,13 +8,16 @@
     "check:site": "npm run check:contracts && npm run build:site && node scripts/check-site.mjs",
     "check:contracts": "node --test scripts/test-html-contract.mjs",
     "check:redirects": "node scripts/check-apache-redirects.mjs",
-    "check:a11y": "npm run build:site && node scripts/check-a11y.mjs"
+    "check:a11y": "npm run build:site && node scripts/check-a11y.mjs",
+    "check:modern-ui": "npm run build:site && node scripts/check-modern-ui.mjs"
   },
   "devDependencies": {
     "@11ty/eleventy": "3.1.6",
     "@axe-core/playwright": "4.13.0",
     "@playwright/test": "1.62.1",
+    "bootstrap": "5.3.8",
     "gray-matter": "4.0.3",
+    "jquery": "3.7.1",
     "parse5": "8.0.1"
   }
 }
