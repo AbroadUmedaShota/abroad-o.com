@@ -7,6 +7,10 @@ const repoRoot = path.resolve(import.meta.dirname, '..');
 const outputRoot = path.join(repoRoot, '_site');
 const sourceRoot = path.join(repoRoot, 'site', 'pages');
 const publicContract = JSON.parse(fs.readFileSync(path.join(repoRoot, 'deploy', 'public-manifest.json'), 'utf8'));
+const defaultOgImageUrl = 'https://www.abroad-o.com/image/top1.png';
+const defaultOgImagePath = path.join(outputRoot, 'image', 'top1.png');
+const defaultOgImageWidth = 1990;
+const defaultOgImageHeight = 810;
 
 function walk(directory) {
   return fs.readdirSync(directory, { withFileTypes: true })
@@ -46,6 +50,14 @@ function assertSingleMeta(html, attribute, name, expected, file) {
   if (values.length !== 1 || (expected !== undefined && values[0] !== expected)) {
     throw new Error(`Unexpected ${name} metadata in ${file}: ${JSON.stringify(values)}`);
   }
+}
+
+function pngDimensions(file) {
+  const png = fs.readFileSync(file);
+  if (png.toString('ascii', 1, 4) !== 'PNG' || png.readUInt32BE(12) !== 0x49484452) {
+    throw new Error(`Expected PNG image: ${file}`);
+  }
+  return [png.readUInt32BE(16), png.readUInt32BE(20)];
 }
 
 function verifyRedirectContract() {
@@ -99,6 +111,11 @@ function verifyContract(manifest) {
   if (sitemap.includes('<lastmod>') || sitemapUrls.includes('https://www.abroad-o.com/index.html') || new Set(sitemapUrls).size !== sitemapUrls.length) {
     throw new Error('Sitemap must contain unique canonical URLs without timestamps or index.html.');
   }
+  if (!fs.existsSync(defaultOgImagePath)) throw new Error('Default OG image is not published.');
+  const [ogImageWidth, ogImageHeight] = pngDimensions(defaultOgImagePath);
+  if (ogImageWidth !== defaultOgImageWidth || ogImageHeight !== defaultOgImageHeight) {
+    throw new Error(`Unexpected default OG image dimensions: ${ogImageWidth}x${ogImageHeight}`);
+  }
   const robots = fs.readFileSync(path.join(outputRoot, 'robots.txt'), 'utf8');
   if (!/^User-agent: \*\r?\nDisallow:\s*\r?\n\r?\nSitemap: https:\/\/www\.abroad-o\.com\/sitemap\.xml\s*$/i.test(robots)) {
     throw new Error('robots.txt does not permit crawling or point at the canonical sitemap.');
@@ -119,13 +136,13 @@ function verifyContract(manifest) {
     assertSingleMeta(html, 'property', 'og:description', undefined, file);
     assertSingleMeta(html, 'property', 'og:type', expectedOgType, file);
     assertSingleMeta(html, 'property', 'og:url', expectedCanonicalUrl, file);
-    assertSingleMeta(html, 'property', 'og:image', undefined, file);
-    assertSingleMeta(html, 'property', 'og:image:width', '1200', file);
-    assertSingleMeta(html, 'property', 'og:image:height', '630', file);
+    assertSingleMeta(html, 'property', 'og:image', defaultOgImageUrl, file);
+    assertSingleMeta(html, 'property', 'og:image:width', String(ogImageWidth), file);
+    assertSingleMeta(html, 'property', 'og:image:height', String(ogImageHeight), file);
     assertSingleMeta(html, 'name', 'twitter:card', 'summary_large_image', file);
     assertSingleMeta(html, 'name', 'twitter:title', undefined, file);
     assertSingleMeta(html, 'name', 'twitter:description', undefined, file);
-    assertSingleMeta(html, 'name', 'twitter:image', undefined, file);
+    assertSingleMeta(html, 'name', 'twitter:image', defaultOgImageUrl, file);
     const noindex = metaValues(html, 'name', 'robots');
     if (file === 'thank.html') {
       if (noindex.length !== 1 || noindex[0] !== 'noindex' || sitemapUrls.includes(expectedCanonicalUrl)) throw new Error('thank.html must be noindex and absent from the sitemap.');
