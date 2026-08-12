@@ -88,13 +88,20 @@ export function assertImagePerformanceContract(html, expectations, label = 'HTML
 }
 
 export function assertTopImagePreloadContract(html, expected, label = 'HTML') {
-  const matches = preloadNodes(html).filter((attrs) => attrs.get('rel') === 'preload' && attrs.get('href') === '/image/top1.png');
+  const matches = preloadNodes(html).filter((attrs) => {
+    const relTokens = (attrs.get('rel') || '').toLowerCase().split(/\s+/).filter(Boolean);
+    return relTokens.includes('preload') && attrs.get('href') === '/image/top1.png';
+  });
   if (!expected) {
     if (matches.length) throw new Error(`Unexpected top image preload in ${label}`);
     return;
   }
   if (matches.length !== 1) throw new Error(`Expected exactly one top image preload in ${label}, found ${matches.length}`);
   const attrs = matches[0];
+  const relTokens = (attrs.get('rel') || '').toLowerCase().split(/\s+/).filter(Boolean);
+  if (relTokens.length !== 1 || relTokens[0] !== 'preload') {
+    throw new Error(`Unexpected rel on top image preload in ${label}: ${attrs.get('rel') ?? '(missing)'}`);
+  }
   for (const [name, value] of Object.entries({ as: 'image', fetchpriority: 'high' })) {
     if (attrs.get(name) !== value) throw new Error(`Unexpected ${name} on top image preload in ${label}: ${attrs.get(name) ?? '(missing)'}`);
   }

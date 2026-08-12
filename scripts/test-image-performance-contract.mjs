@@ -21,7 +21,10 @@ for (const [name, html, expected] of [
   ['duplicateTopPreload', `${topImagePreload}${topImagePreload}`, true],
   ['missingFetchPriority', topImagePreload.replace(' fetchpriority="high"', ''), true],
   ['wrongAs', topImagePreload.replace('as="image"', 'as="script"'), true],
-  ['unexpectedTopPreload', topImagePreload, false]
+  ['unexpectedTopPreload', topImagePreload, false],
+  ['caseInsensitiveUnexpectedTopPreload', topImagePreload.replace('rel="preload"', 'rel="PRELOAD"'), false],
+  ['multiTokenUnexpectedTopPreload', topImagePreload.replace('rel="preload"', 'rel="stylesheet preload"'), false],
+  ['unexpectedTopPreloadRelTokens', topImagePreload.replace('rel="preload"', 'rel="stylesheet preload"'), true]
 ]) test(`rejects ${name}`, () => assert.throws(() => assertTopImagePreloadContract(html, expected, name)));
 
 test('accepts the intrinsic image height rule', () => assert.doesNotThrow(() => assertIntrinsicImageStyle('.image-intrinsic { width: 100%; height: auto; }')));
