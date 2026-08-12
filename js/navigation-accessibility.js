@@ -31,4 +31,19 @@
   });
   document.addEventListener('click', (event) => { if (!event.target.closest('.dropdown')) toggles.forEach((toggle) => close(toggle, false)); });
   document.addEventListener('keydown', (event) => { if (event.key === 'Escape') toggles.filter((toggle) => toggle.getAttribute('aria-expanded') === 'true').forEach((toggle) => close(toggle, true)); });
+  const syncSlickFocus = () => document.querySelectorAll('.slick-slide').forEach((slide) => {
+    const hidden = slide.getAttribute('aria-hidden') === 'true';
+    slide.querySelectorAll('a, button, input, select, textarea, [tabindex]').forEach((element) => {
+      if (hidden) {
+        if (!element.hasAttribute('data-pr4-tabindex')) element.setAttribute('data-pr4-tabindex', element.getAttribute('tabindex') || '0');
+        element.setAttribute('tabindex', '-1');
+      } else if (element.hasAttribute('data-pr4-tabindex')) {
+        const value = element.getAttribute('data-pr4-tabindex');
+        value === '0' ? element.removeAttribute('tabindex') : element.setAttribute('tabindex', value);
+        element.removeAttribute('data-pr4-tabindex');
+      }
+    });
+  });
+  new MutationObserver(syncSlickFocus).observe(document.body, { subtree: true, attributes: true, attributeFilter: ['aria-hidden', 'class'] });
+  syncSlickFocus();
 }());

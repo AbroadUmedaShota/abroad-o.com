@@ -101,8 +101,8 @@ headerContactLabel: "お問い合わせフォーム"
             color: #ff0000;  /*必須アイコンの色を #ff0000 に変更 */
         }
         .badge-danger {
-            color: white !important;
-            background-color: red !important;
+            color: #fff !important;
+            background-color: #b00020 !important;
         }
 
         .scroll-spy {
@@ -114,6 +114,7 @@ headerContactLabel: "お問い合わせフォーム"
             border: solid 1px #C0C0C0;
             margin-bottom: 15px;
         }
+        .scroll-spy:focus { outline: 3px solid #082E5D; outline-offset: 2px; }
         .scroll-spy p {
             padding: 10px 10px 10px 10px;
         }
@@ -164,7 +165,7 @@ headerContactLabel: "お問い合わせフォーム"
             border-color: #f00;
         }
         .error-message {
-            color: #f00;
+            color: #b00020;
             display: none; /* 初期状態では非表示 */
         }
         .error-message.error-visible {
@@ -347,7 +348,7 @@ headerContactLabel: "お問い合わせフォーム"
                         </div>
                     </div>
                      <!-- 個人情報取り扱いに関する記述 -->
-                     <div class="scroll-spy">
+                     <div class="scroll-spy" tabindex="0" aria-label="お問い合わせにおける個人情報の取扱いについて">
                         <p>「お問い合わせにおける個人情報の取扱いについて」</p>
                         <ul>
                             <li>（１）事業者の氏名または名称
@@ -358,7 +359,7 @@ headerContactLabel: "お問い合わせフォーム"
                             <li>（２）個人情報保護管理者（若しくはその代理人）の氏名又は職名、所属及び連絡先
                                 <ul>
                                     <li>個人情報保護管理者：林 剛之</li>
-                                    <li>電子メール：info@abroad-o.com</li>
+                                    <li>電子メール：<a href="mailto:info@abroad-o.com">info@abroad-o.com</a></li>
                                     <li>電話番号：03-5835-0250</li>
                                 </ul>
                             </li>
@@ -437,7 +438,7 @@ headerContactLabel: "お問い合わせフォーム"
                             <input type="checkbox" id="consent" name="consent" required aria-labelledby="consent-label" aria-describedby="form-feedback"><span>個人情報の取扱について同意する。</span>
                         </label>
                     </div>
-                    <div id="turnstile-container" class="turnstile-container" aria-label="bot対策の確認"></div>
+                    <div id="turnstile-container" class="turnstile-container" role="group" aria-label="bot対策の確認"></div>
                     <noscript><p class="msg">送信にはJavaScriptが必要です。利用できない場合は、下記メールアドレスまたは電話番号からお問い合わせください。</p></noscript>
                     <!-- 送信ボタン -->
                     <div class="form-group mt-4 text-center">
@@ -447,7 +448,7 @@ headerContactLabel: "お問い合わせフォーム"
                 <!-- フォームフィードバックエリア -->
                 <div id="form-feedback" class="mt-3" role="status" aria-live="polite" aria-atomic="true"></div>
                  <!-- エラー時の問い合わせ先 -->
-                 <p class="mt-4">※送信後エラー画面になる場合や2営業日経ってもご連絡がない場合は、お手数ではございますが、こちらのメールアドレス<a href="mailto:info@abroad-o.com?subject=お問い合わせフォームページより&body=【貴社名】%0D%0A【ご担当者様】%0D%0A【電話番号】%0D%0A【お問い合わせ内容】">info@abroad-o.com</a>でお問い合わせ下さい。</p>
+                 <p class="mt-4">※送信後エラー画面になる場合や2営業日経ってもご連絡がない場合は、お手数ではございますが、<a class="mailto-link" href="mailto:info@abroad-o.com?subject=お問い合わせフォームページより&body=【貴社名】%0D%0A【ご担当者様】%0D%0A【電話番号】%0D%0A【お問い合わせ内容】">お問い合わせ用メールアドレス（info@abroad-o.com）</a>をご利用ください。</p>
             </div>
         </section>
     </main>

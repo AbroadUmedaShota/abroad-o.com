@@ -1420,6 +1420,13 @@ section#service2 .col-md-4 h2 {
 .nav-submenu-toggle { border: 0; background: transparent; color: inherit; padding: .5rem; }
 .nav-submenu-toggle:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 .slick-slider { overflow: hidden; }
+.slick-slide[aria-hidden="true"] a, .slick-slide[aria-hidden="true"] button, .slick-slide[aria-hidden="true"] input, .slick-slide[aria-hidden="true"] select, .slick-slide[aria-hidden="true"] textarea { pointer-events: none; }
+/* PR4 contrast corrections: #ff0000 to #b00020 (7.33:1 on white); #ccc to #555 (7.46:1 on white). */
+.btn-danger, .btn-danger strong { color: #fff !important; background-color: #b00020 !important; }
+#pre_footer, #pre_footer p, #pre_footer a { color: #222; }
+#pre_footer a { text-decoration: underline; }
+footer a { color: #fff; text-decoration: underline; }
+#telework .container > h2, #telework .container > p { color: #222; }
 @media screen and (max-width: 767px) {
   #feature_section .row { margin-left: 0; margin-right: 0; }
   #carouselExampleIndicators { overflow: hidden; }
