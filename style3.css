@@ -914,6 +914,7 @@ section#pre_footer .col-md-5 img {
   line-height: 1.5;
   padding: 15px 0px 15px 0px;
 }
+#scan_carousel .col-md-7 p.heading-visual { margin: 0 0 .5rem; }
 #scan_carousel .col-md-7 h6, #scan_carousel .col-md-7 p.heading-visual + p.heading-visual {
   font-size: 23px;
   padding: 15px 0px 0px 0px;

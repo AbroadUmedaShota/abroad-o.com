@@ -88,15 +88,21 @@ try {
     }));
     const reference = baseline[pageName][width];
     if (geometry.jquery !== '3.7.1' || !geometry.bootstrap) throw new Error(`${pageName}.html failed to initialize the local legacy core.`);
-    if (geometry.overflow > reference.overflow + 1) throw new Error(`${pageName}.html overflow worsened at ${width}px: ${geometry.overflow}px.`);
+    if (writeScreenshots && ['about', 'aggregate', 'input'].includes(pageName)) await page.screenshot({ path: path.join(screenshots, `${pageName}-${width}.png`), fullPage: true });
+    if (geometry.overflow > reference.overflow + 1) {
+      const offenders = await page.evaluate(() => [...document.querySelectorAll('body *')].map((node) => {
+        const rect = node.getBoundingClientRect();
+        return { selector: `${node.tagName.toLowerCase()}${node.id ? `#${node.id}` : ''}${[...node.classList].slice(0, 2).map((name) => `.${name}`).join('')}`, left: rect.left, right: rect.right, width: rect.width };
+      }).filter((item) => item.left < -1 || item.right > document.documentElement.clientWidth + 1).sort((a, b) => b.right - a.right).slice(0, 8));
+      throw new Error(`${pageName}.html overflow worsened at ${width}px: ${geometry.overflow}px. Offenders: ${JSON.stringify(offenders)}`);
+    }
     const largestContainer = Math.max(...geometry.containers);
     const baselineLargestContainer = Math.max(...reference.containerWidths);
-    if (!geometry.body || Math.abs(geometry.header - reference.headerHeight) / reference.headerHeight > 0.03 || Math.abs(geometry.body - reference.bodyHeight) / reference.bodyHeight > 0.03 || Math.abs(largestContainer - baselineLargestContainer) / baselineLargestContainer > 0.03) throw new Error(`${pageName}.html geometry changed beyond the 3% baseline tolerance at ${width}px.`);
+    if (!geometry.body || Math.abs(geometry.header - reference.headerHeight) / reference.headerHeight > 0.03 || Math.abs(geometry.body - reference.bodyHeight) / reference.bodyHeight > 0.03 || Math.abs(largestContainer - baselineLargestContainer) / baselineLargestContainer > 0.03) throw new Error(`${pageName}.html geometry changed beyond the 3% baseline tolerance at ${width}px (header ${reference.headerHeight}->${geometry.header}, body ${reference.bodyHeight}->${geometry.body}, container ${baselineLargestContainer}->${largestContainer}).`);
     if (!geometry.icons.glyph.font.includes('Glyphicons') || geometry.icons.glyph.content === 'none' || !geometry.icons.fontAwesome.font.includes('Font Awesome') || !geometry.icons.fontAwesome.code) throw new Error(`${pageName}.html did not render local Glyphicons and Font Awesome: ${JSON.stringify(geometry.icons)}.`);
     if (localAssetFailures.length) throw new Error(`${pageName}.html failed to load local assets:\n${localAssetFailures.join('\n')}`);
     candidateMetrics[pageName] ||= {};
     candidateMetrics[pageName][width] = { ...geometry, largestContainer };
-    if (writeScreenshots && ['about', 'aggregate', 'input'].includes(pageName)) await page.screenshot({ path: path.join(screenshots, `${pageName}-${width}.png`), fullPage: true });
     if (width === 375) {
       const toggle = page.locator('.navbar-toggle');
       await toggle.click();
@@ -106,7 +112,7 @@ try {
     }
     if (pageName === 'about' || pageName === 'film') {
       const tabs = page.locator('[data-toggle="tab"]');
-      if (await tabs.count()) {
+      if (await tabs.count() > 1) {
         const pane = await tabs.nth(1).getAttribute('href');
         if (disabledBehavior === 'tab') await tabs.nth(1).evaluate((node) => node.removeAttribute('data-toggle'));
         await tabs.nth(1).click();

@@ -47,15 +47,30 @@ const collect = async (base, browser, candidate) => {
   return Object.fromEntries(measurements);
 };
 const screenshots = async (base, browser, label) => {
-  await Promise.all(['about.html', 'film.html', 'sample.html', 'service-pack.html', 'scan.html'].flatMap((pageName) => [375, 1440].map(async (width) => {
+  for (const pageName of ['about.html', 'film.html', 'sample.html', 'service-pack.html', 'scan.html']) for (const width of [375, 1440]) {
     const page = await browser.newPage({ viewport: { width, height: 900 } });
-    await page.route('**/*', (route) => ['127.0.0.1', 'localhost'].includes(new URL(route.request().url()).hostname) ? route.continue() : route.fulfill({ status: 204, body: '' }));
-    page.setDefaultTimeout(timeout);
-    await page.goto(`${base}/${pageName}`, { waitUntil: 'domcontentloaded', timeout });
-    const destination = path.join(evidenceRoot, label); fs.mkdirSync(destination, { recursive: true });
-    await page.screenshot({ path: path.join(destination, `${pageName.replace('.html', '')}-${width}.png`), animations: 'disabled', timeout });
-    await page.close();
-  })));
+    try {
+      await page.route('**/*', (route) => ['127.0.0.1', 'localhost'].includes(new URL(route.request().url()).hostname) ? route.continue() : route.fulfill({ status: 204, body: '' }));
+      page.setDefaultTimeout(timeout);
+      await page.goto(`${base}/${pageName}`, { waitUntil: 'networkidle', timeout });
+      await page.evaluate(() => document.fonts?.ready);
+      if (pageName === 'scan.html') {
+        await page.waitForFunction(() => Boolean(window.bootstrap?.Carousel));
+        await page.evaluate(() => {
+          const node = document.querySelector('#carouselExampleIndicators');
+          const carousel = window.bootstrap.Carousel.getOrCreateInstance(node);
+          carousel.pause();
+          carousel.to(0);
+        });
+        await page.waitForFunction(() => {
+          const carousel = document.querySelector('#carouselExampleIndicators');
+          return carousel?.querySelector('.carousel-item.active') === carousel?.querySelector('.carousel-item:first-of-type') && !carousel?.querySelector('.carousel-item-start, .carousel-item-end');
+        });
+      }
+      const destination = path.join(evidenceRoot, label); fs.mkdirSync(destination, { recursive: true });
+      await page.screenshot({ path: path.join(destination, `${pageName.replace('.html', '')}-${width}.png`), animations: 'disabled', timeout });
+    } finally { await page.close(); }
+  }
 };
 const collectAboutGeometry = async (base, browser) => {
   const result = {};
