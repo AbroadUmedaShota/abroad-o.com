@@ -122,8 +122,8 @@ export function assertTopImageCssContract(css, label = 'CSS') {
 
 export function assertTopImageGradientCssContract(css, label = 'CSS') {
   const activeCss = css.replaceAll(/\/\*[\s\S]*?\*\//g, '');
-  const pngGradients = [...activeCss.matchAll(/background(?:-image)?\s*:\s*linear-gradient\([^;]+?\),\s*url\(image\/top1\.png\)\s*;/g)];
-  const webpGradients = [...activeCss.matchAll(/background(?:-image)?\s*:\s*linear-gradient\([^;]+?\),\s*image-set\(\s*url\((?:"|')?image\/top1\.webp(?:"|')?\)\s+type\((?:"|')image\/webp(?:"|')?\)\s+1x\s*,\s*url\((?:"|')?image\/top1\.png(?:"|')?\)\s+type\((?:"|')image\/png(?:"|')?\)\s+1x\s*\)\s*;/g)];
+  const pngGradients = [...activeCss.matchAll(/background(?:-image)?\s*:\s*linear-gradient\([^;]+?\),\s*url\(\/?image\/top1\.png\)\s*;/g)];
+  const webpGradients = [...activeCss.matchAll(/background(?:-image)?\s*:\s*linear-gradient\([^;]+?\),\s*image-set\(\s*url\((?:"|')?\/?image\/top1\.webp(?:"|')?\)\s+type\((?:"|')image\/webp(?:"|')?\)\s+1x\s*,\s*url\((?:"|')?\/?image\/top1\.png(?:"|')?\)\s+type\((?:"|')image\/png(?:"|')?\)\s+1x\s*\)\s*;/g)];
   if (pngGradients.length !== 2 || webpGradients.length !== 2) {
     throw new Error(`Expected two PNG/WebP gradient top image fallbacks in ${label}, found ${pngGradients.length}/${webpGradients.length}`);
   }
