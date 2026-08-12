@@ -53,6 +53,17 @@ function imageNodes(html) {
   return images;
 }
 
+function preloadNodes(html) {
+  const document = parse(html);
+  const links = [];
+  const visit = (node) => {
+    if (node.nodeName === 'link') links.push(new Map((node.attrs || []).map(({ name, value }) => [name.toLowerCase(), value])));
+    for (const child of node.childNodes || []) visit(child);
+  };
+  visit(document);
+  return links;
+}
+
 function assertAttribute(actual, expected, name, src, label) {
   if (expected === null) {
     if (actual.has(name)) throw new Error(`Unexpected ${name} on ${src} in ${label}: ${actual.get(name)}`);
@@ -73,6 +84,26 @@ export function assertImagePerformanceContract(html, expectations, label = 'HTML
     for (const name of ['alt', 'class', 'width', 'height', 'decoding', 'loading', 'fetchpriority']) {
       assertAttribute(attrs, expectation[name] ?? null, name, expectation.src, label);
     }
+  }
+}
+
+export function assertTopImagePreloadContract(html, expected, label = 'HTML') {
+  const matches = preloadNodes(html).filter((attrs) => {
+    const relTokens = (attrs.get('rel') || '').toLowerCase().split(/\s+/).filter(Boolean);
+    return relTokens.includes('preload') && attrs.get('href') === '/image/top1.png';
+  });
+  if (!expected) {
+    if (matches.length) throw new Error(`Unexpected top image preload in ${label}`);
+    return;
+  }
+  if (matches.length !== 1) throw new Error(`Expected exactly one top image preload in ${label}, found ${matches.length}`);
+  const attrs = matches[0];
+  const relTokens = (attrs.get('rel') || '').toLowerCase().split(/\s+/).filter(Boolean);
+  if (relTokens.length !== 1 || relTokens[0] !== 'preload') {
+    throw new Error(`Unexpected rel on top image preload in ${label}: ${attrs.get('rel') ?? '(missing)'}`);
+  }
+  for (const [name, value] of Object.entries({ as: 'image', fetchpriority: 'high' })) {
+    if (attrs.get(name) !== value) throw new Error(`Unexpected ${name} on top image preload in ${label}: ${attrs.get(name) ?? '(missing)'}`);
   }
 }
 

@@ -1,9 +1,17 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { assertImageFileDimensions, assertImagePerformanceContract, assertIntrinsicImageStyle } from './lib/image-performance-contract.mjs';
+import { assertImageFileDimensions, assertImagePerformanceContract, assertIntrinsicImageStyle, assertTopImagePreloadContract } from './lib/image-performance-contract.mjs';
 
 const repoRoot = path.resolve(import.meta.dirname, '..');
 const outputRoot = path.join(repoRoot, '_site');
+const topImagePreloadPages = new Set(['index.html', 'speed-ad.html']);
+
+function walk(directory) {
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const fullPath = path.join(directory, entry.name);
+    return entry.isDirectory() ? walk(fullPath) : [fullPath];
+  });
+}
 const image = (src, alt, width, height, options = {}) => ({
   src, alt, class: options.class ?? 'image-intrinsic', width: String(width), height: String(height), decoding: 'async',
   loading: options.loading ?? null, fetchpriority: options.fetchpriority ?? null
@@ -59,8 +67,16 @@ for (const [file, expectations] of cases) {
     assertImageFileDimensions(fs.readFileSync(imagePath), expectation.width, expectation.height, expectation.src);
   }
 }
+const generatedHtmlFiles = walk(outputRoot)
+  .filter((file) => file.endsWith('.html'))
+  .map((file) => path.relative(outputRoot, file).replaceAll('\\', '/'))
+  .filter((file) => file !== 'slick/largeformat.html');
+if (generatedHtmlFiles.length !== 47) throw new Error(`Expected 47 generated HTML files, found ${generatedHtmlFiles.length}`);
+for (const file of generatedHtmlFiles) {
+  assertTopImagePreloadContract(fs.readFileSync(path.join(outputRoot, file), 'utf8'), topImagePreloadPages.has(file), file);
+}
 for (const file of ['style3.css', 'style.css']) {
   assertIntrinsicImageStyle(fs.readFileSync(path.join(outputRoot, file), 'utf8'), file);
 }
 
-console.log(`Image performance contract passed: ${cases.length} generated pages.`);
+console.log(`Image performance contract passed: ${cases.length} image pages and ${generatedHtmlFiles.length} generated preload pages.`);

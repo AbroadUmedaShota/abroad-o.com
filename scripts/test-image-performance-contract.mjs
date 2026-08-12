@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { assertImageFileDimensions, assertImagePerformanceContract, assertIntrinsicImageStyle, imageDimensions } from './lib/image-performance-contract.mjs';
+import { assertImageFileDimensions, assertImagePerformanceContract, assertIntrinsicImageStyle, assertTopImagePreloadContract, imageDimensions } from './lib/image-performance-contract.mjs';
 
 const critical = { src: 'image/critical.png', alt: '重要画像', class: 'critical', width: '1536', height: '1024', decoding: 'async', loading: null, fetchpriority: 'high' };
 const deferred = { src: 'image/deferred.png', alt: '遅延画像', class: null, width: '512', height: '512', decoding: 'async', loading: 'lazy', fetchpriority: null };
@@ -13,6 +13,19 @@ for (const [name, html] of Object.entries({
   missingLazy: valid.replace(' loading="lazy"', ''),
   wrongDimensions: valid.replace('width="512"', 'width="640"')
 })) test(`rejects ${name}`, () => assert.throws(() => assertImagePerformanceContract(html, [critical, deferred], name)));
+
+const topImagePreload = '<link rel="preload" as="image" href="/image/top1.png" fetchpriority="high">';
+test('accepts the top image preload on an opted-in page', () => assert.doesNotThrow(() => assertTopImagePreloadContract(topImagePreload, true, 'preload')));
+test('accepts no top image preload on an opted-out page', () => assert.doesNotThrow(() => assertTopImagePreloadContract('', false, 'no preload')));
+for (const [name, html, expected] of [
+  ['duplicateTopPreload', `${topImagePreload}${topImagePreload}`, true],
+  ['missingFetchPriority', topImagePreload.replace(' fetchpriority="high"', ''), true],
+  ['wrongAs', topImagePreload.replace('as="image"', 'as="script"'), true],
+  ['unexpectedTopPreload', topImagePreload, false],
+  ['caseInsensitiveUnexpectedTopPreload', topImagePreload.replace('rel="preload"', 'rel="PRELOAD"'), false],
+  ['multiTokenUnexpectedTopPreload', topImagePreload.replace('rel="preload"', 'rel="stylesheet preload"'), false],
+  ['unexpectedTopPreloadRelTokens', topImagePreload.replace('rel="preload"', 'rel="stylesheet preload"'), true]
+]) test(`rejects ${name}`, () => assert.throws(() => assertTopImagePreloadContract(html, expected, name)));
 
 test('accepts the intrinsic image height rule', () => assert.doesNotThrow(() => assertIntrinsicImageStyle('.image-intrinsic { width: 100%; height: auto; }')));
 test('rejects a missing intrinsic image height rule', () => assert.throws(() => assertIntrinsicImageStyle('.image-intrinsic { height: 100%; }')));
