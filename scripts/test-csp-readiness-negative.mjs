@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { assertAnalyticsOrder, assertNewsRuntimeOrder, assertNoAnalyticsScripts, assertNoInlineExecutableScripts, assertNoInlineStyles, assertPageStyleLink, assertPageStyleSheet, scriptInventory } from './lib/csp-readiness-contract.mjs';
+import { assertAnalyticsOrder, assertNewsRuntimeOrder, assertNoAnalyticsScripts, assertNoInlineEventAttributes, assertNoInlineExecutableScripts, assertNoInlineStyles, assertPageStyleLink, assertPageStyleSheet } from './lib/csp-readiness-contract.mjs';
 
 const analytics = '<script async src="https://www.googletagmanager.com/gtag/js?id=UA-51168812-1"></script><script src="/js/analytics.js"></script>';
 const news = '<script src="/vendor/jquery/jquery.min.js"></script><script src="/vendor/bootstrap3/js/bootstrap.min.js"></script><script src="/js/jquery.smooth-scroll.min.js"></script><script src="/js/news-runtime.js"></script>';
@@ -34,9 +34,7 @@ test('rejects NEWS runtime omissions, duplication, and order changes', () => {
     .replace('<script src="/js/news-runtime.js"></script>', '<script src="/js/news-runtime.js"></script><script src="/vendor/jquery/jquery.min.js"></script>');
   assert.throws(() => assertNewsRuntimeOrder(reordered, 'reordered'));
 });
-test('documents passthrough inline scripts without treating them as generated-page exceptions', () => {
-  assert.equal(scriptInventory('<script>one()</script><script>two()</script><script>three()</script>').filter((script) => script.inline).length, 3);
-});
+test('rejects inline event attributes', () => assert.throws(() => assertNoInlineEventAttributes('<button onclick="window.x=1">go</button>', 'event-attribute')));
 test('rejects inline styles and changed page stylesheet mapping', () => {
   const valid = '<link rel="stylesheet" href="/css/pages/form.css">';
   assert.doesNotThrow(() => assertNoInlineStyles(valid, 'form.html'));
