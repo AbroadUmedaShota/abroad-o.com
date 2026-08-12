@@ -17,6 +17,12 @@ export default function (eleventyConfig) {
     eleventyConfig.addPassthroughCopy(path);
   }
   eleventyConfig.addPassthroughCopy({
+    'node_modules/@fontsource/crimson-text/files/crimson-text-latin-400-normal.woff2': 'fonts/google/crimson-text-latin-400-normal.woff2',
+    'node_modules/@fontsource/crimson-text/LICENSE': 'fonts/google/crimson-text-OFL.txt',
+    'node_modules/@fontsource/roboto/files/roboto-latin-400-normal.woff2': 'fonts/google/roboto-latin-400-normal.woff2',
+    'node_modules/@fontsource/roboto/files/roboto-latin-500-normal.woff2': 'fonts/google/roboto-latin-500-normal.woff2',
+    'node_modules/@fontsource/roboto/files/roboto-latin-700-normal.woff2': 'fonts/google/roboto-latin-700-normal.woff2',
+    'node_modules/@fontsource/roboto/LICENSE': 'fonts/google/roboto-OFL.txt',
     'node_modules/bootstrap/dist/css/bootstrap.min.css': 'vendor/bootstrap/bootstrap.min.css',
     'node_modules/bootstrap/dist/js/bootstrap.bundle.min.js': 'vendor/bootstrap/bootstrap.bundle.min.js',
     'node_modules/bootstrap/LICENSE': 'vendor/bootstrap/LICENSE',

@@ -3,6 +3,7 @@
 <meta name="description" content="{{ description | escape }}">
 <title>{{ title | escape }}</title>
 <link rel="canonical" href="{{ canonicalUrl | escape }}">
+<link rel="stylesheet" href="/css/fonts.css">
 {% if preloadTopImage %}<link rel="preload" as="image" href="/image/top1.webp" type="image/webp" fetchpriority="high">{% endif %}
 {% if noindex %}<meta name="robots" content="noindex">{% endif %}
 <meta property="og:title" content="{{ (ogTitle or title) | escape }}">
