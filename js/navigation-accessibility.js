@@ -1,5 +1,29 @@
 (function () {
   'use strict';
+  document.documentElement.dataset.navAccessibilityReady = 'true';
+  const navigationToggles = [...document.querySelectorAll('.navbar-toggler, .navbar-toggle')];
+  navigationToggles.forEach((toggle) => {
+    const legacy = toggle.classList.contains('navbar-toggle');
+    const collapse = document.getElementById(toggle.getAttribute('aria-controls')) || document.querySelector('.navbar-main-collapse');
+    if (!collapse) return;
+    const sync = (open) => toggle.setAttribute('aria-expanded', String(open));
+    if (legacy) window.jQuery?.(collapse).on('shown.bs.collapse', () => sync(true)).on('hidden.bs.collapse', () => sync(false));
+    else {
+      collapse.addEventListener('shown.bs.collapse', () => sync(true));
+      collapse.addEventListener('hidden.bs.collapse', () => sync(false));
+    }
+    const hide = () => {
+      if (legacy) window.jQuery?.(collapse).collapse('hide');
+      else window.bootstrap?.Collapse.getOrCreateInstance(collapse).hide();
+    };
+    toggle.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') { event.preventDefault(); hide(); toggle.focus(); }
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && (legacy ? collapse.classList.contains('in') : collapse.classList.contains('show'))) { hide(); toggle.focus(); }
+    });
+    collapse.addEventListener('click', (event) => { if (event.target.closest('a') && window.innerWidth < 768) { hide(); toggle.focus(); } });
+  });
   const toggles = [...document.querySelectorAll('.nav-submenu-toggle, .legacy-submenu-toggle')];
   const close = (toggle, returnFocus) => {
     const menu = document.getElementById(toggle.getAttribute('aria-controls'));

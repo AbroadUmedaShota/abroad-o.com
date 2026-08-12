@@ -1166,7 +1166,7 @@ section#pre_footer .col-md-5 img {
   margin-top: 10px;
   color: #A9A9A9;
 }
-.col-box2 h5 {
+.col-box2 h5, .col-box2 p.heading-visual {
   font-size: 15px;
   font-weight: 700;
   margin-bottom: 5px;
@@ -1180,7 +1180,7 @@ section#pre_footer .col-md-5 img {
   padding-top: 10px;
 }
 @media screen and (max-width: 575px) {
-  .col-box2 h5{
+  .col-box2 h5, .col-box2 p.heading-visual {
     margin-top: 3px;
   }
   .fa-2x {
@@ -1242,7 +1242,7 @@ section#pre_footer .col-md-5 img {
   border:solid 1px #000;
   margin-bottom: 50px;
 }
-#feature_section .col-md-3 h4 {
+#feature_section .col-md-3 h4, #feature_section .col-md-3 p.heading-visual {
   font-size: 16px;
   font-weight: 700;
   text-align: center;

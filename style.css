@@ -1747,12 +1747,12 @@ section#micro_top h3 {
 telework.html 
 ========================================================*/
 
-section#tele_top h3 {
+section#tele_top h3, section#tele_top h2 {
   font-size: 35px;
   margin: 50px 0px 30px 0px;
 }
 @media screen and (max-width: 780px) {
-section#tele_top h3{
+section#tele_top h3, section#tele_top h2{
   font-size: 25px;
 }  
 }
@@ -1888,12 +1888,12 @@ section#tele_mid3 .box {
   color: #fff;
   padding: 10px 5px;
 }
-section#tele_mid3 .box h5{
+section#tele_mid3 .box h5, section#tele_mid3 .box p.heading-visual{
   font-weight: 700;
   font-size: 20px;
 }
 @media screen and (max-width: 780px) {
-  section#tele_mid3 .box h5{
+  section#tele_mid3 .box h5, section#tele_mid3 .box p.heading-visual{
     font-size: 18px;
 } 
 }
@@ -1961,7 +1961,7 @@ section#tele_mid5 h3{
   margin-top: -130px;
   margin-bottom: 100px;
 }
-section#tele_mid5 h5 {
+section#tele_mid5 h5, section#tele_mid5 p.heading-visual {
   font-size: 18px;
   font-weight: 700;
 }
@@ -2315,7 +2315,7 @@ largeformat.html
 .largepaper h4 {
   font-size: 23px!important;
 }
-.largepaper1 h5 {
+.largepaper1 h5, .largepaper1 p.heading-visual {
   margin: 30px 0px 30px;
 }
 .largepaper2 {
