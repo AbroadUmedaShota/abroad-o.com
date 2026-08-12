@@ -28,10 +28,10 @@ jobs:
           sudo apt-get install -y apache2 openssl
           npm run build:site
           openssl req -x509 -nodes -newkey rsa:2048 -keyout /tmp/abroad.key -out /tmp/abroad.crt -subj "/CN=localhost" -days 1
-          apache2 -t -f "$GITHUB_WORKSPACE/scripts/apache-test/httpd.conf" -D DOCROOT="$GITHUB_WORKSPACE/_site" -D CERT=/tmp/abroad.crt -D KEY=/tmp/abroad.key
-          sudo apache2 -f "$GITHUB_WORKSPACE/scripts/apache-test/httpd.conf" -D DOCROOT="$GITHUB_WORKSPACE/_site" -D CERT=/tmp/abroad.crt -D KEY=/tmp/abroad.key -k start
+          export DOCROOT="$GITHUB_WORKSPACE/_site" CERT=/tmp/abroad.crt KEY=/tmp/abroad.key
+          apache2 -t -f "$GITHUB_WORKSPACE/scripts/apache-test/httpd.conf"
+          sudo --preserve-env=DOCROOT,CERT,KEY apache2 -f "$GITHUB_WORKSPACE/scripts/apache-test/httpd.conf" -k start
           NODE_TLS_REJECT_UNAUTHORIZED=0 npm run check:redirects
-        if: always()
       - name: Stop Apache test server
         if: always()
-        run: sudo apache2 -f "$GITHUB_WORKSPACE/scripts/apache-test/httpd.conf" -k stop || true
+        run: DOCROOT="$GITHUB_WORKSPACE/_site" CERT=/tmp/abroad.crt KEY=/tmp/abroad.key sudo --preserve-env=DOCROOT,CERT,KEY apache2 -f "$GITHUB_WORKSPACE/scripts/apache-test/httpd.conf" -k stop || true
