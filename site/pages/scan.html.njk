@@ -19,14 +19,7 @@ activeNav: "service"
     <!-- SNS用説明文 -->
  
     <!-- 【グーグルアナリティクス用】Global site tag (gtag.js) -->
-      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-51168812-1"></script>
-      <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'UA-51168812-1');
-      </script> 
+{% include "partials/analytics.njk" %}
     <!-- Bootstrap css -->
       <link rel="stylesheet" href="/vendor/bootstrap/bootstrap.min.css">
     <!-- 自作CSS　-->

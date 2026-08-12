@@ -14,14 +14,7 @@ activeNav: "service"
     <!-- Bootstrap -->
     <meta name="google-site-verification" content="Nqa719cJbf2AfjLk6kCgmpJHM73egoAodcPCb-cdyyc" />
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-51168812-1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-51168812-1');
-    </script>
+{% include "partials/analytics.njk" %}
     {% include "partials/styles-legacy-core.njk" %}
     <link href="style.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -50,7 +43,6 @@ activeNav: "service"
       }
     </style>
 {% endblock %}
-
 {% block main %}
 <main>
     <section id="sample">
@@ -164,10 +156,5 @@ activeNav: "service"
 {% include "partials/scripts-legacy-core.njk" %}
     <!-- Custom Theme JavaScript -->
     <script src="js/custom.js"></script>
-    <script>
-         // Initialize smooth scroll after all libraries are loaded
-         $(function() {
-            $('a').smoothScroll();
-         });
-    </script>
+    <script src="js/legacy-smooth-scroll-all-ready.js"></script>
 {% endblock %}

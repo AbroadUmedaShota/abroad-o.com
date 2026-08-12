@@ -14,14 +14,7 @@ activeNav: "service"
     <!-- Bootstrap -->
     <meta name="google-site-verification" content="Nqa719cJbf2AfjLk6kCgmpJHM73egoAodcPCb-cdyyc" />
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-51168812-1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-51168812-1');
-    </script>
+{% include "partials/analytics.njk" %}
     {% include "partials/styles-legacy-core.njk" %}
     <link href="style.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -50,7 +43,6 @@ activeNav: "service"
       }
     </style>
 {% endblock %}
-
 {% block main %}
 <main>
   <section id="title_top">
@@ -336,40 +328,9 @@ activeNav: "service"
 {% include "partials/scripts-legacy-core.njk" %}
     <!-- ふわっと表示jQuery -->
     <script src="js/box-fadeup.js"></script>
-    <script>
-         $('a').smoothScroll();
-    </script>
+    <script src="js/legacy-smooth-scroll-all.js"></script>
     <!-- スクロールボタン表示jQuery -->
-    <script>
-    $(function() {
-        var showFlag = false;
-        var topBtn = $('#page-top');
-        topBtn.css('bottom', '-150px');
-        var showFlag = false;
-        $(window).scroll(function () {
-            if ($(this).scrollTop() > 300) {//スクロールが300に達したらボタン表示
-                if (showFlag == false) {
-                    showFlag = true;
-                    topBtn.stop().animate({'bottom' : '20px'}, 300); //スクロールボタンのmargin-bottm
-                }
-            } else {
-                if (showFlag) {
-                    showFlag = false;
-                    topBtn.stop().animate({'bottom' : '-200px'}, 300); //上に-200pxスクロールしたら消える
-                }
-            }
-    });
-    //スクロールしてトップ
-    topBtn.click(function () {
-        $('body,html').animate({
-            scrollTop: 0
-        }, 500);
-        return false;
-    });
-    });
-    </script>
+    <script src="js/legacy-page-top.js"></script>
     <!-- Footer Year Update -->
-    <script>
-      document.getElementById('current-year').textContent = new Date().getFullYear();
-    </script>
+    <script src="js/current-year.js"></script>
 {% endblock %}

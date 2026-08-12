@@ -7,6 +7,8 @@
     "generate:image-derivatives": "node scripts/generate-image-derivatives.mjs",
     "serve:site": "eleventy --serve",
     "check:site": "npm run check:contracts && npm run build:site && node scripts/check-site.mjs",
+    "check:csp-readiness": "node --test scripts/test-csp-readiness-negative.mjs && npm run build:site && node scripts/check-csp-readiness.mjs",
+    "check:csp-runtime": "npm run build:site && node scripts/check-csp-runtime.mjs",
     "check:contracts": "node --test scripts/test-html-contract.mjs",
     "check:image-performance": "node --test scripts/test-image-performance-contract.mjs && npm run build:site && node scripts/check-image-performance.mjs",
     "inventory:public-assets": "npm run build:site && node --test scripts/test-public-asset-inventory.mjs && node scripts/inventory-public-assets.mjs",

@@ -13,13 +13,7 @@ preloadTopImage: true
 {% block headExtras %}
     <meta name="keywords" content="SPEED AD,展示会出展,WEBアンケート作成,無料,名刺データ化,御礼メール,データ入力,アンケート集計">
     <meta name="google-site-verification" content="Nqa719cJbf2AfjLk6kCgmpJHM73egoAodcPCb-cdyyc" />
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-51168812-1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-51168812-1');
-    </script>
+{% include "partials/analytics.njk" %}
     {% include "partials/styles-legacy-core.njk" %}
     <link href="style.css" rel="stylesheet">
     <link rel="shortcut icon" href="image/favicon.png" >
@@ -1306,7 +1300,6 @@ preloadTopImage: true
       }
     </style>
 {% endblock %}
-
 {% block main %}
 <main>
     <section class="speed-ad-hero">
@@ -1548,9 +1541,5 @@ preloadTopImage: true
 {% block scripts %}
 {% include "partials/scripts-legacy-core.njk" %}
     <script src="js/custom.js"></script>
-    <script>
-      $(function() {
-        $('a').smoothScroll();
-      });
-    </script>
+    <script src="js/legacy-smooth-scroll-all-ready.js"></script>
 {% endblock %}
