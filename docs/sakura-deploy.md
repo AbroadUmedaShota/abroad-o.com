@@ -73,7 +73,7 @@ FileZillaの保存情報から `SAKURA_HOST`, `SAKURA_USER`, `SAKURA_REMOTE_DIR`
 .\scripts\deploy-sakura.ps1 -Mode Deploy -UseFileZillaConfig
 ```
 
-FileZillaがFTP/21番で保存されていても、このデプロイスクリプトはバックアップと復元を安全に行うためSSH/SCPを使う。FTPパスワードは表示・利用しない。
+FileZillaがFTP/21番で保存されていても、このデプロイスクリプトは公開前バックアップと公開反映にSSH/SCPを使う。復元はsanitized backup と restoration contract の独立検証が完了するまで停止中である。FTPパスワードは表示・利用しない。
 
 ## GitHub Actions
 

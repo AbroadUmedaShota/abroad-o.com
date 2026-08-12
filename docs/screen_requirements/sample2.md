@@ -34,7 +34,6 @@ This page serves as a demonstration of Abroad Outsourcing Co., Inc.'s scanning c
 *   **Scroll-to-Top Button:** A button appears upon scrolling down, allowing users to quickly return to the top of the page.
 *   **Embedded PDFs:** Uses browser-native PDF display for the samples and provides a direct link when embedded display is unavailable.
 *   **Inquiry Form Link:** A direct link to `form.html` for inquiries.
-*   **Modal Window:** Includes a modal (`myModal`) for embedding Google Forms, consistent with other service pages.
 
 ## Dependencies
 *   **CSS:**

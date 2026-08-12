@@ -91,7 +91,7 @@ CONTACT_AUTOREPLY_ENABLED=true
 
 - 通常時は自動返信を継続する。明確な不正送信、バウンス急増、メール経路障害がある場合だけ、WorkerまたはApps Scriptの`AUTOREPLY_ENABLED`をfalseにして緊急停止する。
 - フォーム受付自体が不安定な場合は`NOTIFY_ENABLED`も停止し、画面上の代替メール・電話導線を利用する。
-- Sakura側HTMLはデプロイ前バックアップから復元できるが、旧Google Form直POST版は悪用経路を再開するため原則として復元しない。復旧までは代替連絡導線を使用する。
+- Sakura側HTMLの復元は、sanitized backup と restoration contract の独立検証が完了するまで実行しない。旧Google Form直POST版は悪用経路を再開するため、いずれにしても復元しない。復旧までは代替連絡導線を使用する。
 - 新旧のSpreadsheet回答や受信メールは自動削除しない。旧Google Form停止後も過去データは保持し、参照可能な状態を維持する。
 
 ## 監視
