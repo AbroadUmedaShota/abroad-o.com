@@ -11,9 +11,11 @@ FileZillaの手作業に依存せず、Git管理された公開ファイルだ�
 含めるもの:
 
 - `_site/`に生成されたルートHTMLとNEWS記事
-- `_site/`へコピーされた`.htaccess`、CSS、画像、JavaScript、`slick/`、および `pdfjs/` 配下の3 PDF（`1c_abroad.pdf`、`2c_abroad.pdf`、`4c_abroad.pdf`）
+- `_site/`へ生成・コピーされた`.htaccess`、`robots.txt`、`sitemap.xml`、CSS、画像、JavaScript、`slick/`、および `pdfjs/` 配下の3 PDF（`1c_abroad.pdf`、`2c_abroad.pdf`、`4c_abroad.pdf`）
 
 `TOOL/` と PDF.js viewer（`pdfjs/build/`、`pdfjs/web/`、`pdfjs/LICENSE`）は公開しない。PDF閲覧はブラウザ組込み機能で行う。
+
+`sitemap.xml` はEleventyがindexableページのcanonical URLだけから固定順序で生成する。`robots.txt` はクロールを許可し、同サイトマップを案内する。`.htaccess` はHTTP／非wwwと`/index`・`/index.html`を、クエリを保ったまま `https://www.abroad-o.com/` のcanonical URLへ1回だけ301リダイレクトする。
 
 含めないもの:
 

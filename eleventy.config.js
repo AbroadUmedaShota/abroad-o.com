@@ -16,8 +16,6 @@ export default function (eleventyConfig) {
   ]) {
     eleventyConfig.addPassthroughCopy(path);
   }
-  eleventyConfig.addPassthroughCopy({ 'sitemap.xml': 'sitemap.xml' });
-
   eleventyConfig.addCollection('newsArticles', (collectionApi) =>
     collectionApi
       .getFilteredByTag('newsArticle')

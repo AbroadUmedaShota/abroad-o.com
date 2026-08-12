@@ -3,3 +3,15 @@
 <meta name="description" content="{{ description }}">
 <title>{{ title }}</title>
 <link rel="canonical" href="{{ canonicalUrl }}">
+{% if noindex %}<meta name="robots" content="noindex">{% endif %}
+<meta property="og:title" content="{{ ogTitle or title }}">
+<meta property="og:description" content="{{ ogDescription or description }}">
+<meta property="og:type" content="{{ ogType or ('article' if tags and 'newsArticle' in tags else 'website') }}">
+<meta property="og:url" content="{{ canonicalUrl }}">
+<meta property="og:image" content="{{ ogImage or 'https://www.abroad-o.com/image/og-image.jpg' }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ ogTitle or title }}">
+<meta name="twitter:description" content="{{ ogDescription or description }}">
+<meta name="twitter:image" content="{{ ogImage or 'https://www.abroad-o.com/image/og-image.jpg' }}">
