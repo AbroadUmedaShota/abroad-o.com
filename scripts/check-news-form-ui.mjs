@@ -25,8 +25,6 @@ for (const pageName of pages) {
 
 const server = http.createServer((request, response) => {
   const url = new URL(request.url, 'http://localhost');
-  if (url.pathname === '/__form/config') return response.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify({ siteKey: 'test-site-key' }));
-  if (url.pathname === '/__form/submit') return response.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify({ ok: true }));
   const file = path.resolve(output, url.pathname === '/' ? 'index.html' : url.pathname.slice(1));
   if (!file.startsWith(`${output}${path.sep}`) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) return response.writeHead(404).end();
   const types = { '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript', '.png': 'image/png', '.woff2': 'font/woff2', '.woff': 'font/woff' };
@@ -41,7 +39,7 @@ try {
     const errors = [], localFailures = [];
     await page.route('**/*', async (route) => {
       const url = new URL(route.request().url());
-      if (url.hostname === 'abroad-o-contact-form.abroad-o.workers.dev') return route.fulfill({ status: 200, contentType: 'application/json', body: url.pathname.endsWith('/config') ? JSON.stringify({ siteKey: 'test-site-key' }) : JSON.stringify({ ok: true }) });
+      if (url.hostname === 'abroad-o-contact-form.abroad-o.workers.dev') return route.fulfill({ status: 200, contentType: 'application/json', body: url.pathname.endsWith('/config') ? JSON.stringify({ turnstileSiteKey: 'test-site-key', turnstileAction: 'contact-submit' }) : JSON.stringify({ ok: true }) });
       if (url.hostname === 'challenges.cloudflare.com') return route.fulfill({ status: 200, contentType: 'application/javascript', body: 'window.turnstile={render:(node,options)=>{window.__turnstileOptions=options; return "test-widget"},reset:()=>{}};' });
       if (!['127.0.0.1', 'localhost'].includes(url.hostname)) return route.fulfill({ status: 204, body: '' });
       return route.continue();
@@ -59,10 +57,10 @@ try {
     if (metrics.overflow > reference.overflow + 1) throw new Error(`${pageName} overflow worsened from base at ${width}px.`);
     const icons = await page.evaluate(() => { const glyph = document.createElement('span'), icon = document.createElement('i'); glyph.className = 'glyphicon glyphicon-arrow-right'; icon.className = 'fa fa-phone'; document.body.append(glyph, icon); const value = { glyph: getComputedStyle(glyph, '::before').content, fa: getComputedStyle(icon, '::before').getPropertyValue('--fa') }; glyph.remove(); icon.remove(); return value; });
     if (icons.glyph === 'none' || !icons.fa) throw new Error(`${pageName} did not render local Glyphicons/Font Awesome.`);
+    if (width === 375 && ['news.html', 'news/news_171023.html', 'news/news_17110101.html', 'form.html', 'thank.html'].includes(pageName)) { fs.mkdirSync(path.join(root, '.deploy', 'pr3c-news-form'), { recursive: true }); await page.screenshot({ path: path.join(root, '.deploy', 'pr3c-news-form', `${pageName.replaceAll('/', '-').replace('.html', '')}.png`), fullPage: true }); }
     if (width === 375) { await page.locator('.navbar-toggle').click(); await page.waitForFunction(() => document.querySelector('.navbar-main-collapse')?.classList.contains('in')); }
     if (lightbox.has(pageName)) { const trigger = page.locator('[data-lightbox]').first(); await trigger.click(); await page.waitForFunction(() => document.querySelector('#lightbox')?.style.display !== 'none' && document.querySelector('.lb-image')?.naturalWidth > 0); await page.locator('.lb-close').click(); await page.waitForFunction(() => document.querySelector('#lightbox')?.style.display === 'none'); }
     if (errors.length || localFailures.length) throw new Error(`${pageName} browser/local-asset failure: ${[...errors, ...localFailures].join('\n')}`);
-    if (width === 375 && ['news.html', 'news/news_171023.html', 'news/news_17110101.html', 'form.html', 'thank.html'].includes(pageName)) { fs.mkdirSync(path.join(root, '.deploy', 'pr3c-news-form'), { recursive: true }); await page.screenshot({ path: path.join(root, '.deploy', 'pr3c-news-form', `${pageName.replaceAll('/', '-').replace('.html', '')}.png`), fullPage: true }); }
     await page.close();
     console.log(`${pageName} ${width}px passed.`);
   }
