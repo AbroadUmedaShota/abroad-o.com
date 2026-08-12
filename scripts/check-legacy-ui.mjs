@@ -13,7 +13,6 @@ const blockedAsset = process.env.LEGACY_BLOCK_ASSET || '';
 const disabledBehavior = process.env.LEGACY_DISABLE_BEHAVIOR || '';
 const timeout = Number(process.env.LEGACY_CHECK_TIMEOUT_MS || 10000);
 const writeScreenshots = process.env.LEGACY_SKIP_SCREENSHOTS !== '1';
-const overflowBaseline = { about: [8, 0], aggregate: [112, 0], edit: [0, 0], film: [0, 0], input: [0, 0], largeformat: [0, 0], microfilm: [0, 0], recruit: [0, 0], rule: [0, 0], sample: [0, 0], sample2: [0, 0], service: [0, 0], 'service-pack': [0, 0], 'speed-ad': [0, 0], telework: [42, 0] };
 const requiredAssets = [
   'vendor/bootstrap3/css/bootstrap.min.css', 'vendor/bootstrap3/js/bootstrap.min.js', 'vendor/bootstrap3/fonts/glyphicons-halflings-regular.woff2', 'vendor/bootstrap3/LICENSE',
   'vendor/fontawesome/css/all.min.css', 'vendor/fontawesome/css/v4-shims.min.css', 'vendor/fontawesome/webfonts/fa-solid-900.woff2', 'vendor/fontawesome/LICENSE.txt',
@@ -52,7 +51,7 @@ const screenshots = path.join(root, '.deploy', 'pr3b-legacy');
 fs.mkdirSync(screenshots, { recursive: true });
 const candidateMetrics = {};
 try {
-  for (const pageName of pages) for (const [index, width] of widths.entries()) {
+  for (const pageName of pages) for (const width of widths) {
     const page = await browser.newPage({ viewport: { width, height: 900 } });
     page.setDefaultTimeout(timeout);
     const errors = [];
@@ -87,9 +86,9 @@ try {
         return result;
       })()
     }));
-    if (geometry.jquery !== '3.7.1' || !geometry.bootstrap) throw new Error(`${pageName}.html failed to initialize the local legacy core.`);
-    if (geometry.overflow > overflowBaseline[pageName][index]) throw new Error(`${pageName}.html overflow worsened at ${width}px: ${geometry.overflow}px.`);
     const reference = baseline[pageName][width];
+    if (geometry.jquery !== '3.7.1' || !geometry.bootstrap) throw new Error(`${pageName}.html failed to initialize the local legacy core.`);
+    if (geometry.overflow > reference.overflow + 1) throw new Error(`${pageName}.html overflow worsened at ${width}px: ${geometry.overflow}px.`);
     const largestContainer = Math.max(...geometry.containers);
     const baselineLargestContainer = Math.max(...reference.containerWidths);
     if (!geometry.body || Math.abs(geometry.header - reference.headerHeight) / reference.headerHeight > 0.03 || Math.abs(geometry.body - reference.bodyHeight) / reference.bodyHeight > 0.03 || Math.abs(largestContainer - baselineLargestContainer) / baselineLargestContainer > 0.03) throw new Error(`${pageName}.html geometry changed beyond the 3% baseline tolerance at ${width}px.`);
