@@ -23,6 +23,7 @@ jobs:
       - run: npm run check:site
       - run: npm run check:csp-readiness
       - run: npm run check:csp-runtime
+      - run: npm run check:page-style-ui
       - run: npm run check:image-performance
       - run: npm run inventory:public-assets
       - name: Upload public asset inventory

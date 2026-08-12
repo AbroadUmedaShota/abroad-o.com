@@ -1,4 +1,44 @@
 import { parse } from 'parse5';
+import crypto from 'node:crypto';
+
+export const pageStyleSheets = new Map([
+  ['about.html', '/css/pages/legacy-no-link.css'],
+  ['aggregate.html', '/css/pages/legacy-no-link.css'],
+  ['edit.html', '/css/pages/legacy-no-link.css'],
+  ['film.html', '/css/pages/legacy-no-link.css'],
+  ['input.html', '/css/pages/legacy-no-link.css'],
+  ['largeformat.html', '/css/pages/legacy-no-link.css'],
+  ['microfilm.html', '/css/pages/legacy-no-link.css'],
+  ['recruit.html', '/css/pages/legacy-no-link.css'],
+  ['rule.html', '/css/pages/legacy-no-link.css'],
+  ['sample.html', '/css/pages/legacy-no-link.css'],
+  ['sample2.html', '/css/pages/legacy-no-link.css'],
+  ['service-pack.html', '/css/pages/legacy-no-link.css'],
+  ['telework.html', '/css/pages/legacy-no-link.css'],
+  ['form.html', '/css/pages/form.css'],
+  ['news.html', '/css/pages/news-index.css'],
+  ['service.html', '/css/pages/service.css'],
+  ['speed-ad.html', '/css/pages/speed-ad.css'],
+  ['news/news_250827.html', '/css/pages/news-office-move.css'],
+  ['news/news_250908.html', '/css/pages/news-office-move.css'],
+  ['news/news_251212.html', '/css/pages/news-251212.css'],
+  ['news/news_260526.html', '/css/pages/news-260526.css'],
+  ['news/news_260615.html', '/css/pages/news-260615.css'],
+  ['news/news_260616.html', '/css/pages/news-260616.css']
+]);
+
+const pageStyleFingerprints = new Map([
+  ['/css/pages/legacy-no-link.css', '2092c2908856'],
+  ['/css/pages/form.css', '86fa3f92bdcd'],
+  ['/css/pages/news-index.css', 'b6b87ee4c690'],
+  ['/css/pages/news-office-move.css', '4c4fcc77f120'],
+  ['/css/pages/news-251212.css', 'e7702985e3d8'],
+  ['/css/pages/news-260526.css', '330eec19dbf8'],
+  ['/css/pages/news-260615.css', '742a7665333f'],
+  ['/css/pages/news-260616.css', '5a684272925a'],
+  ['/css/pages/service.css', 'b543ac64b22a'],
+  ['/css/pages/speed-ad.css', 'ced0b1a7dc18']
+]);
 
 function visit(node, callback) {
   callback(node);
@@ -23,11 +63,46 @@ export function scriptInventory(html) {
 export function styleInventory(html) {
   let styleTags = 0;
   let styleAttributes = 0;
+  const pageStyleLinks = [];
   visit(parse(html), (node) => {
     if (node.nodeName === 'style') styleTags += 1;
     if ((node.attrs || []).some(({ name }) => name.toLowerCase() === 'style')) styleAttributes += 1;
+    if (node.nodeName === 'link') {
+      const attrs = attributes(node);
+      if ((attrs.get('rel') || '').toLowerCase().split(/\s+/).includes('stylesheet') && (attrs.get('href') || '').startsWith('/css/pages/')) {
+        pageStyleLinks.push(attrs.get('href'));
+      }
+    }
   });
-  return { styleTags, styleAttributes };
+  return { styleTags, styleAttributes, pageStyleLinks };
+}
+
+export function assertPageStyleLink(html, file) {
+  const expected = pageStyleSheets.get(file);
+  const { pageStyleLinks } = styleInventory(html);
+  if (!expected) {
+    if (pageStyleLinks.length) throw new Error(`Page stylesheet was added outside the existing page set: ${file}`);
+    return;
+  }
+  if (pageStyleLinks.length !== 1 || pageStyleLinks[0] !== expected) {
+    throw new Error(`Page stylesheet link or count changed in ${file}`);
+  }
+}
+
+export function assertNoInlineStyles(html, file) {
+  const { styleTags } = styleInventory(html);
+  if (styleTags) throw new Error(`Inline style remains in ${file}: ${styleTags}`);
+}
+
+export function assertPageStyleSheet(css, href) {
+  if (!css.trim()) throw new Error(`Page stylesheet is empty: ${href}`);
+  const normalized = css.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s+/g, '');
+  const fingerprint = crypto.createHash('sha256').update(normalized).digest('hex').slice(0, 12);
+  if (pageStyleFingerprints.get(href) !== fingerprint) throw new Error(`Page stylesheet content changed: ${href}`);
+}
+
+export function pageStyleSheetPaths() {
+  return [...pageStyleFingerprints.keys()];
 }
 
 export function assertNoInlineExecutableScripts(html, file) {

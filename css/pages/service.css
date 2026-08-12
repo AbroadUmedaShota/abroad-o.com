@@ -1,0 +1,94 @@
+.no-link-style {
+        color: inherit; /* 親要素の色を継承する */
+        text-decoration: none; /* 下線を削除する */
+      }
+
+      .no-link-style:hover,
+      .no-link-style:active,
+      .no-link-style:visited {
+        color: inherit; /* 親要素の色を継承する */
+        text-decoration: none; /* 下線を削除する */
+      }
+
+      #title_top h1 {
+        margin-top: 0;
+        padding-top: 90px;
+      }
+
+      #service .col-md-6 > h2 {
+        font-size: 20px;
+        padding: 20px 0;
+      }
+
+      #service_detail > .container > h2 {
+        text-align: center;
+        margin: 50px 0;
+        font-size: 24px;
+        font-weight: 500;
+      }
+
+      #service_detail .col-md-6 h3 {
+        text-align: center;
+        font-size: 18px;
+        font-weight: 500;
+      }
+
+      .speed-ad-service-card {
+        clear: both;
+        margin: 24px 0 12px;
+        padding: 28px;
+        border-left: 6px solid #5CB85C;
+        background: #f2f6f8;
+        text-align: left;
+      }
+
+      .speed-ad-service-card__inner {
+        display: table;
+        width: 100%;
+      }
+
+      .speed-ad-service-card__image,
+      .speed-ad-service-card__body {
+        display: table-cell;
+        vertical-align: middle;
+      }
+
+      .speed-ad-service-card__image {
+        width: 150px;
+        padding-right: 26px;
+      }
+
+      .speed-ad-service-card__image img {
+        width: 120px;
+      }
+
+      .speed-ad-service-card h2 {
+        margin-top: 0;
+        color: #082E5D;
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .speed-ad-service-card p {
+        line-height: 1.9;
+      }
+
+      .speed-ad-service-card .btn {
+        margin-top: 8px;
+        border-radius: 0;
+      }
+
+      @media screen and (max-width: 767px) {
+        .speed-ad-service-card__inner,
+        .speed-ad-service-card__image,
+        .speed-ad-service-card__body {
+          display: block;
+          width: 100%;
+        }
+
+        .speed-ad-service-card__image {
+          padding-right: 0;
+          text-align: center;
+          margin-bottom: 16px;
+        }
+      }
