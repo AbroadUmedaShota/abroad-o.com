@@ -20,6 +20,7 @@
       if (event.key === 'Escape') { event.preventDefault(); hide(); toggle.focus(); }
     });
     document.addEventListener('keydown', (event) => {
+      if (event.defaultPrevented) return;
       if (event.key === 'Escape' && (legacy ? collapse.classList.contains('in') : collapse.classList.contains('show'))) { hide(); toggle.focus(); }
     });
     collapse.addEventListener('click', (event) => { if (event.target.closest('a') && window.innerWidth < 768) { hide(); toggle.focus(); } });
@@ -41,6 +42,7 @@
     return menu;
   };
   toggles.forEach((toggle) => {
+    const menu = document.getElementById(toggle.getAttribute('aria-controls'));
     toggle.addEventListener('click', (event) => {
       event.preventDefault(); event.stopImmediatePropagation();
       toggle.getAttribute('aria-expanded') === 'true' ? close(toggle, false) : open(toggle);
@@ -52,9 +54,15 @@
       const menu = open(toggle);
       if (event.key === 'ArrowDown') menu?.querySelector('a')?.focus();
     });
+    menu?.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      event.stopPropagation();
+      close(toggle, true);
+    });
   });
   document.addEventListener('click', (event) => { if (!event.target.closest('.dropdown')) toggles.forEach((toggle) => close(toggle, false)); });
-  document.addEventListener('keydown', (event) => { if (event.key === 'Escape') toggles.filter((toggle) => toggle.getAttribute('aria-expanded') === 'true').forEach((toggle) => close(toggle, true)); });
+  document.addEventListener('keydown', (event) => { if (!event.defaultPrevented && event.key === 'Escape') toggles.filter((toggle) => toggle.getAttribute('aria-expanded') === 'true').forEach((toggle) => close(toggle, true)); });
   const syncSlickFocus = () => document.querySelectorAll('.slick-slide').forEach((slide) => {
     const hidden = slide.getAttribute('aria-hidden') === 'true';
     if (hidden) {

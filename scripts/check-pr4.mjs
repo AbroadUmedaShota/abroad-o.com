@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import { chromium } from '@playwright/test';
+import { assertPr4FormContract, assertPr4HtmlContract } from './lib/pr4-contract.mjs';
 
 const root = path.resolve(import.meta.dirname, '..');
 const output = path.join(root, '_site');
@@ -47,6 +48,7 @@ const assertMenu = async (page, toggleId, legacy) => {
   await page.keyboard.press('ArrowDown');
   assert.equal(await menu.locator('a').first().evaluate((node) => document.activeElement === node), true, `${toggleId} ArrowDown must focus first submenu item`);
   await page.keyboard.press('Escape');
+  await page.waitForFunction((id) => document.activeElement?.id === id, toggleId, { timeout });
   assert.equal(await toggle.evaluate((node) => document.activeElement === node), true, `${toggleId} Escape must return focus`);
   assert.equal(await toggle.getAttribute('aria-expanded'), 'false', `${toggleId} Escape must sync aria-expanded`);
   await toggle.focus(); await page.keyboard.press('Space');
@@ -60,6 +62,8 @@ const assertMenu = async (page, toggleId, legacy) => {
 };
 
 try {
+  assertPr4HtmlContract(fs.readFileSync(path.join(output, 'index.html'), 'utf8'), 'index.html');
+  assertPr4FormContract(fs.readFileSync(path.join(output, 'form.html'), 'utf8'));
   for (const pageName of ['index.html', 'scan.html', 'telework.html']) for (const width of [320, 375, 768, 1440]) await withPage({ width, height: 900 }, async (page) => {
     await open(page, pageName, () => document.readyState === 'complete');
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), 0, `${pageName} must not overflow at ${width}px`);
@@ -68,6 +72,9 @@ try {
     await open(page, pageName, legacy ? () => window.jQuery?.fn?.collapse : () => window.bootstrap && window.jQuery);
     const toggle = page.locator(legacy ? '.navbar-toggle' : '.navbar-toggler');
     for (const link of await page.locator('header a[href]').all()) assert.notEqual(await link.getAttribute('href'), '', `${pageName} primary header link must have a destination`);
+    const outside = page.locator('main a[href], footer a[href]').first();
+    await outside.focus(); await page.keyboard.press('Escape');
+    assert.equal(await outside.evaluate((node) => document.activeElement === node), true, `${pageName} closed main navigation Escape must preserve unrelated focus`);
     await toggle.focus(); await page.keyboard.press('Space');
     await page.waitForFunction(isOpen, legacy, { timeout });
     assert.equal(await toggle.getAttribute('aria-expanded'), 'true');
@@ -78,9 +85,31 @@ try {
     await page.keyboard.press('Escape');
     await page.waitForFunction((isLegacy) => !(isLegacy ? document.querySelector('.navbar-main-collapse')?.classList.contains('in') : document.querySelector('.navbar-collapse')?.classList.contains('show')), legacy, { timeout });
   });
+  for (const [pageName, legacy] of [['index.html', false], ['about.html', true]]) await withPage({ width: 375, height: 900 }, async (page) => {
+    await open(page, pageName, legacy ? () => window.jQuery?.fn?.collapse : () => window.bootstrap && window.jQuery);
+    const toggle = page.locator(legacy ? '.navbar-toggle' : '.navbar-toggler');
+    const collapse = page.locator(legacy ? '.navbar-main-collapse' : '.navbar-collapse');
+    await toggle.click(); await page.waitForFunction(isOpen, legacy, { timeout });
+    const primary = collapse.locator('a[href]').first();
+    await primary.evaluate((node) => node.addEventListener('click', (event) => event.preventDefault(), { once: true }));
+    await primary.click();
+    await page.waitForFunction((isLegacy) => !(isLegacy ? document.querySelector('.navbar-main-collapse')?.classList.contains('in') : document.querySelector('.navbar-collapse')?.classList.contains('show')), legacy, { timeout });
+    await page.waitForFunction((selector) => document.querySelector(selector)?.getAttribute('aria-expanded') === 'false', legacy ? '.navbar-toggle' : '.navbar-toggler', { timeout });
+    assert.equal(await toggle.getAttribute('aria-expanded'), 'false', `${pageName} mobile primary-link activation must close main navigation`);
+    assert.equal(await toggle.evaluate((node) => document.activeElement === node), true, `${pageName} mobile primary-link activation must focus toggle`);
+  });
   for (const [pageName, legacy] of [['index.html', false], ['about.html', true]]) await withPage({ width: 1440, height: 900 }, async (page) => {
     await open(page, pageName, legacy ? () => window.jQuery?.fn?.collapse : () => window.bootstrap && window.jQuery);
     await assertMenu(page, legacy ? 'legacyServiceDropdown' : 'serviceDropdown', legacy);
+    const toggle = page.locator(`#${legacy ? 'legacyServiceDropdown' : 'serviceDropdown'}`);
+    for (const key of ['Enter', 'Space', 'ArrowDown']) {
+      await toggle.focus(); await page.keyboard.press(key);
+      assert.equal(await toggle.getAttribute('aria-expanded'), 'true', `${pageName} submenu ${key} must open it`);
+      assert.equal(await toggle.locator('xpath=..').evaluate((node) => node.classList.contains('open')), true, `${pageName} submenu ${key} must set dropdown class`);
+      await page.keyboard.press('Escape');
+      assert.equal(await toggle.getAttribute('aria-expanded'), 'false', `${pageName} submenu Escape must close it`);
+      assert.equal(await toggle.evaluate((node) => document.activeElement === node), true, `${pageName} submenu Escape must retain its toggle focus`);
+    }
   });
   await withPage({ width: 375, height: 900 }, async (page) => {
     await open(page, 'index.html', () => window.jQuery?.fn?.slick && document.querySelector('.autoplay')?.classList.contains('slick-initialized'));

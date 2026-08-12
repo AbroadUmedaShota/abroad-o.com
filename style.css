@@ -549,6 +549,16 @@ service.html
     margin-top: 0px;
     padding-top: 90px;
 }
+/* CONTACT remains a section landmark while retaining the former title band. */
+#contact-title {
+    height: 200px;
+    background-image: url(image/top1.png);
+    background-attachment: fixed;
+}
+#contact-title h2 {
+    margin-top: 0px;
+    padding-top: 90px;
+}
 #service_detail h3 {
     text-align: center;
     margin: 50px 0px 50px 0px;
@@ -597,6 +607,13 @@ service.html
         height: 150px;
     }
     #title_top h2 {
+        padding-top: 60px;
+        font-size: 25px;
+    }
+    #contact-title {
+        height: 150px;
+    }
+    #contact-title h2 {
         padding-top: 60px;
         font-size: 25px;
     }
@@ -697,14 +714,15 @@ input.html
     color: #fff;
     padding: 5px 0px;
 }
-#text-how h3 {
+#text-how > h2 {
     text-align: center;
     background-color: #000099;
     color: #fff;
     font-size: 18px;
     padding: 5px 0px;
+    margin: 20px 0px 10px;
 }
-#text-how h4 {
+#text-how > h3 {
     margin-top: 30px;
 }
 #text-how .col-md-2 {
@@ -801,7 +819,7 @@ scan.html
 /*========================================================
 service-pack.html
 ========================================================*/
-#service-pack1 h4 {
+#service-pack1 > .container > h2, #service-pack1 h4 {
     text-align: center;
     font-size: 35px;
     margin:50px 0px;
@@ -885,7 +903,7 @@ section#service-pack1 ul {
 }
 
 /*--------------------------------------------------*/
-section#service-pack2 h4 {
+section#service-pack2 > .container > h2, section#service-pack2 h4 {
     text-align: center;
     font-size: 35px;
     margin:50px 0px;
@@ -933,7 +951,7 @@ section#service-pack2 .pack-img p {
     }
 }
 @media screen and (max-width: 991px) {
-    section#service-pack1 h4 {
+    section#service-pack1 > .container > h2, section#service-pack1 h4 {
         font-size: 30px;
     }
     .large-font {
@@ -1038,7 +1056,7 @@ aggregate.html
 /*========================================================
 sample.html 
 ========================================================*/
-section#sample h3 {
+section#sample h3:not(.heading-visual) {
     margin:70px 0px 50px 0px;
     border-bottom: solid 1px #000;
 }
@@ -1058,6 +1076,9 @@ section#sample h5 {
 section#sample h6 {
     margin:30px 0px 0px 0px;
 }
+/* Preserve the legacy visual hierarchy after restoring semantic heading levels. */
+section#sample .sample-subsection { background-color: #BAD3FF; border-bottom: 0; font-size: 16px; padding: 8px 5px; margin: 30px 0px; }
+section#sample .sample-example { background: transparent; border: 0; color: inherit; font-size: .67em; font-weight: bolder; padding: 0; margin:30px 0px 0px 0px; }
 section#sample i {
     display:inline-block;
     border:solid 1px #AAAAAA;
@@ -1173,6 +1194,9 @@ section#title_top2 h2 {
 #tabref-ContentC .image-back h4 {
     padding-top: 50px!important;
 }
+#tabref-ContentC h2 { padding: 0px 0px 30px 30px; }
+#tabref-ContentC .image-back h2 { padding-top: 50px!important; }
+#tabref-ContentC .image-back h2 { font-size: 18px; font-weight: 500; margin: 10px 0px; }
 #tabref-ContentC .image-back p {
     font-size: 16px;
 }
@@ -1219,6 +1243,7 @@ section#about_top .tab-pane u {
     #tabref-ContentC .image-back h4 {
         padding-top: 30px!important;
     }
+    #tabref-ContentC .image-back h2 { padding-top: 30px!important; }
     #tabref-ContentC .image-back p {
         margin-top: -60px;
         font-size: 13px;
@@ -1236,6 +1261,7 @@ section#about_top .tab-pane u {
     #tabref-ContentC .image-back h4 {
         display: none; 
     }
+    #tabref-ContentC .image-back h2 { display: none; }
     #tabref-ContentC .image-back p {
         display: none          
     }
@@ -1888,12 +1914,12 @@ section#tele_mid3 .box {
   color: #fff;
   padding: 10px 5px;
 }
-section#tele_mid3 .box h5, section#tele_mid3 .box p.heading-visual{
+section#tele_mid3 .box h4, section#tele_mid3 .box h5, section#tele_mid3 .box p.heading-visual{
   font-weight: 700;
   font-size: 20px;
 }
 @media screen and (max-width: 780px) {
-  section#tele_mid3 .box h5, section#tele_mid3 .box p.heading-visual{
+  section#tele_mid3 .box h4, section#tele_mid3 .box h5, section#tele_mid3 .box p.heading-visual{
     font-size: 18px;
 } 
 }
@@ -1961,7 +1987,7 @@ section#tele_mid5 h3{
   margin-top: -130px;
   margin-bottom: 100px;
 }
-section#tele_mid5 h5, section#tele_mid5 p.heading-visual {
+section#tele_mid5 h4, section#tele_mid5 h5, section#tele_mid5 p.heading-visual {
   font-size: 18px;
   font-weight: 700;
 }
@@ -2027,9 +2053,10 @@ film.html
 #film_top .col-md-5 {
   margin: 0px 0px 15px 0px;
 }
-#film_top .col-md-5 h4 {
+#film_top .col-md-5 h2, #film_top .col-md-5 h4 {
   font-size: 35px;
   padding: 100px 0px 30px 0px;
+  margin: 10px 0px;
 }
 #film_top .col-md-5 h5, #film_top .col-md-5 p.heading-visual {
   font-size: 18px;
@@ -2044,7 +2071,7 @@ film.html
   #film_top .col-md-7 img {
   width: 100%;  
   }
-  #film_top .col-md-5 h4 {
+  #film_top .col-md-5 h2, #film_top .col-md-5 h4 {
     font-size: 28px;
     padding: 20px 0px 10px 0px;
   }
@@ -2065,7 +2092,7 @@ film.html
   #film_top .col-md-7 img {
     width: 80%;  
   }  
-  #film_top .col-md-5 h4 {
+  #film_top .col-md-5 h2, #film_top .col-md-5 h4 {
     font-size: 28px;
     padding: 20px 0px 10px 0px;
     text-align: center;
@@ -2155,7 +2182,7 @@ film.html
   #film_table tr td{
     font-size: 12px;
   }
-  .film_price p{
+  .film_price > p.heading-visual{
     font-size: 12px;
   }
   .box-large h5, .box-large p.heading-visual {
@@ -2309,7 +2336,7 @@ microfilm.html
   margin: 30px 0xp 30px 0px;
   font-size: 18px;
 }
-.film_price p { font-size: 18px; }
+.film_price > p.heading-visual { font-size: 18px; }
 /*========================================================
 largeformat.html
 ========================================================*/
@@ -2387,7 +2414,19 @@ largeformat.html
 .nav-item.dropdown { display: flex; align-items: center; }
 .nav-submenu-toggle,
 .legacy-submenu-toggle { border: 0; background: transparent; color: inherit; padding: .5rem; }
-.legacy-submenu-toggle { padding: 15px 5px; }
+.legacy-submenu-toggle {
+  color: #fff;
+  height: 50px;
+  left: calc(50% + 26px);
+  padding: 15px 6px;
+  position: absolute;
+  top: 0;
+  z-index: 1;
+}
+#header_nav li.dropdown { position: relative; }
+@media screen and (max-width: 767px) {
+  .legacy-submenu-toggle { left: auto; right: 0; }
+}
 .nav-submenu-toggle:focus-visible,
 .legacy-submenu-toggle:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 /* #ff0000 to #b00020: 7.33:1 on white. */
@@ -2396,7 +2435,7 @@ largeformat.html
 .nav-tabs > li > a[style] { color: #555 !important; }
 section#tele_mid5 li, section#tele_mid5 li .noninteractive-text, .tele-box1 span { color: #222; }
 #telework h5, #telework h5 .noninteractive-text { color: #222; }
-section#tele_mid5 h5, section#tele_mid5 h5 .noninteractive-text { color: #222 !important; }
+section#tele_mid5 h4, section#tele_mid5 h5, section#tele_mid5 h4 .noninteractive-text, section#tele_mid5 h5 .noninteractive-text { color: #222 !important; }
 section#tele_mid5 p.heading-visual, section#tele_mid5 p.heading-visual .noninteractive-text { color: #222 !important; }
 #form-feedback { color: #222 !important; }
 .mailto-link { color: #082E5D; font-weight: 700; text-decoration: underline; }

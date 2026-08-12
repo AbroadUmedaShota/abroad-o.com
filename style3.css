@@ -47,10 +47,11 @@
   background-color:rgba(255,255,255,0.5);
   background-blend-mode:lighten;*/
 }
-.max-width-line h3 {
+.max-width-line h2, .max-width-line h3 {
   padding: 5px 0px 5px 0px;
   color: #fff;
 }
+.max-width-line h2 { font-size: 1.17em; font-weight: bolder; margin: 1em 0; }
 
 /*----------三角矢印----------*/
 .triangle_orange {
@@ -1038,7 +1039,7 @@ section#pre_footer .col-md-5 img {
   margin-top: 10px;
   color: #A9A9A9;
 }
-.col-box h5, .col-box p.heading-visual {
+.col-box h3, .col-box h5, .col-box p.heading-visual {
   font-size: 15px;
   padding-top: 10px;
   font-weight: 700;
@@ -1081,7 +1082,7 @@ section#pre_footer .col-md-5 img {
   }    
 }
 @media screen and (min-width:768px) and (max-width: 1100px) {
-  h5.ex-font1, p.ex-font1.heading-visual {
+  h3.ex-font1, h5.ex-font1, p.ex-font1.heading-visual {
     font-size: 15px;
     padding: 10px 0px 0px 0px;
   }  
@@ -1090,7 +1091,7 @@ section#pre_footer .col-md-5 img {
   .icon2 span{
     margin-top: 20px
   }
-  h5.ex-font2, p.ex-font2.heading-visual {
+  h3.ex-font2, h5.ex-font2, p.ex-font2.heading-visual {
     padding: 10px 0px 18px 0px;
   }  
 }
@@ -1127,7 +1128,7 @@ section#pre_footer .col-md-5 img {
     font-size: 20px; 
     margin-bottom: 20px;
   }
-  .col-box h5, .col-box p.heading-visual {
+  .col-box h3, .col-box h5, .col-box p.heading-visual {
     font-size: 11px;
   }  
   .col-box h6, .col-box p.heading-visual + p.heading-visual {
@@ -1152,7 +1153,7 @@ section#pre_footer .col-md-5 img {
   .icon2 span{
     font-size: 18px; 
   }  
-  .col-box h5 {
+  .col-box h3, .col-box h5, .col-box p.heading-visual {
     font-size: 10px;
   }    
 }
@@ -1166,7 +1167,7 @@ section#pre_footer .col-md-5 img {
   margin-top: 10px;
   color: #A9A9A9;
 }
-.col-box2 h5, .col-box2 p.heading-visual {
+.col-box2 h3, .col-box2 h5, .col-box2 p.heading-visual {
   font-size: 15px;
   font-weight: 700;
   margin-bottom: 5px;
@@ -1175,15 +1176,13 @@ section#pre_footer .col-md-5 img {
   font-size: 13px;
   margin-bottom: 0px;
 }
-@media screen and (max-width: 342px) {
-  .col-box2 p { font-size: 10px; }
-}
+.col-box2 h3 { margin-top: 0; }
 .col-box2 img{
   width: 55%;
   padding-top: 10px;
 }
 @media screen and (max-width: 575px) {
-  .col-box2 h5, .col-box2 p.heading-visual {
+  .col-box2 h3, .col-box2 h5, .col-box2 p.heading-visual {
     margin-top: 3px;
   }
   .fa-2x {
@@ -1418,9 +1417,22 @@ section#service2 .col-md-4 h2 {
     font-size: 17px;
   }
 }
-/* PR4 modern submenu control; the primary links remain links. */
-.nav-item.dropdown { display: flex; align-items: center; }
-.nav-submenu-toggle { border: 0; background: transparent; color: inherit; padding: .5rem; }
+/* PR4 modern submenu control; overlay the control so the legacy nav geometry remains unchanged. */
+.nav-item.dropdown { display: block; position: relative; }
+.nav-submenu-toggle {
+  border: 0;
+  background: transparent;
+  color: #fff;
+  height: 50px;
+  left: calc(50% + 26px);
+  padding: .5rem;
+  position: absolute;
+  top: -8px;
+  z-index: 1;
+}
+@media screen and (max-width: 575px) {
+  .nav-submenu-toggle { left: auto; right: 0; }
+}
 .nav-submenu-toggle:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 .slick-slider { overflow: hidden; }
 .slick-slide[aria-hidden="true"] a, .slick-slide[aria-hidden="true"] button, .slick-slide[aria-hidden="true"] input, .slick-slide[aria-hidden="true"] select, .slick-slide[aria-hidden="true"] textarea { pointer-events: none; }
