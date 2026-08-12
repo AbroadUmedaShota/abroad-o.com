@@ -1,5 +1,47 @@
 import { parse } from 'parse5';
 
+export function imageDimensions(buffer, label = 'image') {
+  const pngSignature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  if (buffer.length >= 24 && buffer.subarray(0, 8).equals(pngSignature) && buffer.toString('ascii', 12, 16) === 'IHDR') {
+    return [buffer.readUInt32BE(16), buffer.readUInt32BE(20)];
+  }
+
+  if (buffer.length >= 4 && buffer[0] === 0xff && buffer[1] === 0xd8) {
+    let offset = 2;
+    while (offset + 3 < buffer.length) {
+      if (buffer[offset] !== 0xff) {
+        offset += 1;
+        continue;
+      }
+      while (buffer[offset] === 0xff) offset += 1;
+      const marker = buffer[offset];
+      offset += 1;
+      if (marker === 0xd8 || marker === 0xd9) continue;
+      if (marker === 0xda) break;
+      if (offset + 1 >= buffer.length) break;
+      const length = buffer.readUInt16BE(offset);
+      if (length < 2 || offset + length > buffer.length) break;
+      const isStartOfFrame = (marker >= 0xc0 && marker <= 0xc3)
+        || (marker >= 0xc5 && marker <= 0xc7)
+        || (marker >= 0xc9 && marker <= 0xcb)
+        || (marker >= 0xcd && marker <= 0xcf);
+      if (isStartOfFrame && length >= 7) {
+        return [buffer.readUInt16BE(offset + 5), buffer.readUInt16BE(offset + 3)];
+      }
+      offset += length;
+    }
+  }
+
+  throw new Error(`Unsupported or invalid image format: ${label}`);
+}
+
+export function assertImageFileDimensions(buffer, width, height, label = 'image') {
+  const [actualWidth, actualHeight] = imageDimensions(buffer, label);
+  if (actualWidth !== Number(width) || actualHeight !== Number(height)) {
+    throw new Error(`Image dimensions changed for ${label}: expected ${width}x${height}, found ${actualWidth}x${actualHeight}`);
+  }
+}
+
 function imageNodes(html) {
   const document = parse(html);
   const images = [];

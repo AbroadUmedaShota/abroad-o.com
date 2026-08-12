@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { assertImagePerformanceContract, assertIntrinsicImageStyle } from './lib/image-performance-contract.mjs';
+import { assertImageFileDimensions, assertImagePerformanceContract, assertIntrinsicImageStyle } from './lib/image-performance-contract.mjs';
 
 const repoRoot = path.resolve(import.meta.dirname, '..');
 const outputRoot = path.join(repoRoot, '_site');
@@ -49,6 +49,15 @@ const cases = [
 
 for (const [file, expectations] of cases) {
   assertImagePerformanceContract(fs.readFileSync(path.join(outputRoot, file), 'utf8'), expectations, file);
+  for (const expectation of expectations) {
+    const relativeImagePath = expectation.src.replace(/^\/+/, '');
+    const imagePath = path.resolve(outputRoot, relativeImagePath);
+    if (path.relative(outputRoot, imagePath).startsWith('..') || path.isAbsolute(path.relative(outputRoot, imagePath))) {
+      throw new Error(`Image path escapes the public root: ${expectation.src}`);
+    }
+    if (!fs.existsSync(imagePath)) throw new Error(`Expected published image is missing: ${expectation.src}`);
+    assertImageFileDimensions(fs.readFileSync(imagePath), expectation.width, expectation.height, expectation.src);
+  }
 }
 for (const file of ['style3.css', 'style.css']) {
   assertIntrinsicImageStyle(fs.readFileSync(path.join(outputRoot, file), 'utf8'), file);
