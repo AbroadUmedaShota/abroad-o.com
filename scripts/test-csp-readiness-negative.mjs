@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { assertAnalyticsOrder, assertNewsRuntimeOrder, assertNoInlineExecutableScripts, scriptInventory } from './lib/csp-readiness-contract.mjs';
+import { assertAnalyticsOrder, assertNewsRuntimeOrder, assertNoAnalyticsScripts, assertNoInlineExecutableScripts, scriptInventory } from './lib/csp-readiness-contract.mjs';
 
 const analytics = '<script async src="https://www.googletagmanager.com/gtag/js?id=UA-51168812-1"></script><script src="/js/analytics.js"></script>';
 const news = '<script src="/vendor/jquery/jquery.min.js"></script><script src="/vendor/bootstrap3/js/bootstrap.min.js"></script><script src="/js/jquery.smooth-scroll.min.js"></script><script src="/js/news-runtime.js"></script>';
@@ -12,6 +12,9 @@ test('accepts externalized scripts', () => {
 });
 test('rejects inline executable scripts', () => assert.throws(() => assertNoInlineExecutableScripts('<script>window.x=1</script>', 'inline')));
 test('rejects changed analytics scope or order', () => {
+  assert.doesNotThrow(() => assertNoAnalyticsScripts('<script src="/js/site.js"></script>', 'outside-scope'));
+  assert.throws(() => assertNoAnalyticsScripts('<script src="/js/analytics.js"></script>', 'outside-local'));
+  assert.throws(() => assertNoAnalyticsScripts('<script async src="https://www.googletagmanager.com/gtag/js?id=UA-51168812-1"></script>', 'outside-loader'));
   assert.throws(() => assertAnalyticsOrder('<script src="/js/analytics.js"></script>', analyticsScript, 'missing-ga'));
   assert.throws(() => assertAnalyticsOrder(analytics.replace('async ', ''), analyticsScript, 'non-async-ga'));
   assert.throws(() => assertAnalyticsOrder(analytics.split('</script>').reverse().join('</script>'), analyticsScript, 'reversed'));

@@ -50,6 +50,14 @@ export function assertAnalyticsOrder(html, analyticsScript, file) {
   if (analyticsIds.length !== 1 || analyticsIds[0] !== 'UA-51168812-1') throw new Error(`Unexpected analytics ID in ${file}`);
 }
 
+export function assertNoAnalyticsScripts(html, file) {
+  const scripts = scriptInventory(html);
+  const analyticsScripts = scripts.filter((script) =>
+    script.src === '/js/analytics.js' || script.src.includes('googletagmanager.com/gtag/js?id=')
+  );
+  if (analyticsScripts.length) throw new Error(`Analytics was added outside the existing page set: ${file}`);
+}
+
 export function assertNewsRuntimeOrder(html, file) {
   const scripts = scriptInventory(html).map(({ src }) => src);
   const required = ['/vendor/jquery/jquery.min.js', '/vendor/bootstrap3/js/bootstrap.min.js', '/js/jquery.smooth-scroll.min.js', '/js/news-runtime.js'];

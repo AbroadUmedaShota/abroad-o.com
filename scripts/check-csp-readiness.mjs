@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { assertAnalyticsOrder, assertNewsRuntimeOrder, assertNoInlineExecutableScripts, scriptInventory, styleInventory } from './lib/csp-readiness-contract.mjs';
+import { assertAnalyticsOrder, assertNewsRuntimeOrder, assertNoAnalyticsScripts, assertNoInlineExecutableScripts, scriptInventory, styleInventory } from './lib/csp-readiness-contract.mjs';
 
 const repoRoot = path.resolve(import.meta.dirname, '..');
 const outputRoot = path.join(repoRoot, '_site');
@@ -36,9 +36,7 @@ for (const file of generatedFiles) {
   if (analyticsPages.has(relative)) {
     assertAnalyticsOrder(html, analyticsScript, relative);
     analyticsCount += 1;
-  } else if (scriptInventory(html).some((script) => script.src === '/js/analytics.js')) {
-    throw new Error(`Analytics was added outside the existing page set: ${relative}`);
-  }
+  } else assertNoAnalyticsScripts(html, relative);
   if (relative === 'news.html' || relative.startsWith('news/')) {
     assertNewsRuntimeOrder(html, relative);
     newsRuntimeCount += 1;
