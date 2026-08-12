@@ -16,13 +16,7 @@ preloadTopImage: true
     <!-- SNS共有用のメタタグ -->
 
     <!-- Google Analytics設定 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-51168812-1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'UA-51168812-1');
-    </script>
+{% include "partials/analytics.njk" %}
 
     <!-- CSSファイルの読み込み -->
     <link rel="stylesheet" href="/vendor/bootstrap/bootstrap.min.css">
