@@ -354,10 +354,10 @@ while IFS= read -r prefix; do
   case "`$prefix" in TOOL/|pdfjs/build/|pdfjs/web/) ;; *) echo "Unsafe delete prefix: `$prefix" >&2; exit 1 ;; esac
   test "`$prefix" != 'pdfjs/' && test "`$prefix" != '/'
   if [ -d "`$REMOTE_DIR/`$prefix" ]; then
-    (cd "`$REMOTE_DIR" && find "`$prefix" -type f -printf '%p\n') >> "`$deletable"
+    (cd "`$REMOTE_DIR" && find "`$prefix" -type f -print) >> "`$deletable"
   fi
 done < "`$delete_prefixes"
-(cd "`$REMOTE_DIR" && find . -type f -printf '%P\n' | LC_ALL=C sort) > "`$actual"
+(cd "`$REMOTE_DIR" && find . -type f -print | sed 's#^\./##' | LC_ALL=C sort) > "`$actual"
 snapshot_bytes=0
 while IFS= read -r path; do
   [ -n "`$path" ] || continue
@@ -466,7 +466,7 @@ while IFS=' ' read -r expected_hash expected_bytes path; do
   mkdir -p "`$BACKUP_STAGE/`$ARCHIVE_ROOT/payload/pdfjs"
   cp -p "`$REMOTE_DIR/`$path" "`$BACKUP_STAGE/`$ARCHIVE_ROOT/payload/`$path"
 done < "`$protected_paths"
-(cd "`$BACKUP_STAGE/`$ARCHIVE_ROOT/payload" && find . -type f -printf '%P\n' | LC_ALL=C sort | while IFS= read -r path; do sha256sum "`$path"; done) > "`$BACKUP_STAGE/`$ARCHIVE_ROOT/manifest.txt"
+(cd "`$BACKUP_STAGE/`$ARCHIVE_ROOT/payload" && find . -type f -print | sed 's#^\./##' | LC_ALL=C sort | while IFS= read -r path; do sha256sum "`$path"; done) > "`$BACKUP_STAGE/`$ARCHIVE_ROOT/manifest.txt"
 test -s "`$BACKUP_STAGE/`$ARCHIVE_ROOT/manifest.txt"
 manifest_sha=`$(sha256sum "`$BACKUP_STAGE/`$ARCHIVE_ROOT/manifest.txt" | awk '{print `$1}')
 printf '%s  manifest.txt\n' "`$manifest_sha" > "`$BACKUP_STAGE/`$ARCHIVE_ROOT/manifest.sha256"
@@ -912,7 +912,7 @@ manifest_has_path() {
   awk -v path="`$candidate" 'length(`$0) == 66 + length(path) && substr(`$0, 1, 64) ~ /^[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]/ && substr(`$0, 65, 2) == "  " && substr(`$0, 67) == path { found = 1 } END { exit !found }' "`$previous_manifest"
 }
 archive_payload_entries="`$RESTORE_STAGE/archive-payload-entries"
-find "`$RESTORE_STAGE/`$ARCHIVE_ROOT/payload" -type f -printf '%P\n' | LC_ALL=C sort > "`$archive_payload_entries"
+(cd "`$RESTORE_STAGE/`$ARCHIVE_ROOT/payload" && find . -type f -print | sed 's#^\./##' | LC_ALL=C sort) > "`$archive_payload_entries"
 test -z "`$(sort "`$archive_payload_entries" | uniq -d)"
 manifest_paths="`$RESTORE_STAGE/manifest-paths"
 manifest_hashes="`$RESTORE_STAGE/manifest-hashes"
