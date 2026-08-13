@@ -38,7 +38,7 @@ for (const key of ['includeDirectories', 'managedDirectories']) c[key] = [...new
 c.restoreContract.remotePublicRoot = root; c.restoreContract.backupDirectory = backups;
 fs.writeFileSync(out, JSON.stringify(c));
 NODE
-pkgout=$(pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode Package -ConfigPath "$config" -WorkDir "$work/package")
+pkgout=$(env SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode Package -ConfigPath "$config" -WorkDir "$work/package")
 manifest=$(printf '%s\n' "$pkgout" | sed -n 's/^Manifest: //p' | tail -1)
 path_sha=$(printf '%s\n' "$pkgout" | sed -n 's/^Path manifest SHA-256: //p' | tail -1)
 evidence_sha=$(printf '%s\n' "$pkgout" | sed -n 's/^Content evidence SHA-256: //p' | tail -1)

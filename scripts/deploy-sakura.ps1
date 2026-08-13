@@ -998,7 +998,7 @@ Assert-SakuraRestoreConfig -Config $config
 $workDirFullPath = if ([IO.Path]::IsPathRooted($WorkDir)) { [IO.Path]::GetFullPath($WorkDir) } else { Join-Path $repoRoot $WorkDir }
 New-Item -ItemType Directory -Path $workDirFullPath -Force | Out-Null
 
-if ($config.publicRoot -and $Mode -notin @("Verify", "Restore") -and $env:SAKURA_VALIDATE_REMOTE_SCRIPT -ne "1") {
+if ($config.publicRoot -and $Mode -notin @("Verify", "Restore") -and $env:SAKURA_VALIDATE_REMOTE_SCRIPT -ne "1" -and $env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -ne "1") {
     $npmCommand = if ($IsWindows) { "npm.cmd" } else { "npm" }
     & $npmCommand run build:site
     if ($LASTEXITCODE -ne 0) {
