@@ -71,6 +71,12 @@
     "thank.html"
   ],
   "minimumFreeBytes": 104857600,
+  "restoreContract": {
+    "version": 1,
+    "archiveRoot": "restore-contract-v1",
+    "remotePublicRoot": "/home/abroad-o/www/abroad-o.com",
+    "backupDirectory": "/home/abroad-o/abroad-o-backups"
+  },
   "deletePaths": [
     "pdfjs/LICENSE"
   ],
