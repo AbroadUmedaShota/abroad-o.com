@@ -409,6 +409,9 @@ STAGE_DIR=`$(mktemp -d "`$HOME/abroad-o-stage.XXXXXX")
 cleanup() { rm -rf "`$STAGE_DIR"; }
 trap cleanup EXIT
 test -f "`$REMOTE_PACKAGE"
+test "`$(realpath -e "`$REMOTE_DIR")" = "`$REMOTE_DIR"
+test "`$(realpath -e "`$(dirname "`$REMOTE_BACKUP")")" = "`$(dirname "`$REMOTE_BACKUP")" || { echo 'Backup directory has a symlink component.' >&2; exit 1; }
+if [ -e "`$REMOTE_BACKUP" ] || [ -L "`$REMOTE_BACKUP" ]; then echo 'Backup destination already exists or is a symlink; refusing promote.' >&2; exit 1; fi
 if find "`$REMOTE_DIR" -type l -print -quit | grep -q .; then
   echo 'Remote directory contains a symlink immediately before promote; refusing deployment.' >&2
   exit 1
@@ -461,6 +464,31 @@ printf '{"formatVersion":1,"archiveRoot":"%s","remotePublicRoot":"%s","deploymen
 mkdir -p "`$BACKUP_DIRECTORY"
 tar -czf "`$REMOTE_BACKUP" -C "`$BACKUP_STAGE" "`$ARCHIVE_ROOT"
 archive_sha=`$(sha256sum "`$REMOTE_BACKUP" | awk '{print `$1}')
+VERIFY_STAGE=`$(mktemp -d "`$HOME/abroad-o-backup-verify.XXXXXX")
+verify_cleanup() { rm -rf "`$VERIFY_STAGE"; }
+trap 'cleanup; backup_cleanup; verify_cleanup' EXIT
+test "`$(realpath -e "`$REMOTE_BACKUP")" = "`$REMOTE_BACKUP"
+tar -tzf "`$REMOTE_BACKUP" | awk -v root="`$ARCHIVE_ROOT" '
+  /^\// || /(^|\/)\.\.($|\/)/ || /\\/ { bad = 1 }
+  `$0 != root "/" && `$0 != root "/payload/" && `$0 != root "/manifest.txt" && `$0 != root "/manifest.sha256" && `$0 != root "/metadata.json" && index(`$0, root "/payload/") != 1 { bad = 1 }
+  END { exit bad }'
+test -z "`$(tar -tvzf "`$REMOTE_BACKUP" | awk 'substr(`$1, 1, 1) == "l" || substr(`$1, 1, 1) == "h" { print; exit }')"
+tar -xzf "`$REMOTE_BACKUP" -C "`$VERIFY_STAGE"
+test "`$(sha256sum "`$VERIFY_STAGE/`$ARCHIVE_ROOT/manifest.txt" | awk '{print `$1}')" = "`$manifest_sha"
+test "`$(cat "`$VERIFY_STAGE/`$ARCHIVE_ROOT/manifest.sha256")" = "`$manifest_sha  manifest.txt"
+expected_metadata=`$(printf '{"formatVersion":1,"archiveRoot":"%s","remotePublicRoot":"%s","deploymentPathManifestSha256":"%s","deploymentEvidenceSha256":"%s"}' "`$ARCHIVE_ROOT" "`$REMOTE_DIR" "`$DEPLOYMENT_PATH_MANIFEST_SHA" "`$DEPLOYMENT_EVIDENCE_SHA")
+test "`$(tr -d '\r\n' < "`$VERIFY_STAGE/`$ARCHIVE_ROOT/metadata.json")" = "`$expected_metadata"
+test -z "`$(find "`$VERIFY_STAGE/`$ARCHIVE_ROOT" -type l -print -quit)"
+awk -v verify_payload="`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload" '
+  length(`$0) < 67 || substr(`$0, 1, 64) !~ /^[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]/ || substr(`$0, 65, 2) != "  " { exit 1 }
+  { path = substr(`$0, 67); if (path in seen) exit 1; seen[path] = 1; if (path ~ /^TOOL\// || path == "pdfjs/LICENSE" || path ~ /^pdfjs\/(build|web)\// || path !~ /^[A-Za-z0-9._\/@+-]+$/) exit 1; command = "test -f \"" verify_payload "/" path "\" && sha256sum \"" verify_payload "/" path "\""; command | getline line; close(command); split(line, fields, " "); if (fields[1] != substr(`$0, 1, 64)) exit 1 }
+  END { if (NR == 0) exit 1 }' "`$VERIFY_STAGE/`$ARCHIVE_ROOT/manifest.txt"
+while IFS=' ' read -r expected_hash expected_bytes path; do
+  test -f "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/`$path"
+  test "`$(wc -c < "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/`$path" | tr -d ' ')" = "`$expected_bytes"
+  test "`$(sha256sum "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/`$path" | awk '{print `$1}')" = "`$expected_hash"
+done < "`$protected_paths"
+test ! -e "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/TOOL" && test ! -e "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/pdfjs/build" && test ! -e "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/pdfjs/web" && test ! -e "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/pdfjs/LICENSE"
 echo "Sanitized backup: archiveSha256=`$archive_sha manifestSha256=`$manifest_sha"
 tar -xzf "`$REMOTE_PACKAGE" -C "`$STAGE_DIR"
 if find "`$STAGE_DIR" -type l -print -quit | grep -q .; then
@@ -798,8 +826,11 @@ RESTORE_STAGE=`$(mktemp -d "`$HOME/abroad-o-restore.XXXXXX")
 cleanup_restore() { rm -rf "`$RESTORE_STAGE"; }
 trap cleanup_restore EXIT
 test -d "`$REMOTE_DIR" && test ! -L "`$REMOTE_DIR"
+test "`$(realpath -e "`$REMOTE_DIR")" = "`$REMOTE_DIR"
 find "`$REMOTE_DIR" -type l -print -quit | grep -q . && { echo 'Restore target contains a symlink; refusing restore.' >&2; exit 1; }
 test -f "`$REMOTE_ARCHIVE" && test ! -L "`$REMOTE_ARCHIVE"
+test "`$(realpath -e "`$REMOTE_ARCHIVE")" = "`$REMOTE_ARCHIVE"
+test "`$(realpath -e "`$(dirname "`$REMOTE_ARCHIVE")")" = "`$(dirname "`$REMOTE_ARCHIVE")"
 actual_archive_sha=`$(sha256sum "`$REMOTE_ARCHIVE" | awk '{print `$1}')
 test "`$actual_archive_sha" = "`$EXPECTED_ARCHIVE_SHA"
 unsafe_entries=`$(tar -tzf "`$REMOTE_ARCHIVE" | awk '/^\// || /(^|\/)\.\.($|\/)/ || /\\/ { print; exit }')
@@ -837,6 +868,10 @@ is_managed() {
   case "`$path" in pdfjs/1c_abroad.pdf|pdfjs/2c_abroad.pdf|pdfjs/4c_abroad.pdf) return 0;; pdfjs/*) return 1;; esac
   case "`$path" in */*) top=`${path%%/*}; grep -Fxq "`$top" "`$managed_directories";; *) grep -Fxq "`$path" "`$managed_roots";; esac
 }
+manifest_has_path() {
+  candidate="`$1"
+  awk -v path="`$candidate" 'length(`$0) == 66 + length(path) && substr(`$0, 1, 64) ~ /^[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]/ && substr(`$0, 65, 2) == "  " && substr(`$0, 67) == path { found = 1 } END { exit !found }' "`$previous_manifest"
+}
 cut -d ' ' -f 3- "`$previous_manifest" | while IFS= read -r path; do
   is_managed "`$path" || { echo "Unmanaged restore path: `$path" >&2; exit 1; }
   test -f "`$RESTORE_STAGE/`$ARCHIVE_ROOT/payload/`$path"
@@ -853,7 +888,7 @@ done < "`$protected_paths"
 while IFS= read -r path; do
   [ -n "`$path" ] || continue
   is_managed "`$path" || { echo "Current manifest has unmanaged restore path: `$path" >&2; exit 1; }
-  if ! grep -Fq "  `$path" "`$previous_manifest"; then printf 'DELETE_NEW_ONLY %s\n' "`$path"; fi
+  if ! manifest_has_path "`$path"; then printf 'DELETE_NEW_ONLY %s\n' "`$path"; fi
 done < "`$current_manifest"
 if [ "`$APPLY" != 1 ]; then
   echo 'RestoreSafe dry run complete. No files were changed.'
@@ -865,7 +900,7 @@ cut -d ' ' -f 3- "`$previous_manifest" | while IFS= read -r path; do
 done
 while IFS= read -r path; do
   [ -n "`$path" ] || continue
-  if ! grep -Fq "  `$path" "`$previous_manifest"; then rm -f "`$REMOTE_DIR/`$path"; fi
+  if ! manifest_has_path "`$path"; then rm -f "`$REMOTE_DIR/`$path"; fi
 done < "`$current_manifest"
 echo 'RestoreSafe apply completed.'
 "@
