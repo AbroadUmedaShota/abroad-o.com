@@ -112,10 +112,13 @@ try {
     Assert-Throws { Test-SakuraSanitizedRestoreArchive -ArchivePath $archive -ExpectedArchiveSha256 $archiveInfo.ArchiveSha256 -ExpectedManifestSha256 $archiveInfo.ManifestSha256 -ExpectedDeploymentPathManifestSha256 $deploymentPathManifestSha256 -ExpectedDeploymentEvidenceSha256 ("d" * 64) -Config $config } "different deployment evidence binding is rejected"
     Assert-Throws { Invoke-SakuraSanitizedRestorePlan -Plan $plan -DestinationDirectory $published -ExpectedDestinationDirectory (Join-Path $testRoot "other") -Apply } "unexpected restore destination is rejected"
 
+    $deployScript = Join-Path $PSScriptRoot "deploy-sakura.ps1"
+    $deployScriptText = Get-Content -LiteralPath $deployScript -Raw
+    Assert-True (-not $deployScriptText.Contains("-printf")) "remote shell avoids GNU-only find -printf"
+
     $savedShellValidation = $env:SAKURA_VALIDATE_REMOTE_SCRIPT
     try {
         $env:SAKURA_VALIDATE_REMOTE_SCRIPT = "1"
-        $deployScript = Join-Path $PSScriptRoot "deploy-sakura.ps1"
         & pwsh -NoProfile -File $deployScript -Mode Preflight -HostName "syntax-only.invalid" -UserName "abroad-o" -RemoteDir "/home/abroad-o/www/abroad-o.com" -SshKeyPath "ignored"
         if ($LASTEXITCODE -ne 0) { throw "Generated Preflight shell syntax check failed." }
         & pwsh -NoProfile -File $deployScript -Mode RestoreSafe -HostName "syntax-only.invalid" -UserName "abroad-o" -RemoteDir "/home/abroad-o/www/abroad-o.com" -SshKeyPath "ignored" -BackupFile "/home/abroad-o/abroad-o-backups/abroad-o-before-test.sra.tgz" -BackupArchiveSha256 ("a" * 64) -BackupManifestSha256 ("b" * 64)
