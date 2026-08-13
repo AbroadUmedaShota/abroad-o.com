@@ -115,6 +115,7 @@ try {
     $deployScript = Join-Path $PSScriptRoot "deploy-sakura.ps1"
     $deployScriptText = Get-Content -LiteralPath $deployScript -Raw
     Assert-True (-not $deployScriptText.Contains("-printf")) "remote shell avoids GNU-only find -printf"
+    Assert-True ($deployScriptText.Contains('Write-Host "Package SHA-256: $($package.PackageSha256)"')) "DryRun reports the RC package SHA-256"
 
     $savedShellValidation = $env:SAKURA_VALIDATE_REMOTE_SCRIPT
     try {
