@@ -46,7 +46,7 @@ evidence_sha=$(printf '%s\n' "$pkgout" | sed -n 's/^Content evidence SHA-256: //
 [ -s "$package" ] && [ -s "$manifest" ] || fail 'generated package or manifest missing'
 [[ $path_sha =~ ^[0-9a-f]{64}$ && $evidence_sha =~ ^[0-9a-f]{64}$ ]] || fail 'invalid deployment bindings'
 cp -a _site "$previous"
-rm -f "$previous/css/style.css"
+rm -f "$previous/style.css"
 printf 'prior release\n' > "$previous/index.html"
 cp -a "$previous" "$public"
 
@@ -90,7 +90,8 @@ stage="$work/stage"; mkdir -p "$stage"; tar -xzf "$archive" -C "$stage"
 manifest_sha=$(sha "$stage/restore-contract-v1/manifest.txt")
 valid_archive="$archive"; valid_archive_sha="$archive_sha"
 [ "$(sha "$public/index.html")" = "$(sha _site/index.html)" ] || fail 'Promote did not publish the new index'
-[ "$(sha "$public/css/style.css")" = "$(sha _site/css/style.css)" ] || fail 'Promote did not publish the new-only file'
+[ -f "$public/style.css" ] && [ -f _site/style.css ] || fail 'Promote new-only file fixture is missing'
+[ "$(sha "$public/style.css")" = "$(sha _site/style.css)" ] || fail 'Promote did not publish the new-only file'
 [ "$(cat "$public/unknown.txt")" = unknown ] || fail 'Promote changed unknown file'
 for p in TOOL/index.html pdfjs/build/pdf.js pdfjs/web/viewer.html pdfjs/LICENSE; do absent "$public/$p"; done
 [ ! -e "$home/$release.tgz" ] || fail 'Promote did not remove staged package'
@@ -102,7 +103,7 @@ for p in 1c_abroad.pdf 2c_abroad.pdf 4c_abroad.pdf; do printf changed > "$public
 dry=$(tree "$public"); run 0 >/dev/null; [ "$dry" = "$(tree "$public")" ] || fail 'DryRun changed public root'
 run 1 >/dev/null
 for p in index.html foo/foo.map woff/font.woff woff2/font.woff2; do [ "$(sha "$public/$p")" = "$(sha "$previous/$p")" ] || fail "prefix collision restore failed: $p"; done
-absent "$public/css/style.css"; [ "$(cat "$public/unknown.txt")" = unknown ] || fail 'unknown changed'
+absent "$public/style.css"; [ "$(cat "$public/unknown.txt")" = unknown ] || fail 'unknown changed'
 for p in TOOL/index.html pdfjs/build/pdf.js pdfjs/web/viewer.html pdfjs/LICENSE; do absent "$public/$p"; done
 for p in 1c_abroad.pdf 2c_abroad.pdf 4c_abroad.pdf; do [ "$(sha "$public/pdfjs/$p")" = "$(sha "$previous/pdfjs/$p")" ] || fail "PDF changed: $p"; done
 [ -z "$(find "$home" -maxdepth 1 -name 'abroad-o-restore.*' -print -quit)" ] || fail 'successful restore left temp'
