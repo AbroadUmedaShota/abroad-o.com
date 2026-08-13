@@ -17,7 +17,7 @@
     "check:csp-runtime": "npm run build:site && node scripts/check-csp-runtime.mjs",
     "check:page-style-ui": "npm run build:site && node scripts/check-page-style-ui.mjs",
     "check:contracts": "node --test scripts/test-html-contract.mjs",
-    "check:restore-contract": "pwsh -NoProfile -File scripts/test-sakura-restore-contract.ps1",
+    "check:restore-contract": "pwsh -NoProfile -File scripts/test-sakura-restore-contract.ps1 && bash scripts/test-sakura-remote-restore-contract.sh",
     "check:image-performance": "node --test scripts/test-image-performance-contract.mjs && npm run build:site && node scripts/check-image-performance.mjs",
     "inventory:public-assets": "npm run build:site && node --test scripts/test-public-asset-inventory.mjs && node scripts/inventory-public-assets.mjs",
     "inventory:heading-skips": "node scripts/inventory-heading-skips.mjs",

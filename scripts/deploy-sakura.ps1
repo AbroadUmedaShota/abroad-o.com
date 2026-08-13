@@ -396,6 +396,7 @@ function Invoke-RemotePromote {
     $protectedPathsBody = (@($Config.protectedPaths | ForEach-Object { "{0} {1} {2}" -f $_.sha256.ToLowerInvariant(), $_.bytes, $_.path }) -join "`n")
     $archiveRoot = [string]$Config.restoreContract.archiveRoot
     $backupDirectory = [string]$Config.restoreContract.backupDirectory
+    $remoteRestoreLibrary = Get-Content -LiteralPath (Join-Path $PSScriptRoot "lib/sakura-restore-remote.sh") -Raw
     $script = @"
 set -eu
 REMOTE_DIR='$RemoteDirectory'
@@ -468,6 +469,8 @@ VERIFY_STAGE=`$(mktemp -d "`$HOME/abroad-o-backup-verify.XXXXXX")
 verify_cleanup() { rm -rf "`$VERIFY_STAGE"; }
 trap 'cleanup; backup_cleanup; verify_cleanup' EXIT
 test "`$(realpath -e "`$REMOTE_BACKUP")" = "`$REMOTE_BACKUP"
+$remoteRestoreLibrary
+validate_sanitized_archive "`$REMOTE_BACKUP" "`$VERIFY_STAGE" "`$archive_sha" "`$manifest_sha" "`$ARCHIVE_ROOT" "`$REMOTE_DIR" "`$DEPLOYMENT_PATH_MANIFEST_SHA" "`$DEPLOYMENT_EVIDENCE_SHA"
 tar -tzf "`$REMOTE_BACKUP" | awk -v root="`$ARCHIVE_ROOT" '
   /^\// || /(^|\/)\.\.($|\/)/ || /\\/ { bad = 1 }
   `$0 != root "/" && `$0 != root "/payload/" && `$0 != root "/manifest.txt" && `$0 != root "/manifest.sha256" && `$0 != root "/metadata.json" && index(`$0, root "/payload/") != 1 { bad = 1 }
@@ -605,6 +608,15 @@ function Invoke-RemoteScript {
         $normalizedScript | & bash -n -
         if ($LASTEXITCODE -ne 0) { throw "Generated remote shell syntax validation failed." }
         Write-Host "Generated remote shell syntax passed."
+        return
+    }
+    # Contract tests execute the exact generated remote script locally. This hook is
+    # deliberately opt-in and is never set by deployment workflows.
+    if ($env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -eq "1") {
+        $normalizedScript | & bash -s
+        if ($LASTEXITCODE -ne 0) {
+            throw "Local remote-script contract execution failed."
+        }
         return
     }
     $target = Get-SshTarget
@@ -812,6 +824,7 @@ function Invoke-RemoteSanitizedRestore {
     $protectedPathsBody = (@($Config.protectedPaths | ForEach-Object { "{0} {1} {2}" -f $_.sha256.ToLowerInvariant(), $_.bytes, $_.path }) -join "`n")
     $archiveRoot = [string]$Config.restoreContract.archiveRoot
     $applyFlag = if ($Apply) { "1" } else { "0" }
+    $remoteRestoreLibrary = Get-Content -LiteralPath (Join-Path $PSScriptRoot "lib/sakura-restore-remote.sh") -Raw
     $script = @"
 set -eu
 REMOTE_DIR='$RemoteDirectory'
@@ -831,6 +844,8 @@ find "`$REMOTE_DIR" -type l -print -quit | grep -q . && { echo 'Restore target c
 test -f "`$REMOTE_ARCHIVE" && test ! -L "`$REMOTE_ARCHIVE"
 test "`$(realpath -e "`$REMOTE_ARCHIVE")" = "`$REMOTE_ARCHIVE"
 test "`$(realpath -e "`$(dirname "`$REMOTE_ARCHIVE")")" = "`$(dirname "`$REMOTE_ARCHIVE")"
+$remoteRestoreLibrary
+validate_sanitized_archive "`$REMOTE_ARCHIVE" "`$RESTORE_STAGE" "`$EXPECTED_ARCHIVE_SHA" "`$EXPECTED_MANIFEST_SHA" "`$ARCHIVE_ROOT" "`$REMOTE_DIR" "`$EXPECTED_DEPLOYMENT_PATH_MANIFEST_SHA" "`$EXPECTED_DEPLOYMENT_EVIDENCE_SHA"
 actual_archive_sha=`$(sha256sum "`$REMOTE_ARCHIVE" | awk '{print `$1}')
 test "`$actual_archive_sha" = "`$EXPECTED_ARCHIVE_SHA"
 unsafe_entries=`$(tar -tzf "`$REMOTE_ARCHIVE" | awk '/^\// || /(^|\/)\.\.($|\/)/ || /\\/ { print; exit }')
@@ -872,10 +887,31 @@ manifest_has_path() {
   candidate="`$1"
   awk -v path="`$candidate" 'length(`$0) == 66 + length(path) && substr(`$0, 1, 64) ~ /^[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]/ && substr(`$0, 65, 2) == "  " && substr(`$0, 67) == path { found = 1 } END { exit !found }' "`$previous_manifest"
 }
-cut -d ' ' -f 3- "`$previous_manifest" | while IFS= read -r path; do
+archive_payload_entries="`$RESTORE_STAGE/archive-payload-entries"
+tar -tzf "`$REMOTE_ARCHIVE" | awk -v root="`$ARCHIVE_ROOT" '
+  /^\// || /(^|\/)\.\.($|\/)/ || /\\/ { exit 1 }
+  `$0 == root "/" || `$0 == root "/payload/" || `$0 == root "/manifest.txt" || `$0 == root "/manifest.sha256" || `$0 == root "/metadata.json" { next }
+  index(`$0, root "/payload/") == 1 { print substr(`$0, length(root "/payload/") + 1); next }
+  { exit 1 }' > "`$archive_payload_entries"
+test -z "`$(sort "`$archive_payload_entries" | uniq -d)"
+manifest_paths="`$RESTORE_STAGE/manifest-paths"
+manifest_hashes="`$RESTORE_STAGE/manifest-hashes"
+: > "`$manifest_paths"
+: > "`$manifest_hashes"
+while IFS= read -r line || [ -n "`$line" ]; do
+  printf '%s\n' "`$line" | grep -Eq '^[0-9a-f]{64}  [A-Za-z0-9._/@+-]+$' || { echo 'Invalid restore manifest line.' >&2; exit 1; }
+  path=`${line#*  }
   is_managed "`$path" || { echo "Unmanaged restore path: `$path" >&2; exit 1; }
+  printf '%s\n' "`$path" >> "`$manifest_paths"
+  printf '%s\t%s\n' "`$path" "`${line%%  *}" >> "`$manifest_hashes"
+done < "`$previous_manifest"
+test -s "`$manifest_paths"
+test -z "`$(sort "`$manifest_paths" | uniq -d)"
+test "`$(LC_ALL=C sort "`$archive_payload_entries")" = "`$(LC_ALL=C sort "`$manifest_paths")"
+cut -d ' ' -f 3- "`$previous_manifest" | while IFS= read -r path; do
   test -f "`$RESTORE_STAGE/`$ARCHIVE_ROOT/payload/`$path"
-  expected=`$(grep -F "  `$path" "`$previous_manifest" | awk '{print `$1}')
+  expected=`$(awk -F '\t' -v path="`$path" '`$1 == path { print `$2 }' "`$manifest_hashes")
+  test -n "`$expected"
   actual=`$(sha256sum "`$RESTORE_STAGE/`$ARCHIVE_ROOT/payload/`$path" | awk '{print `$1}')
   test "`$expected" = "`$actual"
   printf 'RESTORE %s\n' "`$path"
@@ -952,14 +988,14 @@ function Invoke-Verification {
 }
 
 $repoRoot = Resolve-RepoRoot
-$configFullPath = Join-Path $repoRoot $ConfigPath
+$configFullPath = if ([IO.Path]::IsPathRooted($ConfigPath)) { [IO.Path]::GetFullPath($ConfigPath) } else { Join-Path $repoRoot $ConfigPath }
 if (-not (Test-Path $configFullPath)) {
     throw "Config not found: $configFullPath"
 }
 
 $config = Get-Content -Path $configFullPath -Raw | ConvertFrom-Json
 Assert-SakuraRestoreConfig -Config $config
-$workDirFullPath = Join-Path $repoRoot $WorkDir
+$workDirFullPath = if ([IO.Path]::IsPathRooted($WorkDir)) { [IO.Path]::GetFullPath($WorkDir) } else { Join-Path $repoRoot $WorkDir }
 New-Item -ItemType Directory -Path $workDirFullPath -Force | Out-Null
 
 if ($config.publicRoot -and $Mode -notin @("Verify", "Restore") -and $env:SAKURA_VALIDATE_REMOTE_SCRIPT -ne "1") {
