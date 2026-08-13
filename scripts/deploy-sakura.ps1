@@ -657,6 +657,16 @@ function Invoke-RemoteScriptOutput {
         Write-Host "Generated remote shell syntax passed."
         return @()
     }
+    if ($env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -eq "1") {
+        if ($env:SAKURA_LOCAL_REMOTE_SCRIPT_MARKER) {
+            [System.IO.File]::AppendAllText($env:SAKURA_LOCAL_REMOTE_SCRIPT_MARKER, "invoke-output`n", [System.Text.UTF8Encoding]::new($false))
+        }
+        $output = $normalizedScript | & bash -s
+        if ($LASTEXITCODE -ne 0) {
+            throw "Local remote-script output contract execution failed."
+        }
+        return @($output)
+    }
     $target = Get-SshTarget
     $sshArgs = Get-SshArgs
     if ($IsWindows) {
