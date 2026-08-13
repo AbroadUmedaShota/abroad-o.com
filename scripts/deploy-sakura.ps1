@@ -242,6 +242,7 @@ function New-DeployPackage {
 
     $pathManifestSha256 = (Get-FileHash -LiteralPath $manifestPath -Algorithm SHA256).Hash.ToLowerInvariant()
     $evidenceSha256 = (Get-FileHash -LiteralPath $evidencePath -Algorithm SHA256).Hash.ToLowerInvariant()
+    $packageSha256 = (Get-FileHash -LiteralPath $packagePath -Algorithm SHA256).Hash.ToLowerInvariant()
     [pscustomobject]@{
         StagingDir = $stagingDir
         PackagePath = $packagePath
@@ -249,6 +250,7 @@ function New-DeployPackage {
         EvidencePath = $evidencePath
         PathManifestSha256 = $pathManifestSha256
         EvidenceSha256 = $evidenceSha256
+        PackageSha256 = $packageSha256
         # Backward-compatible alias for prior console output; it is the content evidence SHA-256.
         ManifestSha256 = $evidenceSha256
         FileCount = $manifest.Count
@@ -1041,6 +1043,7 @@ if ($Mode -eq "Restore") {
 
 $package = New-DeployPackage -RepoRoot $repoRoot -Config $config -WorkDirPath $workDirFullPath
 Write-Host "Package: $($package.PackagePath)"
+Write-Host "Package SHA-256: $($package.PackageSha256)"
 Write-Host "Manifest: $($package.ManifestPath)"
 Write-Host "Manifest evidence: $($package.EvidencePath)"
 Write-Host "Path manifest SHA-256: $($package.PathManifestSha256)"
