@@ -574,7 +574,7 @@ function Invoke-RemoteScript {
     $normalizedScript = ($Script -replace "`r`n", "`n") -replace "`r", "`n"
     [System.IO.File]::WriteAllText($scriptPath, $normalizedScript, [System.Text.UTF8Encoding]::new($false))
     if ($env:SAKURA_VALIDATE_REMOTE_SCRIPT -eq "1") {
-        & bash -n $scriptPath
+        $normalizedScript | & bash -n -
         if ($LASTEXITCODE -ne 0) { throw "Generated remote shell syntax validation failed." }
         Write-Host "Generated remote shell syntax passed."
         return
@@ -598,7 +598,7 @@ function Invoke-RemoteScriptOutput {
     $normalizedScript = ($Script -replace "`r`n", "`n") -replace "`r", "`n"
     [System.IO.File]::WriteAllText($scriptPath, $normalizedScript, [System.Text.UTF8Encoding]::new($false))
     if ($env:SAKURA_VALIDATE_REMOTE_SCRIPT -eq "1") {
-        & bash -n $scriptPath
+        $normalizedScript | & bash -n -
         if ($LASTEXITCODE -ne 0) { throw "Generated remote shell syntax validation failed." }
         Write-Host "Generated remote shell syntax passed."
         return @()
