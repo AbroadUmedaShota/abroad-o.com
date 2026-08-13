@@ -613,7 +613,7 @@ function Invoke-RemoteScript {
     # Contract tests execute the exact generated remote script locally. This hook is
     # deliberately opt-in and is never set by deployment workflows.
     if ($env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -eq "1") {
-        $normalizedScript | & bash -x -s
+        $normalizedScript | & bash -s
         if ($LASTEXITCODE -ne 0) {
             throw "Local remote-script contract execution failed."
         }
