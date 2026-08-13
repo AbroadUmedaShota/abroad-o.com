@@ -888,11 +888,7 @@ manifest_has_path() {
   awk -v path="`$candidate" 'length(`$0) == 66 + length(path) && substr(`$0, 1, 64) ~ /^[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]/ && substr(`$0, 65, 2) == "  " && substr(`$0, 67) == path { found = 1 } END { exit !found }' "`$previous_manifest"
 }
 archive_payload_entries="`$RESTORE_STAGE/archive-payload-entries"
-tar -tzf "`$REMOTE_ARCHIVE" | awk -v root="`$ARCHIVE_ROOT" '
-  /^\// || /(^|\/)\.\.($|\/)/ || /\\/ { exit 1 }
-  `$0 == root "/" || `$0 == root "/payload/" || `$0 == root "/manifest.txt" || `$0 == root "/manifest.sha256" || `$0 == root "/metadata.json" { next }
-  index(`$0, root "/payload/") == 1 { print substr(`$0, length(root "/payload/") + 1); next }
-  { exit 1 }' > "`$archive_payload_entries"
+find "`$RESTORE_STAGE/`$ARCHIVE_ROOT/payload" -type f -printf '%P\n' | LC_ALL=C sort > "`$archive_payload_entries"
 test -z "`$(sort "`$archive_payload_entries" | uniq -d)"
 manifest_paths="`$RESTORE_STAGE/manifest-paths"
 manifest_hashes="`$RESTORE_STAGE/manifest-hashes"
