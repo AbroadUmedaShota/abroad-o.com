@@ -116,8 +116,8 @@ for kind in extra symlink hardlink duplicate invalid empty pdfmissing crlf; do
   mutate; candidate="$work/$kind.tgz"
   case "$kind" in
     extra) printf x > "$work/mutate/restore-contract-v1/unexpected"; ret "$candidate" ;;
-    symlink) ln -s /etc/passwd "$work/mutate/restore-contract-v1/payload/link"; ret "$candidate"; tar -tvzf "$candidate" | grep -q '^l' || fail 'symlink fixture is not a symlink entry' ;;
-    hardlink) ln "$work/mutate/restore-contract-v1/payload/index.html" "$work/mutate/restore-contract-v1/payload/index-copy.html"; ret "$candidate"; tar -tvzf "$candidate" | grep -q '^h' || fail 'hardlink fixture is not a hardlink entry' ;;
+    symlink) ln -s /etc/passwd "$work/mutate/restore-contract-v1/payload/link"; ret "$candidate"; tar -tvzf "$candidate" | awk 'substr($1, 1, 1) == "l" { found = 1 } END { exit !found }' || fail 'symlink fixture is not a symlink entry' ;;
+    hardlink) ln "$work/mutate/restore-contract-v1/payload/index.html" "$work/mutate/restore-contract-v1/payload/index-copy.html"; ret "$candidate"; tar -tvzf "$candidate" | awk 'substr($1, 1, 1) == "h" { found = 1 } END { exit !found }' || fail 'hardlink fixture is not a hardlink entry' ;;
     duplicate) head -1 "$work/mutate/restore-contract-v1/manifest.txt" >> "$work/mutate/restore-contract-v1/manifest.txt"; printf '%s  manifest.txt\n' "$(sha "$work/mutate/restore-contract-v1/manifest.txt")" > "$work/mutate/restore-contract-v1/manifest.sha256"; ret "$candidate" ;;
     invalid) sed -i '1s/^[0-9a-f]/z/' "$work/mutate/restore-contract-v1/manifest.txt"; printf '%s  manifest.txt\n' "$(sha "$work/mutate/restore-contract-v1/manifest.txt")" > "$work/mutate/restore-contract-v1/manifest.sha256"; ret "$candidate" ;;
     empty) : > "$work/mutate/restore-contract-v1/manifest.txt"; printf '%s  manifest.txt\n' "$(sha "$work/mutate/restore-contract-v1/manifest.txt")" > "$work/mutate/restore-contract-v1/manifest.sha256"; ret "$candidate" ;;
@@ -128,9 +128,9 @@ for kind in extra symlink hardlink duplicate invalid empty pdfmissing crlf; do
 done
 
 # A real short/long manifest pair must be treated as distinct paths. The
-# archive intentionally omits the short file, while retaining its .map.
-pair_short=$(grep -m1 '^vendor/bootstrap3/css/bootstrap\.min\.css$' "$manifest" || true)
-pair_long="${pair_short}.map"
+# archive intentionally omits the WOFF file, while retaining its WOFF2 peer.
+pair_short=$(grep -m1 '^vendor/bootstrap3/fonts/glyphicons-halflings-regular\.woff$' "$manifest" || true)
+pair_long="${pair_short}2"
 if [ -n "$pair_short" ] && grep -Fxq "$pair_long" "$manifest"; then
   rm -rf "$work/pair-stage"; cp -a "$stage" "$work/pair-stage"
   rm -f "$work/pair-stage/restore-contract-v1/payload/$pair_short"
@@ -139,9 +139,9 @@ if [ -n "$pair_short" ] && grep -Fxq "$pair_long" "$manifest"; then
   printf changed > "$public/$pair_short"; printf changed > "$public/$pair_long"
   run 1 >/dev/null
   absent "$public/$pair_short"
-  [ "$(sha "$public/$pair_long")" = "$(sha "$previous/$pair_long")" ] || fail 'long .map path was not restored exactly'
+  [ "$(sha "$public/$pair_long")" = "$(sha "$previous/$pair_long")" ] || fail 'long WOFF2 path was not restored exactly'
 else
-  fail 'required bootstrap CSS/.map prefix-collision fixture is absent from package manifest'
+  fail 'required Bootstrap 3 WOFF/WOFF2 prefix-collision fixture is absent from package manifest'
 fi
 baseline=$(tree "$public")
 valid_archive="$archive"; valid_archive_sha="$archive_sha"
