@@ -397,6 +397,11 @@ function Invoke-RemotePromote {
     $archiveRoot = [string]$Config.restoreContract.archiveRoot
     $backupDirectory = [string]$Config.restoreContract.backupDirectory
     $remoteRestoreLibrary = Get-Content -LiteralPath (Join-Path $PSScriptRoot "lib/sakura-restore-remote.sh") -Raw
+    $promoteArchiveFault = if ($env:SAKURA_LOCAL_PROMOTE_CORRUPT_BACKUP -eq "1" -and $env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -eq "1") {
+        'printf ''codex-invalid-backup'' >> "$REMOTE_BACKUP"'
+    } else {
+        ''
+    }
     $script = @"
 set -eu
 REMOTE_DIR='$RemoteDirectory'
@@ -429,7 +434,11 @@ if [ -n "`$archive_links" ]; then
 fi
 test "`$(dirname "`$REMOTE_BACKUP")" = "`$BACKUP_DIRECTORY"
 BACKUP_STAGE=`$(mktemp -d "`$HOME/abroad-o-backup.XXXXXX")
-backup_cleanup() { rm -rf "`$BACKUP_STAGE"; }
+backup_verified=0
+backup_cleanup() {
+  rm -rf "`$BACKUP_STAGE"
+  if [ "`$backup_verified" != 1 ]; then rm -f "`$REMOTE_BACKUP"; fi
+}
 trap 'cleanup; backup_cleanup' EXIT
 mkdir -p "`$BACKUP_STAGE/`$ARCHIVE_ROOT/payload"
 protected_paths="`$BACKUP_STAGE/protected-paths"
@@ -465,6 +474,7 @@ printf '{"formatVersion":1,"archiveRoot":"%s","remotePublicRoot":"%s","deploymen
 mkdir -p "`$BACKUP_DIRECTORY"
 tar -czf "`$REMOTE_BACKUP" -C "`$BACKUP_STAGE" "`$ARCHIVE_ROOT"
 archive_sha=`$(sha256sum "`$REMOTE_BACKUP" | awk '{print `$1}')
+$promoteArchiveFault
 VERIFY_STAGE=`$(mktemp -d "`$HOME/abroad-o-backup-verify.XXXXXX")
 verify_cleanup() { rm -rf "`$VERIFY_STAGE"; }
 trap 'cleanup; backup_cleanup; verify_cleanup' EXIT
@@ -493,6 +503,7 @@ while IFS=' ' read -r expected_hash expected_bytes path; do
 done < "`$protected_paths"
 test ! -e "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/TOOL" && test ! -e "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/pdfjs/build" && test ! -e "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/pdfjs/web" && test ! -e "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/pdfjs/LICENSE"
 echo "Sanitized backup: archiveSha256=`$archive_sha manifestSha256=`$manifest_sha"
+backup_verified=1
 tar -xzf "`$REMOTE_PACKAGE" -C "`$STAGE_DIR"
 if find "`$STAGE_DIR" -type l -print -quit | grep -q .; then
   echo 'Extracted staging directory contains a symlink; refusing deployment.' >&2
@@ -613,6 +624,9 @@ function Invoke-RemoteScript {
     # Contract tests execute the exact generated remote script locally. This hook is
     # deliberately opt-in and is never set by deployment workflows.
     if ($env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -eq "1") {
+        if ($env:SAKURA_LOCAL_REMOTE_SCRIPT_MARKER) {
+            [System.IO.File]::AppendAllText($env:SAKURA_LOCAL_REMOTE_SCRIPT_MARKER, "invoke`n", [System.Text.UTF8Encoding]::new($false))
+        }
         $normalizedScript | & bash -s
         if ($LASTEXITCODE -ne 0) {
             throw "Local remote-script contract execution failed."
@@ -1060,7 +1074,7 @@ if ($Mode -eq "RestoreSafe") {
 $releaseId = "abroad-o-public-$($package.Stamp)"
 $remotePackageForScp = "~/$releaseId.tgz"
 $remoteBackupName = "abroad-o-before-$($package.Stamp).sra.tgz"
-$remoteBackupPath = "/home/$UserName/abroad-o-backups/$remoteBackupName"
+$remoteBackupPath = "$([string]$config.restoreContract.backupDirectory)/$remoteBackupName"
 
 if ($Mode -in @("Preflight", "Stage", "Promote", "Deploy")) {
     Invoke-RemotePreflight -Package $package -RemoteDirectory $remoteDirValue -Config $config
@@ -1087,4 +1101,6 @@ if ($Mode -eq "Promote") {
     $remotePackagePath = Get-VerifiedStagedPackage -Package $package -ReleaseId $StagedReleaseId
 }
 Invoke-RemotePromote -Package $package -RemoteDirectory $remoteDirValue -RemotePackage $remotePackagePath -RemoteBackup $remoteBackupPath -Config $config
-Invoke-Verification -Config $config
+if ($env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -ne "1") {
+    Invoke-Verification -Config $config
+}

@@ -39,18 +39,17 @@ c.restoreContract.remotePublicRoot = root; c.restoreContract.backupDirectory = b
 fs.writeFileSync(out, JSON.stringify(c));
 NODE
 pkgout=$(env SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode Package -ConfigPath "$config" -WorkDir "$work/package")
+package=$(printf '%s\n' "$pkgout" | sed -n 's/^Package: //p' | tail -1)
 manifest=$(printf '%s\n' "$pkgout" | sed -n 's/^Manifest: //p' | tail -1)
 path_sha=$(printf '%s\n' "$pkgout" | sed -n 's/^Path manifest SHA-256: //p' | tail -1)
 evidence_sha=$(printf '%s\n' "$pkgout" | sed -n 's/^Content evidence SHA-256: //p' | tail -1)
-[ -s "$manifest" ] || fail 'generated manifest missing'
+[ -s "$package" ] && [ -s "$manifest" ] || fail 'generated package or manifest missing'
 [[ $path_sha =~ ^[0-9a-f]{64}$ && $evidence_sha =~ ^[0-9a-f]{64}$ ]] || fail 'invalid deployment bindings'
-cp -a _site "$previous"; cp -a "$previous" "$public"
+cp -a _site "$previous"
+rm -f "$previous/css/style.css"
+printf 'prior release\n' > "$previous/index.html"
+cp -a "$previous" "$public"
 
-# Build a correctly bound sanitized prior-release archive. css/style.css is a
-# current-only file, allowing Apply to prove delete-new-only behavior.
-paths="$work/paths"; grep -vx 'css/style.css' "$manifest" > "$paths"
-stage="$work/stage"; mkdir -p "$stage/restore-contract-v1/payload"
-while IFS= read -r path; do mkdir -p "$stage/restore-contract-v1/payload/$(dirname "$path")"; cp -p "$previous/$path" "$stage/restore-contract-v1/payload/$path"; done < "$paths"
 refresh() {
   local dir=$1 out=$2
   (cd "$dir/restore-contract-v1/payload" && find . -type f -printf '%P\n' | LC_ALL=C sort | while IFS= read -r p; do sha256sum "$p"; done) > "$dir/restore-contract-v1/manifest.txt"
@@ -58,19 +57,47 @@ refresh() {
   printf '{"formatVersion":1,"archiveRoot":"restore-contract-v1","remotePublicRoot":"%s","deploymentPathManifestSha256":"%s","deploymentEvidenceSha256":"%s"}\n' "$public" "$path_sha" "$evidence_sha" > "$dir/restore-contract-v1/metadata.json"
   tar -czf "$out" -C "$dir" restore-contract-v1
 }
-archive="$backups/abroad-o-before-contract.sra.tgz"; refresh "$stage" "$archive"
-archive_sha=$(sha "$archive"); manifest_sha=$(sha "$stage/restore-contract-v1/manifest.txt")
-valid_archive="$archive"; valid_archive_sha="$archive_sha"
+invocations="$work/remote-script-invocations"
+invocation_count() { if [ -f "$invocations" ]; then wc -l < "$invocations" | tr -d ' '; else printf '0\n'; fi; }
 run() {
   local apply=${1:-0}
-  env HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode RestoreSafe -ConfigPath "$config" -WorkDir "$work/pkg-$RANDOM" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -BackupFile "$archive" -BackupArchiveSha256 "$archive_sha" -BackupManifestSha256 "$manifest_sha" $( [ "$apply" = 1 ] && printf '%s' -RestoreApply )
+  env HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 SAKURA_LOCAL_REMOTE_SCRIPT_MARKER="$invocations" pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode RestoreSafe -ConfigPath "$config" -WorkDir "$work/pkg-$RANDOM" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -BackupFile "$archive" -BackupArchiveSha256 "$archive_sha" -BackupManifestSha256 "$manifest_sha" $( [ "$apply" = 1 ] && printf '%s' -RestoreApply )
 }
 
-# Simulated Promote retirement occurs before any RestoreSafe invocation.
+# Execute the exact generated Promote shell. The first run corrupts its newly
+# created backup after hashing and must fail before changing the public root.
 mkdir -p "$public/TOOL" "$public/pdfjs/build" "$public/pdfjs/web"
 printf old > "$public/TOOL/index.html"; printf old > "$public/pdfjs/build/pdf.js"; printf old > "$public/pdfjs/web/viewer.html"; printf old > "$public/pdfjs/LICENSE"
-rm -rf "$public/TOOL" "$public/pdfjs/build" "$public/pdfjs/web"; rm -f "$public/pdfjs/LICENSE"
-printf unknown > "$public/unknown.txt"; printf changed > "$public/index.html"; printf changed > "$public/foo/foo.map"; printf changed > "$public/woff/font.woff"; printf changed > "$public/woff2/font.woff2"
+printf unknown > "$public/unknown.txt"
+release=restore-contract-e2e
+cp -p "$package" "$home/$release.tgz"
+mkdir -p "$home/.abroad-o-stages"
+printf '%s  %s  %s\n' "$(sha "$home/$release.tgz")" "$path_sha" "$evidence_sha" > "$home/.abroad-o-stages/$release.meta"
+run_promote() {
+  env HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 ${1:-} pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode Promote -ConfigPath "$config" -WorkDir "$work/promote-$RANDOM" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -StagedReleaseId "$release"
+}
+before_failed_promote=$(tree "$public")
+if run_promote SAKURA_LOCAL_PROMOTE_CORRUPT_BACKUP=1 >/dev/null 2>&1; then fail 'corrupt Promote backup was accepted'; fi
+[ "$before_failed_promote" = "$(tree "$public")" ] || fail 'failed Promote changed public root'
+[ -z "$(find "$backups" -maxdepth 1 -type f -name 'abroad-o-before-*.sra.tgz' -print -quit)" ] || fail 'failed Promote left an invalid backup'
+[ -z "$(find "$home" -maxdepth 1 \( -name 'abroad-o-stage.*' -o -name 'abroad-o-backup.*' -o -name 'abroad-o-backup-verify.*' \) -print -quit)" ] || fail 'failed Promote left temp'
+run_promote >/dev/null
+mapfile -t promote_backups < <(find "$backups" -maxdepth 1 -type f -name 'abroad-o-before-*.sra.tgz' -print)
+[ "${#promote_backups[@]}" -eq 1 ] || fail 'valid Promote did not create exactly one sanitized backup'
+archive=${promote_backups[0]}
+archive_sha=$(sha "$archive")
+stage="$work/stage"; mkdir -p "$stage"; tar -xzf "$archive" -C "$stage"
+manifest_sha=$(sha "$stage/restore-contract-v1/manifest.txt")
+valid_archive="$archive"; valid_archive_sha="$archive_sha"
+[ "$(sha "$public/index.html")" = "$(sha _site/index.html)" ] || fail 'Promote did not publish the new index'
+[ "$(sha "$public/css/style.css")" = "$(sha _site/css/style.css)" ] || fail 'Promote did not publish the new-only file'
+[ "$(cat "$public/unknown.txt")" = unknown ] || fail 'Promote changed unknown file'
+for p in TOOL/index.html pdfjs/build/pdf.js pdfjs/web/viewer.html pdfjs/LICENSE; do absent "$public/$p"; done
+[ ! -e "$home/$release.tgz" ] || fail 'Promote did not remove staged package'
+[ -z "$(find "$home" -maxdepth 1 \( -name 'abroad-o-stage.*' -o -name 'abroad-o-backup.*' -o -name 'abroad-o-backup-verify.*' \) -print -quit)" ] || fail 'successful Promote left temp'
+
+# RestoreSafe now consumes the archive produced by the real Promote shell.
+printf changed > "$public/index.html"; printf changed > "$public/foo/foo.map"; printf changed > "$public/woff/font.woff"; printf changed > "$public/woff2/font.woff2"
 for p in 1c_abroad.pdf 2c_abroad.pdf 4c_abroad.pdf; do printf changed > "$public/pdfjs/$p"; done
 dry=$(tree "$public"); run 0 >/dev/null; [ "$dry" = "$(tree "$public")" ] || fail 'DryRun changed public root'
 run 1 >/dev/null
@@ -89,31 +116,36 @@ invalid() {
   else
     manifest_sha=$(printf '0%.0s' {1..64})
   fi
+  local before_invocations after_invocations
+  before_invocations=$(invocation_count)
   if run 1 >/dev/null 2>&1; then fail "accepted invalid archive: $label"; fi
+  after_invocations=$(invocation_count)
+  [ "$after_invocations" -eq "$((before_invocations + 1))" ] || fail "invalid $label did not reach the generated remote shell"
   [ "$baseline" = "$(tree "$public")" ] || fail "invalid $label changed public root"
   [ -z "$(find "$home" -maxdepth 1 -name 'abroad-o-restore.*' -print -quit)" ] || fail "failed $label left temp"
 }
 mutate() { rm -rf "$work/mutate"; mkdir -p "$work/mutate"; tar -xzf "$archive" -C "$work/mutate"; }
 ret() { tar -czf "$1" -C "$work/mutate" restore-contract-v1; }
 
-printf raw > "$work/raw"; tar -czf "$work/raw.tgz" -C "$work" raw; invalid "$work/raw.tgz" raw
-mkdir -p "$work/odd"; printf x > "$work/odd/x"; tar -czf "$work/absolute.tgz" --transform='s,^,/,' -C "$work/odd" x; invalid "$work/absolute.tgz" absolute
-tar -czf "$work/traversal.tgz" --transform='s,^,../,' -C "$work/odd" x; invalid "$work/traversal.tgz" traversal
-python3 - "$work/backslash.tgz" <<'PY'
+printf raw > "$work/raw"; raw_archive="$backups/abroad-o-before-invalid-raw.sra.tgz"; tar -czf "$raw_archive" -C "$work" raw; invalid "$raw_archive" raw
+mkdir -p "$work/odd"; printf x > "$work/odd/x"; absolute_archive="$backups/abroad-o-before-invalid-absolute.sra.tgz"; tar -czf "$absolute_archive" --transform='s,^,/,' -C "$work/odd" x; invalid "$absolute_archive" absolute
+traversal_archive="$backups/abroad-o-before-invalid-traversal.sra.tgz"; tar -czf "$traversal_archive" --transform='s,^,../,' -C "$work/odd" x; invalid "$traversal_archive" traversal
+backslash_archive="$backups/abroad-o-before-invalid-backslash.sra.tgz"
+python3 - "$backslash_archive" <<'PY'
 import io, tarfile, sys
 with tarfile.open(sys.argv[1], "w:gz") as archive:
     entry = tarfile.TarInfo(r"a\b")
     entry.size = 1
     archive.addfile(entry, io.BytesIO(b"x"))
 PY
-invalid "$work/backslash.tgz" backslash
+invalid "$backslash_archive" backslash
 
 # Mutations start from the valid archive and intentionally retain valid outer
 # SHA arguments, exercising each inner validator before Apply.
 archive="$backups/abroad-o-before-contract.sra.tgz"
 for kind in extra symlink hardlink duplicate invalid empty pdfmissing crlf; do
   archive="$valid_archive"
-  mutate; candidate="$work/$kind.tgz"
+  mutate; candidate="$backups/abroad-o-before-invalid-$kind.sra.tgz"
   case "$kind" in
     extra) printf x > "$work/mutate/restore-contract-v1/unexpected"; ret "$candidate" ;;
     symlink) ln -s /etc/passwd "$work/mutate/restore-contract-v1/payload/link"; ret "$candidate"; tar -tvzf "$candidate" | awk 'substr($1, 1, 1) == "l" { found = 1 } END { exit !found }' || fail 'symlink fixture is not a symlink entry' ;;
