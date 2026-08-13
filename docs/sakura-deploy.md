@@ -85,6 +85,7 @@ FileZillaがFTP/21番で保存されていても、このデプロイスクリ�
 
 - `package`: Eleventyビルドと公開パッケージ作成のみ。SecretsとSakura接続は不要。
 - `audit`: SSHで本番を読み取り、Gitから生成した公開物とSHA-256を照合する。本番は更新しない。
+- `preflight`: SSHで公開ルート、symlink、sanitized snapshotに必要な空き容量、管理外ファイル件数を確認する。本番は更新しない。
 - `deploy`: 公開前バックアップを作成し、Sakuraへ本番反映する。実行前に明示確認を得る。
 
 GitHub repository secrets:
@@ -104,11 +105,26 @@ GitHub repository secrets:
 
 ## バックアップと復元
 
-`Restore` と `RestoreSafe` は、sanitized backup と復元契約が実装され、独立検証されるまで停止中である。旧 `TOOL/` や PDF.js viewer を復活させるおそれがあるため、実行しない。
+`Restore` は恒久的に停止している。生のサイト全体backupを復元する機能は持たない。
 
-`Deploy` は `Preflight`、`Stage`、限定 `Promote` の順で実行する。Preflightは読み取り専用で、公開ディレクトリがシンボリックリンクでないこと、公開ファイルに未知の追加物がないこと、パッケージ・現行バックアップ・作業領域を確保できる空き容量があることを確認する。未知のリモートファイルが1件でもある場合は反映を中止する。manifestに追加されたファイルや、明示した削除allowlist上のファイルはこの照合で許可する。
+`Promote` 前には、今回のRC path manifestに列挙されたファイルのうち、公開前に存在するものだけを `restore-contract-v1/` 形式のsanitized archiveとして保存する。`TOOL/`、`pdfjs/build/`、`pdfjs/web/`、`pdfjs/LICENSE`、管理外ファイルはarchiveに入らない。3件のPDFはバイト数とSHA-256を照合し、archiveに必ず含める。archive内metadataはformat version、固定公開ルート、対象RCのpath manifest SHA-256、content evidence SHA-256を結び付ける。archive SHA-256はarchive作成後に出力する。
 
-`Stage` は公開tarballをホームディレクトリに置くだけで、公開ディレクトリを変更しない。`Promote` はmanifest記載ファイルだけを上書きし、公開ルートや管理ディレクトリを一括削除しない。反映前に `~/abroad-o-backups/abroad-o-before-<timestamp>.tgz` を作り、manifestのSHA-256を操作証跡として出力する。
+このarchiveは「今回のRCにより上書きされる既存管理ファイル」の安全な復元用であり、旧サイト全体の完全snapshotではない。過去の所有manifestがないため、現行RCにない旧ファイルを管理対象と推定して保存・復活させない。退役ファイルを戻す必要がある場合は、この契約を拡張せず、別の証跡と明示承認を用意する。
+
+`RestoreSafe` は、上記形式のversioned archiveだけを対象にする。デフォルトはDryRunで、復元・新規管理ファイル削除の一覧だけを出す。実際に変更するには`-RestoreApply`を明示し、archive SHA-256とrestore manifest SHA-256を指定する。`-RestoreApply`は本番変更であり、DryRun結果を確認した後の別の明示承認が必須である。復元先は設定済みの公開ルートと完全一致しなければならず、絶対パス、`..`、CRLF、backslash、symbolic link、hard linkを含むarchiveは拒否する。復元はarchiveの管理対象だけを戻し、現在RC manifestにのみある管理ファイルだけを削除する。管理外ファイルは保持する。
+
+```powershell
+$env:SAKURA_BACKUP_FILE = '/home/abroad-o/abroad-o-backups/abroad-o-before-YYYYMMDD-HHMMSS.sra.tgz'
+$env:SAKURA_RESTORE_ARCHIVE_SHA256 = '<archive sha256>'
+$env:SAKURA_RESTORE_MANIFEST_SHA256 = '<restore manifest sha256>'
+.\scripts\deploy-sakura.ps1 -Mode RestoreSafe
+# DryRunの一覧を確認した、別の明示承認後だけ実行
+.\scripts\deploy-sakura.ps1 -Mode RestoreSafe -RestoreApply
+```
+
+`Deploy` は `Preflight`、`Stage`、限定 `Promote` の順で実行する。Preflightは読み取り専用で、公開ディレクトリがシンボリックリンクでないこと、sanitized snapshotに必要な空き容量、管理外ファイル数を確認する。管理外ファイルは一覧出力せずtop-level集計だけを示し、Promoteでは変更・削除しない。manifest記載ファイルと明示削除allowlistだけが公開操作の対象である。
+
+`Stage` は公開tarballをホームディレクトリに置くだけで、公開ディレクトリを変更しない。`Promote` はmanifest記載ファイルだけを上書きし、公開ルートや管理ディレクトリを一括削除しない。反映前に `~/abroad-o-backups/abroad-o-before-<timestamp>.sra.tgz` を作り、package SHA-256、path manifest SHA-256、content evidence SHA-256を区別して出力する。
 
 これらのモードはSSH/SCP鍵認証が必須である。FileZillaにFTP/21の設定しかない場合は、このスクリプトで接続・公開しない。FTPパスワードの読取り、表示、またはFTPへのフォールバックは行わない。
 

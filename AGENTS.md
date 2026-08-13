@@ -73,4 +73,4 @@
 
 ## ロールバック
 
-sanitized backup と restoration contract が実装され、独立検証されるまで、`Restore`、`RestoreSafe`、およびバックアップからの手動復元は実行しない。旧 `TOOL/` や PDF.js viewer を再公開する可能性があるため、復元は fail-closed とする。
+`Restore` と生のバックアップからの手動復元は恒久的に禁止する。旧 `TOOL/` やPDF.js viewerを再公開する可能性があるため、復元はfail-closedとする。`RestoreSafe`はversioned sanitized archive、archive／manifest SHA-256、固定公開ルート、DryRun、独立確認を満たす場合だけ使用できる。`-RestoreApply`は本番変更のため、DryRun結果を共有した後に別途明示承認を得るまで実行しない。

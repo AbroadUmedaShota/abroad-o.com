@@ -4,13 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "Package, audit the current public files, or deploy to Sakura."
+        description: "Package, audit, preflight, or deploy to Sakura."
         required: true
         default: "package"
         type: choice
         options:
           - "package"
           - "audit"
+          - "preflight"
           - "deploy"
 
 permissions:
@@ -40,7 +41,7 @@ jobs:
         run: ./scripts/deploy-sakura.ps1 -Mode DryRun
 
       - name: Validate Sakura secrets
-        if: ${{ inputs.mode == 'audit' || inputs.mode == 'deploy' }}
+        if: ${{ inputs.mode == 'audit' || inputs.mode == 'preflight' || inputs.mode == 'deploy' }}
         shell: bash
         env:
           SAKURA_HOST: ${{ secrets.SAKURA_HOST }}
@@ -63,7 +64,7 @@ jobs:
           fi
 
       - name: Install SSH key
-        if: ${{ inputs.mode == 'audit' || inputs.mode == 'deploy' }}
+        if: ${{ inputs.mode == 'audit' || inputs.mode == 'preflight' || inputs.mode == 'deploy' }}
         shell: bash
         env:
           SAKURA_HOST: ${{ secrets.SAKURA_HOST }}
@@ -89,6 +90,18 @@ jobs:
         run: |
           $env:SAKURA_SSH_KEY_PATH = Join-Path $HOME ".ssh/sakura_deploy_key"
           ./scripts/deploy-sakura.ps1 -Mode Audit
+
+      - name: Preflight Sakura deployment contract
+        if: ${{ inputs.mode == 'preflight' }}
+        shell: pwsh
+        env:
+          SAKURA_HOST: ${{ secrets.SAKURA_HOST }}
+          SAKURA_USER: ${{ secrets.SAKURA_USER }}
+          SAKURA_REMOTE_DIR: ${{ secrets.SAKURA_REMOTE_DIR }}
+          SAKURA_PORT: ${{ secrets.SAKURA_PORT }}
+        run: |
+          $env:SAKURA_SSH_KEY_PATH = Join-Path $HOME ".ssh/sakura_deploy_key"
+          ./scripts/deploy-sakura.ps1 -Mode Preflight
 
       - name: Deploy to Sakura
         if: ${{ inputs.mode == 'deploy' }}
