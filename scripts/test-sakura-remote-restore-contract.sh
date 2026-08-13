@@ -99,7 +99,14 @@ ret() { tar -czf "$1" -C "$work/mutate" restore-contract-v1; }
 printf raw > "$work/raw"; tar -czf "$work/raw.tgz" -C "$work" raw; invalid "$work/raw.tgz" raw
 mkdir -p "$work/odd"; printf x > "$work/odd/x"; tar -czf "$work/absolute.tgz" --transform='s,^,/,' -C "$work/odd" x; invalid "$work/absolute.tgz" absolute
 tar -czf "$work/traversal.tgz" --transform='s,^,../,' -C "$work/odd" x; invalid "$work/traversal.tgz" traversal
-printf x > "$work/odd/a\\b"; tar -czf "$work/backslash.tgz" -C "$work/odd" 'a\b'; invalid "$work/backslash.tgz" backslash
+python3 - "$work/backslash.tgz" <<'PY'
+import io, tarfile, sys
+with tarfile.open(sys.argv[1], "w:gz") as archive:
+    entry = tarfile.TarInfo(r"a\b")
+    entry.size = 1
+    archive.addfile(entry, io.BytesIO(b"x"))
+PY
+invalid "$work/backslash.tgz" backslash
 
 # Mutations start from the valid archive and intentionally retain valid outer
 # SHA arguments, exercising each inner validator before Apply.
