@@ -38,6 +38,12 @@ fi
 exec "$system_realpath" "\$@"
 EOF
 chmod 700 "$compat_bin/realpath"
+cat > "$compat_bin/sha256sum" <<'EOF'
+#!/bin/sh
+echo 'sha256sum: not found' >&2
+exit 127
+EOF
+chmod 700 "$compat_bin/sha256sum"
 remote_path="$compat_bin:$PATH"
 
 cd "$repo"
@@ -78,7 +84,7 @@ invocations="$work/remote-script-invocations"
 invocation_count() { if [ -f "$invocations" ]; then wc -l < "$invocations" | tr -d ' '; else printf '0\n'; fi; }
 run() {
   local apply=${1:-0}
-  env PATH="$remote_path" HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 SAKURA_LOCAL_REMOTE_SCRIPT_MARKER="$invocations" pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode RestoreSafe -ConfigPath "$config" -WorkDir "$work/pkg-$RANDOM" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -BackupFile "$archive" -BackupArchiveSha256 "$archive_sha" -BackupManifestSha256 "$manifest_sha" $( [ "$apply" = 1 ] && printf '%s' -RestoreApply )
+  env PATH="${remote_test_path:-$remote_path}" HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 SAKURA_LOCAL_REMOTE_SCRIPT_MARKER="$invocations" pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode RestoreSafe -ConfigPath "$config" -WorkDir "$work/pkg-$RANDOM" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -BackupFile "$archive" -BackupArchiveSha256 "$archive_sha" -BackupManifestSha256 "$manifest_sha" $( [ "$apply" = 1 ] && printf '%s' -RestoreApply )
 }
 
 # Execute the exact generated Promote shell. The first run corrupts its newly
@@ -91,7 +97,7 @@ cp -p "$package" "$home/$release.tgz"
 mkdir -p "$home/.abroad-o-stages"
 printf '%s  %s  %s\n' "$(sha "$home/$release.tgz")" "$path_sha" "$evidence_sha" > "$home/.abroad-o-stages/$release.meta"
 run_promote() {
-  env PATH="$remote_path" HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 ${1:-} pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode Promote -ConfigPath "$config" -WorkDir "$work/promote-$RANDOM" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -StagedReleaseId "$release"
+  env PATH="${remote_test_path:-$remote_path}" HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 ${1:-} pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode Promote -ConfigPath "$config" -WorkDir "$work/promote-$RANDOM" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -StagedReleaseId "$release"
 }
 before_failed_promote=$(tree "$public")
 if run_promote SAKURA_LOCAL_PROMOTE_CORRUPT_BACKUP=1 >/dev/null 2>&1; then fail 'corrupt Promote backup was accepted'; fi
@@ -125,6 +131,23 @@ for p in TOOL/index.html pdfjs/build/pdf.js pdfjs/web/viewer.html pdfjs/LICENSE;
 for p in 1c_abroad.pdf 2c_abroad.pdf 4c_abroad.pdf; do [ "$(sha "$public/pdfjs/$p")" = "$(sha "$previous/pdfjs/$p")" ] || fail "PDF changed: $p"; done
 [ -z "$(find "$home" -maxdepth 1 -name 'abroad-o-restore.*' -print -quit)" ] || fail 'successful restore left temp'
 baseline=$(tree "$public")
+
+# The helper must fail closed before Apply when neither supported hash command
+# is available. The ordinary shim above already proves the shasum fallback.
+nohash_bin="$work/no-hash-bin"
+mkdir -p "$nohash_bin"
+for command in sha256sum shasum; do
+  cat > "$nohash_bin/$command" <<EOF
+#!/bin/sh
+echo '$command: not found' >&2
+exit 127
+EOF
+  chmod 700 "$nohash_bin/$command"
+done
+remote_test_path="$nohash_bin:$remote_path"
+if run 1 >/dev/null 2>&1; then fail 'RestoreSafe accepted an environment without a SHA-256 command'; fi
+unset remote_test_path
+[ "$baseline" = "$(tree "$public")" ] || fail 'missing hash commands changed public root'
 
 invalid() {
   local candidate=$1 label=$2
