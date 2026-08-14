@@ -417,8 +417,8 @@ STAGE_DIR=`$(mktemp -d "`$HOME/abroad-o-stage.XXXXXX")
 cleanup() { rm -rf "`$STAGE_DIR"; }
 trap cleanup EXIT
 test -f "`$REMOTE_PACKAGE"
-test "`$(realpath -e "`$REMOTE_DIR")" = "`$REMOTE_DIR"
-test "`$(realpath -e "`$(dirname "`$REMOTE_BACKUP")")" = "`$(dirname "`$REMOTE_BACKUP")" || { echo 'Backup directory has a symlink component.' >&2; exit 1; }
+test "`$(realpath "`$REMOTE_DIR")" = "`$REMOTE_DIR"
+test "`$(realpath "`$(dirname "`$REMOTE_BACKUP")")" = "`$(dirname "`$REMOTE_BACKUP")" || { echo 'Backup directory has a symlink component.' >&2; exit 1; }
 if [ -e "`$REMOTE_BACKUP" ] || [ -L "`$REMOTE_BACKUP" ]; then echo 'Backup destination already exists or is a symlink; refusing promote.' >&2; exit 1; fi
 if find "`$REMOTE_DIR" -type l -print -quit | grep -q .; then
   echo 'Remote directory contains a symlink immediately before promote; refusing deployment.' >&2
@@ -480,7 +480,7 @@ $promoteArchiveFault
 VERIFY_STAGE=`$(mktemp -d "`$HOME/abroad-o-backup-verify.XXXXXX")
 verify_cleanup() { rm -rf "`$VERIFY_STAGE"; }
 trap 'cleanup; backup_cleanup; verify_cleanup' EXIT
-test "`$(realpath -e "`$REMOTE_BACKUP")" = "`$REMOTE_BACKUP"
+test "`$(realpath "`$REMOTE_BACKUP")" = "`$REMOTE_BACKUP"
 $remoteRestoreLibrary
 validate_sanitized_archive "`$REMOTE_BACKUP" "`$VERIFY_STAGE" "`$archive_sha" "`$manifest_sha" "`$ARCHIVE_ROOT" "`$REMOTE_DIR" "`$DEPLOYMENT_PATH_MANIFEST_SHA" "`$DEPLOYMENT_EVIDENCE_SHA"
 tar -tzf "`$REMOTE_BACKUP" | awk -v root="`$ARCHIVE_ROOT" '
@@ -865,11 +865,11 @@ RESTORE_STAGE=`$(mktemp -d "`$HOME/abroad-o-restore.XXXXXX")
 cleanup_restore() { rm -rf "`$RESTORE_STAGE"; }
 trap cleanup_restore EXIT
 test -d "`$REMOTE_DIR" && test ! -L "`$REMOTE_DIR"
-test "`$(realpath -e "`$REMOTE_DIR")" = "`$REMOTE_DIR"
+test "`$(realpath "`$REMOTE_DIR")" = "`$REMOTE_DIR"
 find "`$REMOTE_DIR" -type l -print -quit | grep -q . && { echo 'Restore target contains a symlink; refusing restore.' >&2; exit 1; }
 test -f "`$REMOTE_ARCHIVE" && test ! -L "`$REMOTE_ARCHIVE"
-test "`$(realpath -e "`$REMOTE_ARCHIVE")" = "`$REMOTE_ARCHIVE"
-test "`$(realpath -e "`$(dirname "`$REMOTE_ARCHIVE")")" = "`$(dirname "`$REMOTE_ARCHIVE")"
+test "`$(realpath "`$REMOTE_ARCHIVE")" = "`$REMOTE_ARCHIVE"
+test "`$(realpath "`$(dirname "`$REMOTE_ARCHIVE")")" = "`$(dirname "`$REMOTE_ARCHIVE")"
 $remoteRestoreLibrary
 validate_sanitized_archive "`$REMOTE_ARCHIVE" "`$RESTORE_STAGE" "`$EXPECTED_ARCHIVE_SHA" "`$EXPECTED_MANIFEST_SHA" "`$ARCHIVE_ROOT" "`$REMOTE_DIR" "`$EXPECTED_DEPLOYMENT_PATH_MANIFEST_SHA" "`$EXPECTED_DEPLOYMENT_EVIDENCE_SHA"
 actual_archive_sha=`$(sha256sum "`$REMOTE_ARCHIVE" | awk '{print `$1}')
