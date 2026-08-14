@@ -23,6 +23,23 @@ sha() { sha256sum "$1" | awk '{print $1}'; }
 tree() { (cd "$1" && find . -type f -printf '%P\0' | LC_ALL=C sort -z | xargs -0 -r sha256sum); }
 absent() { [ ! -e "$1" ] && [ ! -L "$1" ] || fail "expected absent: $1"; }
 
+# Sakura uses BSD realpath, which accepts paths but not GNU's -e option.
+# Put an equivalent compatibility shim first so the generated remote scripts
+# would fail if they regress to `realpath -e`.
+system_realpath=$(command -v realpath)
+compat_bin="$work/bsd-realpath-bin"
+mkdir -p "$compat_bin"
+cat > "$compat_bin/realpath" <<EOF
+#!/bin/sh
+if [ "\${1:-}" = '-e' ]; then
+  echo 'realpath: illegal option -- e' >&2
+  exit 64
+fi
+exec "$system_realpath" "\$@"
+EOF
+chmod 700 "$compat_bin/realpath"
+remote_path="$compat_bin:$PATH"
+
 cd "$repo"
 pwsh -NoProfile -Command 'npm run build:site' >/dev/null
 mkdir -p _site/foo _site/woff _site/woff2 "$home" "$backups"
@@ -61,7 +78,7 @@ invocations="$work/remote-script-invocations"
 invocation_count() { if [ -f "$invocations" ]; then wc -l < "$invocations" | tr -d ' '; else printf '0\n'; fi; }
 run() {
   local apply=${1:-0}
-  env HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 SAKURA_LOCAL_REMOTE_SCRIPT_MARKER="$invocations" pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode RestoreSafe -ConfigPath "$config" -WorkDir "$work/pkg-$RANDOM" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -BackupFile "$archive" -BackupArchiveSha256 "$archive_sha" -BackupManifestSha256 "$manifest_sha" $( [ "$apply" = 1 ] && printf '%s' -RestoreApply )
+  env PATH="$remote_path" HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 SAKURA_LOCAL_REMOTE_SCRIPT_MARKER="$invocations" pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode RestoreSafe -ConfigPath "$config" -WorkDir "$work/pkg-$RANDOM" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -BackupFile "$archive" -BackupArchiveSha256 "$archive_sha" -BackupManifestSha256 "$manifest_sha" $( [ "$apply" = 1 ] && printf '%s' -RestoreApply )
 }
 
 # Execute the exact generated Promote shell. The first run corrupts its newly
@@ -74,7 +91,7 @@ cp -p "$package" "$home/$release.tgz"
 mkdir -p "$home/.abroad-o-stages"
 printf '%s  %s  %s\n' "$(sha "$home/$release.tgz")" "$path_sha" "$evidence_sha" > "$home/.abroad-o-stages/$release.meta"
 run_promote() {
-  env HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 ${1:-} pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode Promote -ConfigPath "$config" -WorkDir "$work/promote-$RANDOM" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -StagedReleaseId "$release"
+  env PATH="$remote_path" HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 ${1:-} pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode Promote -ConfigPath "$config" -WorkDir "$work/promote-$RANDOM" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -StagedReleaseId "$release"
 }
 before_failed_promote=$(tree "$public")
 if run_promote SAKURA_LOCAL_PROMOTE_CORRUPT_BACKUP=1 >/dev/null 2>&1; then fail 'corrupt Promote backup was accepted'; fi

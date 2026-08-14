@@ -5,7 +5,7 @@ validate_sanitized_archive() {
   archive=$1 verify_stage=$2 expected_archive_sha=$3 expected_manifest_sha=$4
   archive_root=$5 remote_public_root=$6 deployment_path_sha=$7 deployment_evidence_sha=$8
   test -f "$archive" && test ! -L "$archive"
-  test "$(realpath -e "$archive")" = "$archive"
+  test "$(realpath "$archive")" = "$archive"
   test "$(sha256sum "$archive" | awk '{print $1}')" = "$expected_archive_sha"
   test -z "$(tar -tzf "$archive" | awk '/^\// || /(^|\/)\.\.($|\/)/ || /\\/ { print; exit }')"
   test -z "$(tar -tvzf "$archive" | awk 'substr($1, 1, 1) == "l" || substr($1, 1, 1) == "h" { print; exit }')"
