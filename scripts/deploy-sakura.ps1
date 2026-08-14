@@ -445,6 +445,7 @@ trap 'cleanup; backup_cleanup' EXIT
 mkdir -p "`$BACKUP_STAGE/`$ARCHIVE_ROOT/payload"
 protected_paths="`$BACKUP_STAGE/protected-paths"
 find "`$REMOTE_DIR" -type l -print -quit | grep -q . && { echo 'Remote directory contains a symlink before backup.' >&2; exit 1; }
+$remoteRestoreLibrary
 cat > "`$protected_paths" <<'CODEX_PROTECTED_PATHS'
 $protectedPathsBody
 CODEX_PROTECTED_PATHS
@@ -463,25 +464,24 @@ while IFS=' ' read -r expected_hash expected_bytes path; do
   case "`$path" in pdfjs/1c_abroad.pdf|pdfjs/2c_abroad.pdf|pdfjs/4c_abroad.pdf) ;; *) echo "Invalid protected PDF: `$path" >&2; exit 1;; esac
   test -f "`$REMOTE_DIR/`$path"
   actual_bytes=`$(wc -c < "`$REMOTE_DIR/`$path" | tr -d ' ')
-  actual_hash=`$(sha256sum "`$REMOTE_DIR/`$path" | awk '{print `$1}')
+  actual_hash=`$(sakura_sha256 "`$REMOTE_DIR/`$path")
   test "`$actual_bytes" = "`$expected_bytes" && test "`$actual_hash" = "`$expected_hash"
   mkdir -p "`$BACKUP_STAGE/`$ARCHIVE_ROOT/payload/pdfjs"
   cp -p "`$REMOTE_DIR/`$path" "`$BACKUP_STAGE/`$ARCHIVE_ROOT/payload/`$path"
 done < "`$protected_paths"
-(cd "`$BACKUP_STAGE/`$ARCHIVE_ROOT/payload" && find . -type f -print | sed 's#^\./##' | LC_ALL=C sort | while IFS= read -r path; do sha256sum "`$path"; done) > "`$BACKUP_STAGE/`$ARCHIVE_ROOT/manifest.txt"
+(cd "`$BACKUP_STAGE/`$ARCHIVE_ROOT/payload" && find . -type f -print | sed 's#^\./##' | LC_ALL=C sort | while IFS= read -r path; do printf '%s  %s\n' "`$(sakura_sha256 "`$path")" "`$path"; done) > "`$BACKUP_STAGE/`$ARCHIVE_ROOT/manifest.txt"
 test -s "`$BACKUP_STAGE/`$ARCHIVE_ROOT/manifest.txt"
-manifest_sha=`$(sha256sum "`$BACKUP_STAGE/`$ARCHIVE_ROOT/manifest.txt" | awk '{print `$1}')
+manifest_sha=`$(sakura_sha256 "`$BACKUP_STAGE/`$ARCHIVE_ROOT/manifest.txt")
 printf '%s  manifest.txt\n' "`$manifest_sha" > "`$BACKUP_STAGE/`$ARCHIVE_ROOT/manifest.sha256"
 printf '{"formatVersion":1,"archiveRoot":"%s","remotePublicRoot":"%s","deploymentPathManifestSha256":"%s","deploymentEvidenceSha256":"%s"}\n' "`$ARCHIVE_ROOT" "`$REMOTE_DIR" "`$DEPLOYMENT_PATH_MANIFEST_SHA" "`$DEPLOYMENT_EVIDENCE_SHA" > "`$BACKUP_STAGE/`$ARCHIVE_ROOT/metadata.json"
 mkdir -p "`$BACKUP_DIRECTORY"
 tar -czf "`$REMOTE_BACKUP" -C "`$BACKUP_STAGE" "`$ARCHIVE_ROOT"
-archive_sha=`$(sha256sum "`$REMOTE_BACKUP" | awk '{print `$1}')
+archive_sha=`$(sakura_sha256 "`$REMOTE_BACKUP")
 $promoteArchiveFault
 VERIFY_STAGE=`$(mktemp -d "`$HOME/abroad-o-backup-verify.XXXXXX")
 verify_cleanup() { rm -rf "`$VERIFY_STAGE"; }
 trap 'cleanup; backup_cleanup; verify_cleanup' EXIT
 test "`$(realpath "`$REMOTE_BACKUP")" = "`$REMOTE_BACKUP"
-$remoteRestoreLibrary
 validate_sanitized_archive "`$REMOTE_BACKUP" "`$VERIFY_STAGE" "`$archive_sha" "`$manifest_sha" "`$ARCHIVE_ROOT" "`$REMOTE_DIR" "`$DEPLOYMENT_PATH_MANIFEST_SHA" "`$DEPLOYMENT_EVIDENCE_SHA"
 tar -tzf "`$REMOTE_BACKUP" | awk -v root="`$ARCHIVE_ROOT" '
   /^\// || /(^|\/)\.\.($|\/)/ || /\\/ { bad = 1 }
@@ -489,19 +489,25 @@ tar -tzf "`$REMOTE_BACKUP" | awk -v root="`$ARCHIVE_ROOT" '
   END { exit bad }'
 test -z "`$(tar -tvzf "`$REMOTE_BACKUP" | awk 'substr(`$1, 1, 1) == "l" || substr(`$1, 1, 1) == "h" { print; exit }')"
 tar -xzf "`$REMOTE_BACKUP" -C "`$VERIFY_STAGE"
-test "`$(sha256sum "`$VERIFY_STAGE/`$ARCHIVE_ROOT/manifest.txt" | awk '{print `$1}')" = "`$manifest_sha"
+test "`$(sakura_sha256 "`$VERIFY_STAGE/`$ARCHIVE_ROOT/manifest.txt")" = "`$manifest_sha"
 test "`$(cat "`$VERIFY_STAGE/`$ARCHIVE_ROOT/manifest.sha256")" = "`$manifest_sha  manifest.txt"
 expected_metadata=`$(printf '{"formatVersion":1,"archiveRoot":"%s","remotePublicRoot":"%s","deploymentPathManifestSha256":"%s","deploymentEvidenceSha256":"%s"}' "`$ARCHIVE_ROOT" "`$REMOTE_DIR" "`$DEPLOYMENT_PATH_MANIFEST_SHA" "`$DEPLOYMENT_EVIDENCE_SHA")
 test "`$(tr -d '\r\n' < "`$VERIFY_STAGE/`$ARCHIVE_ROOT/metadata.json")" = "`$expected_metadata"
 test -z "`$(find "`$VERIFY_STAGE/`$ARCHIVE_ROOT" -type l -print -quit)"
 awk -v verify_payload="`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload" '
   length(`$0) < 67 || substr(`$0, 1, 64) !~ /^[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]/ || substr(`$0, 65, 2) != "  " { exit 1 }
-  { path = substr(`$0, 67); if (path in seen) exit 1; seen[path] = 1; if (path ~ /^TOOL\// || path == "pdfjs/LICENSE" || path ~ /^pdfjs\/(build|web)\// || path !~ /^[A-Za-z0-9._\/@+-]+$/) exit 1; command = "test -f \"" verify_payload "/" path "\" && sha256sum \"" verify_payload "/" path "\""; command | getline line; close(command); split(line, fields, " "); if (fields[1] != substr(`$0, 1, 64)) exit 1 }
+  { path = substr(`$0, 67); if (path in seen) exit 1; seen[path] = 1; if (path ~ /^TOOL\// || path == "pdfjs/LICENSE" || path ~ /^pdfjs\/(build|web)\// || path !~ /^[A-Za-z0-9._\/@+-]+$/) exit 1 }
   END { if (NR == 0) exit 1 }' "`$VERIFY_STAGE/`$ARCHIVE_ROOT/manifest.txt"
+while IFS= read -r line; do
+  expected=`${line%%  *}
+  path=`${line#*  }
+  test -f "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/`$path"
+  test "`$(sakura_sha256 "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/`$path")" = "`$expected"
+done < "`$VERIFY_STAGE/`$ARCHIVE_ROOT/manifest.txt"
 while IFS=' ' read -r expected_hash expected_bytes path; do
   test -f "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/`$path"
   test "`$(wc -c < "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/`$path" | tr -d ' ')" = "`$expected_bytes"
-  test "`$(sha256sum "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/`$path" | awk '{print `$1}')" = "`$expected_hash"
+  test "`$(sakura_sha256 "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/`$path")" = "`$expected_hash"
 done < "`$protected_paths"
 test ! -e "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/TOOL" && test ! -e "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/pdfjs/build" && test ! -e "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/pdfjs/web" && test ! -e "`$VERIFY_STAGE/`$ARCHIVE_ROOT/payload/pdfjs/LICENSE"
 echo "Sanitized backup: archiveSha256=`$archive_sha manifestSha256=`$manifest_sha"
@@ -542,13 +548,15 @@ function Assert-RemoteStage {
     param([object]$Package, [string]$ReleaseId)
     if ($ReleaseId -notmatch '^[A-Za-z0-9._-]+$') { throw "Unsafe staged release id." }
     $localPackageHash = (Get-FileHash -LiteralPath $Package.PackagePath -Algorithm SHA256).Hash.ToLowerInvariant()
+    $remoteRestoreLibrary = Get-Content -LiteralPath (Join-Path $PSScriptRoot "lib/sakura-restore-remote.sh") -Raw
     $script = @"
 set -eu
 RELEASE_ID='$ReleaseId'
 PACKAGE="`$HOME/`$RELEASE_ID.tgz"
 METADATA="`$HOME/.abroad-o-stages/`$RELEASE_ID.meta"
+$remoteRestoreLibrary
 test -f "`$PACKAGE"
-if command -v sha256sum >/dev/null 2>&1; then archive_sha=`$(sha256sum "`$PACKAGE" | awk '{print `$1}'); else archive_sha=`$(shasum -a 256 "`$PACKAGE" | awk '{print `$1}'); fi
+archive_sha=`$(sakura_sha256 "`$PACKAGE")
 test "`$archive_sha" = '$localPackageHash'
 mkdir -p "`$(dirname "`$METADATA")"
 printf '%s  %s  %s\n' "`$archive_sha" '$($Package.PathManifestSha256)' '$($Package.EvidenceSha256)' > "`$METADATA"
@@ -563,16 +571,18 @@ printf '%s\n' "`$PACKAGE"
 function Get-VerifiedStagedPackage {
     param([object]$Package, [string]$ReleaseId)
     if (-not $ReleaseId -or $ReleaseId -notmatch '^[A-Za-z0-9._-]+$') { throw "StagedReleaseId or SAKURA_STAGED_RELEASE_ID is required for Promote." }
+    $remoteRestoreLibrary = Get-Content -LiteralPath (Join-Path $PSScriptRoot "lib/sakura-restore-remote.sh") -Raw
     $script = @"
 set -eu
 RELEASE_ID='$ReleaseId'
 PACKAGE="`$HOME/`$RELEASE_ID.tgz"
 METADATA="`$HOME/.abroad-o-stages/`$RELEASE_ID.meta"
+$remoteRestoreLibrary
 test -f "`$PACKAGE" && test -f "`$METADATA"
 read archive_sha path_manifest_sha evidence_sha < "`$METADATA"
 test "`$path_manifest_sha" = '$($Package.PathManifestSha256)'
 test "`$evidence_sha" = '$($Package.EvidenceSha256)'
-if command -v sha256sum >/dev/null 2>&1; then actual_sha=`$(sha256sum "`$PACKAGE" | awk '{print `$1}'); else actual_sha=`$(shasum -a 256 "`$PACKAGE" | awk '{print `$1}'); fi
+actual_sha=`$(sakura_sha256 "`$PACKAGE")
 test "`$actual_sha" = "`$archive_sha"
 printf '%s\n' "`$PACKAGE"
 "@
@@ -872,7 +882,7 @@ test "`$(realpath "`$REMOTE_ARCHIVE")" = "`$REMOTE_ARCHIVE"
 test "`$(realpath "`$(dirname "`$REMOTE_ARCHIVE")")" = "`$(dirname "`$REMOTE_ARCHIVE")"
 $remoteRestoreLibrary
 validate_sanitized_archive "`$REMOTE_ARCHIVE" "`$RESTORE_STAGE" "`$EXPECTED_ARCHIVE_SHA" "`$EXPECTED_MANIFEST_SHA" "`$ARCHIVE_ROOT" "`$REMOTE_DIR" "`$EXPECTED_DEPLOYMENT_PATH_MANIFEST_SHA" "`$EXPECTED_DEPLOYMENT_EVIDENCE_SHA"
-actual_archive_sha=`$(sha256sum "`$REMOTE_ARCHIVE" | awk '{print `$1}')
+actual_archive_sha=`$(sakura_sha256 "`$REMOTE_ARCHIVE")
 test "`$actual_archive_sha" = "`$EXPECTED_ARCHIVE_SHA"
 unsafe_entries=`$(tar -tzf "`$REMOTE_ARCHIVE" | awk '/^\// || /(^|\/)\.\.($|\/)/ || /\\/ { print; exit }')
 test -z "`$unsafe_entries"
@@ -881,7 +891,7 @@ test -z "`$archive_links"
 tar -xzf "`$REMOTE_ARCHIVE" -C "`$RESTORE_STAGE"
 test -d "`$RESTORE_STAGE/`$ARCHIVE_ROOT/payload"
 test -f "`$RESTORE_STAGE/`$ARCHIVE_ROOT/manifest.txt" && test -f "`$RESTORE_STAGE/`$ARCHIVE_ROOT/manifest.sha256" && test -f "`$RESTORE_STAGE/`$ARCHIVE_ROOT/metadata.json"
-actual_manifest_sha=`$(sha256sum "`$RESTORE_STAGE/`$ARCHIVE_ROOT/manifest.txt" | awk '{print `$1}')
+actual_manifest_sha=`$(sakura_sha256 "`$RESTORE_STAGE/`$ARCHIVE_ROOT/manifest.txt")
 test "`$actual_manifest_sha" = "`$EXPECTED_MANIFEST_SHA"
 test "`$(cat "`$RESTORE_STAGE/`$ARCHIVE_ROOT/manifest.sha256")" = "`$actual_manifest_sha  manifest.txt"
 expected_metadata=`$(printf '{"formatVersion":1,"archiveRoot":"%s","remotePublicRoot":"%s","deploymentPathManifestSha256":"%s","deploymentEvidenceSha256":"%s"}' "`$ARCHIVE_ROOT" "`$REMOTE_DIR" "`$EXPECTED_DEPLOYMENT_PATH_MANIFEST_SHA" "`$EXPECTED_DEPLOYMENT_EVIDENCE_SHA")
@@ -934,14 +944,14 @@ cut -d ' ' -f 3- "`$previous_manifest" | while IFS= read -r path; do
   test -f "`$RESTORE_STAGE/`$ARCHIVE_ROOT/payload/`$path"
   expected=`$(awk -F '\t' -v path="`$path" '`$1 == path { print `$2 }' "`$manifest_hashes")
   test -n "`$expected"
-  actual=`$(sha256sum "`$RESTORE_STAGE/`$ARCHIVE_ROOT/payload/`$path" | awk '{print `$1}')
+  actual=`$(sakura_sha256 "`$RESTORE_STAGE/`$ARCHIVE_ROOT/payload/`$path")
   test "`$expected" = "`$actual"
   printf 'RESTORE %s\n' "`$path"
 done
 while IFS=' ' read -r expected_hash expected_bytes path; do
   test -f "`$RESTORE_STAGE/`$ARCHIVE_ROOT/payload/`$path"
   test "`$(wc -c < "`$RESTORE_STAGE/`$ARCHIVE_ROOT/payload/`$path" | tr -d ' ')" = "`$expected_bytes"
-  test "`$(sha256sum "`$RESTORE_STAGE/`$ARCHIVE_ROOT/payload/`$path" | awk '{print `$1}')" = "`$expected_hash"
+  test "`$(sakura_sha256 "`$RESTORE_STAGE/`$ARCHIVE_ROOT/payload/`$path")" = "`$expected_hash"
 done < "`$protected_paths"
 while IFS= read -r path; do
   [ -n "`$path" ] || continue
