@@ -1,0 +1,34 @@
+{
+  "origin": "https://www.abroad-o.com",
+  "name": "アブロードアウトソーシング",
+  "legalName": "アブロードアウトソーシング株式会社",
+  "language": "ja",
+  "locale": "ja_JP",
+  "organizationId": "https://www.abroad-o.com/#organization",
+  "websiteId": "https://www.abroad-o.com/#website",
+  "logoUrl": "https://www.abroad-o.com/image/rogo.png",
+  "defaultOgImageUrl": "https://www.abroad-o.com/image/top1.png",
+  "defaultOgImageAlt": "アブロードアウトソーシング株式会社のサービス紹介",
+  "googleSiteVerification": "Nqa719cJbf2AfjLk6kCgmpJHM73egoAodcPCb-cdyyc",
+  "telephone": "+81-3-5835-0250",
+  "email": "info@abroad-o.com",
+  "address": {
+    "postalCode": "101-0032",
+    "addressRegion": "東京都",
+    "addressLocality": "千代田区",
+    "streetAddress": "岩本町2-11-9 IT2ビル 8階",
+    "addressCountry": "JP"
+  },
+  "indexNowKey": "d9275bdf04cc4f5885b2aabca3b5fe85",
+  "indexNowKeyLocation": "https://www.abroad-o.com/d9275bdf04cc4f5885b2aabca3b5fe85.txt",
+  "serviceItems": [
+    { "name": "データ入力", "url": "https://www.abroad-o.com/input.html" },
+    { "name": "データ集計・分析", "url": "https://www.abroad-o.com/aggregate.html" },
+    { "name": "スキャニング", "url": "https://www.abroad-o.com/scan.html" },
+    { "name": "画像編集・加工", "url": "https://www.abroad-o.com/edit.html" },
+    { "name": "SPEED AD", "url": "https://www.abroad-o.com/speed-ad.html" },
+    { "name": "テキスト入力", "url": "https://www.abroad-o.com/input.html" },
+    { "name": "テープ起こし", "url": "https://www.abroad-o.com/input.html" },
+    { "name": "サクッと経理", "url": "https://www.abroad-o.biz/" }
+  ]
+}

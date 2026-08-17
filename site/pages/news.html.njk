@@ -26,7 +26,7 @@ scriptsVariant: "news"
   <section id="news_list" class="container news-list-spacing">
 {% for article in collections.newsArticles %}
     <article class="news-summary-item{% if article.data.summaryClass %} {{ article.data.summaryClass }}{% endif %}">
-      <p class="news-date">{{ article.data.displayDate }}</p>
+      <p class="news-date"><time datetime="{{ article.data.datePublished }}">{{ article.data.displayDate }}</time></p>
       <h2><a href="{{ article.url }}">{{ article.data.summaryTitle }}</a></h2>
       <p class="news-excerpt">{{ article.data.excerpt }}</p>
       <p class="read-more"><a href="{{ article.url }}">続きを読む &raquo;</a></p>
