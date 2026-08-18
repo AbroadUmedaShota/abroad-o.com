@@ -9,6 +9,8 @@ scriptsVariant: "news"
 tags: ["newsArticle"]
 newsOrder: "20251212"
 displayDate: "2025/12/12"
+schemaType: "NewsArticle"
+datePublished: "2025-12-12"
 summaryTitle: "年末年始のご挨拶"
 excerpt: "一年の感謝とともに、年末年始の休業期間やお問い合わせ対応日のご案内をお知らせいたします。"
 summaryClass: ""
@@ -16,7 +18,6 @@ summaryClass: ""
 {% extends "layouts/site.njk" %}
 
 {% block headExtras %}
-    <meta name="keywords" content="スキャニング,データ入力,画像編集,集計,スキャニング依頼,コスト削減">
     {% include "partials/styles-legacy-core.njk" %}
     <link href="../style.css" rel="stylesheet">
     <link rel="icon" href="../image/favicon.png" type="image/png">
@@ -51,7 +52,7 @@ summaryClass: ""
             </ul>
 
             <p>2026年も、より一層皆様のお役に立てるようサービス向上に努めてまいります。引き続きご愛顧のほどよろしくお願い申し上げます。どうぞ良いお年をお迎えください。</p>
-            <p class="news-article-created-at">作成日：2025/12/12</p>
+            <p class="news-article-created-at">作成日：<time datetime="{{ datePublished }}">2025/12/12</time></p>
             <a class="contact-link" href="../form.html">お問い合わせフォームへ</a>
           </div>
         </div>

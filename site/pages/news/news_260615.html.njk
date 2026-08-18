@@ -10,6 +10,8 @@ scriptsVariant: "news"
 tags: ["newsArticle"]
 newsOrder: "20260615"
 displayDate: "2026/06/15"
+schemaType: "NewsArticle"
+datePublished: "2026-06-15"
 summaryTitle: "新サービス「SPEED AD」正式リリースのお知らせ"
 excerpt: "展示会・セミナーで集めた来場者情報や名刺情報を整理し、会期後フォローへつなげやすくする新サービス「SPEED AD」を、2026年6月15日に正式リリースしました。"
 summaryClass: "news-summary-item-featured"
@@ -17,7 +19,6 @@ summaryClass: "news-summary-item-featured"
 {% extends "layouts/site.njk" %}
 
 {% block headExtras %}
-    <meta name="keywords" content="SPEED AD,展示会,セミナー,名刺データ化,来場者情報,WEBアンケート,御礼メール">
     {% include "partials/styles-legacy-core.njk" %}
     <link href="../style.css" rel="stylesheet">
     <link rel="icon" href="../image/favicon.png" type="image/png">
@@ -63,7 +64,7 @@ summaryClass: "news-summary-item-featured"
 
             <p class="final-message">今後とも、展示会・セミナー後の情報整理やフォロー業務を支援できるよう、サービスの改善を続けてまいります。</p>
             <br>
-            <p class="news-article-date">2026年6月15日<br>
+            <p class="news-article-date"><time datetime="{{ datePublished }}">2026年6月15日</time><br>
             アブロードアウトソーシング株式会社</p>
           </div>
         </div>

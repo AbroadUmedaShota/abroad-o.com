@@ -5,11 +5,13 @@ import { execFileSync } from 'node:child_process';
 import matter from 'gray-matter';
 import { assertPageMetadata } from './lib/html-contract.mjs';
 import { assertAccessibilityContract } from './lib/accessibility-contract.mjs';
+import { assertRobotsPolicy } from './lib/structured-data.mjs';
 
 const repoRoot = path.resolve(import.meta.dirname, '..');
 const outputRoot = path.join(repoRoot, '_site');
 const sourceRoot = path.join(repoRoot, 'site', 'pages');
 const publicContract = JSON.parse(fs.readFileSync(path.join(repoRoot, 'deploy', 'public-manifest.json'), 'utf8'));
+const site = JSON.parse(fs.readFileSync(path.join(repoRoot, 'site', '_data', 'site.json'), 'utf8'));
 const defaultOgImageUrl = 'https://www.abroad-o.com/image/top1.png';
 const defaultOgImagePath = path.join(outputRoot, 'image', 'top1.png');
 const defaultOgImageWidth = 1990;
@@ -109,9 +111,7 @@ function verifyContract(manifest) {
     throw new Error(`Unexpected default OG image dimensions: ${ogImageWidth}x${ogImageHeight}`);
   }
   const robots = fs.readFileSync(path.join(outputRoot, 'robots.txt'), 'utf8');
-  if (!/^User-agent: \*\r?\nDisallow:\s*\r?\n\r?\nSitemap: https:\/\/www\.abroad-o\.com\/sitemap\.xml\s*$/i.test(robots)) {
-    throw new Error('robots.txt does not permit crawling or point at the canonical sitemap.');
-  }
+  assertRobotsPolicy(robots);
 
   const indexableCanonicalUrls = [];
   for (const { path: file } of generatedFiles) {
@@ -127,9 +127,12 @@ function verifyContract(manifest) {
     assertPageMetadata(html, { title: source.title, noindex: source.noindex === true, meta: {
       description: source.description, canonical: source.canonicalUrl, 'og:title': source.ogTitle || source.title,
       'og:description': source.ogDescription || source.description, 'og:type': sourceOgType, 'og:url': source.canonicalUrl,
-      'og:image': sourceOgImage, 'og:image:width': String(ogImageWidth), 'og:image:height': String(ogImageHeight),
+      'og:site_name': site.name, 'og:locale': site.locale, 'og:image': sourceOgImage,
+      'og:image:alt': source.ogImageAlt || site.defaultOgImageAlt, 'og:image:width': String(ogImageWidth), 'og:image:height': String(ogImageHeight),
       'twitter:card': 'summary_large_image', 'twitter:title': source.ogTitle || source.title,
-      'twitter:description': source.ogDescription || source.description, 'twitter:image': sourceOgImage
+      'twitter:description': source.ogDescription || source.description, 'twitter:image': sourceOgImage,
+      'twitter:image:alt': source.ogImageAlt || site.defaultOgImageAlt,
+      'google-site-verification': site.googleSiteVerification
     } }, file);
     if (source.noindex === true) {
       if (sitemapUrls.includes(source.canonicalUrl)) throw new Error(`noindex page is in sitemap: ${file}`);

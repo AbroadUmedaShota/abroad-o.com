@@ -6,11 +6,15 @@ const analytics = '<script async src="https://www.googletagmanager.com/gtag/js?i
 const news = '<script src="/vendor/jquery/jquery.min.js"></script><script src="/vendor/bootstrap3/js/bootstrap.min.js"></script><script src="/js/jquery.smooth-scroll.min.js"></script><script src="/js/news-runtime.js"></script>';
 const analyticsScript = "window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-51168812-1');";
 test('accepts externalized scripts', () => {
-  assert.doesNotThrow(() => assertNoInlineExecutableScripts(`${analytics}${news}`, 'valid'));
+  assert.doesNotThrow(() => assertNoInlineExecutableScripts(`${analytics}${news}<script type="application/ld+json">{"@context":"https://schema.org"}</script>`, 'valid'));
   assert.doesNotThrow(() => assertAnalyticsOrder(analytics, analyticsScript, 'analytics'));
   assert.doesNotThrow(() => assertNewsRuntimeOrder(news, 'news'));
 });
 test('rejects inline executable scripts', () => assert.throws(() => assertNoInlineExecutableScripts('<script>window.x=1</script>', 'inline')));
+test('rejects executable MIME types even when they resemble JSON-LD', () => {
+  assert.throws(() => assertNoInlineExecutableScripts('<script type="application/javascript">window.x=1</script>', 'javascript-type'));
+  assert.throws(() => assertNoInlineExecutableScripts('<script type="application/ld+jsonx">window.x=1</script>', 'near-json-ld-type'));
+});
 test('rejects changed analytics scope or order', () => {
   assert.doesNotThrow(() => assertNoAnalyticsScripts('<script src="/js/site.js"></script>', 'outside-scope'));
   assert.throws(() => assertNoAnalyticsScripts('<script src="/js/analytics.js"></script>', 'outside-local'));

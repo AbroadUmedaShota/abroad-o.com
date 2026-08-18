@@ -3,6 +3,7 @@
   "includeRootFiles": [
     "*.html",
     ".htaccess",
+    "d9275bdf04cc4f5885b2aabca3b5fe85.txt",
     "robots.txt",
     "sitemap.xml",
     "style*.css",
@@ -45,6 +46,7 @@
     ".htaccess",
     "about.html",
     "aggregate.html",
+    "d9275bdf04cc4f5885b2aabca3b5fe85.txt",
     "edit.html",
     "film.html",
     "form.html",

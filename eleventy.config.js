@@ -1,3 +1,5 @@
+import { serializeStructuredData } from './scripts/lib/structured-data.mjs';
+
 export default function (eleventyConfig) {
   for (const path of [
     '.htaccess',
@@ -48,6 +50,9 @@ export default function (eleventyConfig) {
     collectionApi
       .getFilteredByTag('newsArticle')
       .sort((left, right) => right.data.newsOrder.localeCompare(left.data.newsOrder))
+  );
+  eleventyConfig.addGlobalData('eleventyComputed.structuredData', () =>
+    (data) => serializeStructuredData(data)
   );
 
   return {

@@ -9,6 +9,8 @@ scriptsVariant: "news"
 tags: ["newsArticle"]
 newsOrder: "20250908"
 displayDate: "2025/09/08"
+schemaType: "NewsArticle"
+datePublished: "2025-09-08"
 summaryTitle: "オフィス移転完了のお知らせ"
 excerpt: "新オフィスへ移転し、2025年9月8日より業務を開始いたしました。"
 summaryClass: ""
@@ -16,7 +18,6 @@ summaryClass: ""
 {% extends "layouts/site.njk" %}
 
 {% block headExtras %}
-    <meta name="keywords" content="スキャニング,データ入力,画像編集,集計,スキャニング依頼,コスト削減">
     {% include "partials/styles-legacy-core.njk" %}
     <link href="../style.css" rel="stylesheet">
     <link rel="icon" href="../image/favicon.png" type="image/png">
@@ -72,7 +73,7 @@ summaryClass: ""
             <p class="final-message">これを機に、社員一同さらに精励し、皆様のご期待に沿えるよう努めてまいります。<br>
             今後とも変わらぬご支援を賜りますようお願い申し上げます。</p>
             <br>
-            <p class="news-article-date">2025年9月8日<br>
+            <p class="news-article-date"><time datetime="{{ datePublished }}">2025年9月8日</time><br>
             アブロードアウトソーシング株式会社<br>
             代表取締役 林 剛之</p>
           </div>

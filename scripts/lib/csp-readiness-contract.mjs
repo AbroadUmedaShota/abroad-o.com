@@ -55,7 +55,7 @@ export function scriptInventory(html) {
     if (node.nodeName !== 'script') return;
     const attrs = attributes(node);
     const content = (node.childNodes || []).map((child) => child.value || '').join('').trim();
-    scripts.push({ src: attrs.get('src') || '', inline: !attrs.has('src') && content.length > 0, async: attrs.has('async') });
+    scripts.push({ src: attrs.get('src') || '', type: (attrs.get('type') || '').trim().toLowerCase(), inline: !attrs.has('src') && content.length > 0, async: attrs.has('async') });
   });
   return scripts;
 }
@@ -106,7 +106,7 @@ export function pageStyleSheetPaths() {
 }
 
 export function assertNoInlineExecutableScripts(html, file) {
-  const inline = scriptInventory(html).filter((script) => script.inline);
+  const inline = scriptInventory(html).filter((script) => script.inline && script.type !== 'application/ld+json');
   if (inline.length) throw new Error(`Inline executable script remains in ${file}: ${inline.length}`);
 }
 
