@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   handleRequest,
   keyedHash,
+  readLimitedText,
   validateSubmission,
 } from '../src/index.js';
 
@@ -108,6 +109,42 @@ test('rejects honeypot, fast submission, malformed fields and URL flooding', () 
   assert.equal(validateSubmission(validPayload({
     inquiryDetails: 'https://a.test https://b.test https://c.test https://d.test https://e.test https://f.test',
   })).reason, 'field_validation_failed');
+});
+
+test('returns form_expired as a safe client recovery code', async () => {
+  const audit = silenceAudit();
+  try {
+    const response = await handleRequest(submitRequest(validPayload({
+      formStartedAt: Date.now() - ((2 * 60 * 60 * 1000) + 1),
+    })), validEnv());
+    assert.equal(response.status, 400);
+    assert.deepEqual(await response.json(), { ok: false, code: 'form_expired' });
+  } finally {
+    audit.restore();
+  }
+});
+
+test('reads request bodies at the byte boundary and cancels an oversized stream', async () => {
+  const atLimit = new ReadableStream({
+    start(controller) {
+      controller.enqueue(new TextEncoder().encode('a'.repeat(32 * 1024)));
+      controller.close();
+    },
+  });
+  assert.equal((await readLimitedText(atLimit, 32 * 1024)).length, 32 * 1024);
+
+  let cancelled = false;
+  const tooLarge = new ReadableStream({
+    start(controller) {
+      controller.enqueue(new TextEncoder().encode('a'.repeat(16 * 1024)));
+      controller.enqueue(new TextEncoder().encode('b'.repeat((16 * 1024) + 1)));
+    },
+    cancel() {
+      cancelled = true;
+    },
+  });
+  await assert.rejects(readLimitedText(tooLarge, 32 * 1024), { message: 'body_too_large' });
+  assert.equal(cancelled, true);
 });
 
 test('serves public Turnstile configuration only to an allowed origin', async () => {
@@ -257,6 +294,28 @@ test('forwards a valid request with an HMAC signature and safe control flags', a
   } finally {
     globalThis.fetch = originalFetch;
     audit.restore();
+  }
+});
+
+test('propagates approved receiver recovery codes without changing success compatibility', async () => {
+  for (const [code, status] of [
+    ['request_id_conflict', 409],
+    ['delivery_review_required', 202],
+  ]) {
+    const env = validEnv();
+    const audit = silenceAudit();
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async (url) => String(url).includes('/siteverify')
+      ? Response.json({ success: true, hostname: 'www.abroad-o.com', action: 'contact-submit' })
+      : Response.json({ ok: false, code });
+    try {
+      const response = await handleRequest(submitRequest(validPayload()), env);
+      assert.equal(response.status, status);
+      assert.deepEqual(await response.json(), { ok: false, code });
+    } finally {
+      globalThis.fetch = originalFetch;
+      audit.restore();
+    }
   }
 });
 

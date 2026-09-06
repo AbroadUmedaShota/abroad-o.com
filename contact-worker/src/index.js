@@ -3,6 +3,21 @@ const MAX_UPSTREAM_RESPONSE_BYTES = 4 * 1024;
 const MIN_SUBMISSION_TIME_MS = 3_000;
 const MAX_SUBMISSION_TIME_MS = 2 * 60 * 60 * 1_000;
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+const SAFE_CLIENT_CODES = new Set([
+  'form_expired',
+  'request_id_conflict',
+  'delivery_review_required',
+  'rate_limited',
+  'request_too_large',
+]);
+
+const CLIENT_CODE_STATUS = {
+  form_expired: 400,
+  request_id_conflict: 409,
+  delivery_review_required: 202,
+  rate_limited: 429,
+  request_too_large: 413,
+};
 
 const FIELD_RULES = {
   enterprise: { required: true, max: 120 },
@@ -81,7 +96,15 @@ export async function handleRequest(request, env) {
       return reject(requestId, 'request_too_large', 413, allowedOrigin);
     }
 
-    const requestText = await request.text();
+    let requestText;
+    try {
+      requestText = await readLimitedText(request.body, MAX_REQUEST_BYTES);
+    } catch (error) {
+      if (error && error.message === 'body_too_large') {
+        return reject(requestId, 'request_too_large', 413, allowedOrigin);
+      }
+      throw error;
+    }
     if (new TextEncoder().encode(requestText).byteLength > MAX_REQUEST_BYTES) {
       return reject(requestId, 'request_too_large', 413, allowedOrigin);
     }
@@ -95,6 +118,9 @@ export async function handleRequest(request, env) {
 
     const validation = validateSubmission(input);
     if (!validation.ok) {
+      if (SAFE_CLIENT_CODES.has(validation.reason)) {
+        return clientCodeResponse(validation.reason, allowedOrigin);
+      }
       return reject(requestId, validation.reason, 400, allowedOrigin, validation.fields);
     }
 
@@ -162,6 +188,9 @@ export async function handleRequest(request, env) {
     const upstreamResult = await sendToUpstream(upstreamPayload, env);
     if (!upstreamResult.ok) {
       audit('upstream_error', requestId, upstreamResult.reason, ipKey);
+      if (SAFE_CLIENT_CODES.has(upstreamResult.code)) {
+        return clientCodeResponse(upstreamResult.code, allowedOrigin);
+      }
       return jsonResponse({ ok: false, code: 'service_unavailable' }, 503, allowedOrigin);
     }
 
@@ -319,9 +348,13 @@ export async function sendToUpstream(payload, env) {
       return { ok: false, reason: 'upstream_http_error' };
     }
     const result = await readLimitedJson(response, MAX_UPSTREAM_RESPONSE_BYTES);
-    return result && result.ok === true
-      ? { ok: true }
-      : { ok: false, reason: 'upstream_rejected' };
+    if (result && result.ok === true) {
+      return { ok: true };
+    }
+    if (result && SAFE_CLIENT_CODES.has(result.code)) {
+      return { ok: false, reason: 'upstream_rejected', code: result.code };
+    }
+    return { ok: false, reason: 'upstream_rejected' };
   } catch (error) {
     return {
       ok: false,
@@ -350,10 +383,14 @@ export async function keyedHash(secret, value) {
 }
 
 async function readLimitedJson(response, limit) {
-  if (!response.body) {
+  return JSON.parse(await readLimitedText(response.body, limit));
+}
+
+export async function readLimitedText(body, limit) {
+  if (!body) {
     throw new Error('empty_response');
   }
-  const reader = response.body.getReader();
+  const reader = body.getReader();
   const decoder = new TextDecoder();
   let total = 0;
   let text = '';
@@ -365,12 +402,12 @@ async function readLimitedJson(response, limit) {
     total += value.byteLength;
     if (total > limit) {
       await reader.cancel();
-      throw new Error('response_too_large');
+      throw new Error('body_too_large');
     }
     text += decoder.decode(value, { stream: true });
   }
   text += decoder.decode();
-  return JSON.parse(text);
+  return text;
 }
 
 function requiredConfiguration(env) {
@@ -421,6 +458,11 @@ function jsonResponse(body, status, origin, extraHeaders = {}) {
     Object.assign(headers, corsHeaders(origin));
   }
   return new Response(JSON.stringify(body), { status, headers });
+}
+
+function clientCodeResponse(code, origin) {
+  const headers = code === 'rate_limited' ? { 'Retry-After': '60' } : {};
+  return jsonResponse({ ok: false, code }, CLIENT_CODE_STATUS[code], origin, headers);
 }
 
 function reject(requestId, reason, status, origin, fields) {
@@ -481,7 +523,7 @@ function safeErrorReason(error) {
   }
   const allowed = new Set([
     'empty_response',
-    'response_too_large',
+    'body_too_large',
     'SyntaxError',
     'TypeError',
   ]);
