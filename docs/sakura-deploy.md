@@ -154,10 +154,11 @@ $env:SAKURA_RESTORE_MANIFEST_SHA256 = '<restore manifest sha256>'
 段階操作を個別に実行する場合は、`Stage` の出力したrelease IDを `Promote` に渡す。Promoteはrelease metadata内のtarball SHA-256とmanifest SHA-256を再照合するため、別パッケージのmanifestでの反映はできない。
 
 ```powershell
-.\scripts\deploy-sakura.ps1 -Mode Preflight
-.\scripts\deploy-sakura.ps1 -Mode Stage
+$selectedSha = git rev-parse HEAD
+.\scripts\deploy-sakura.ps1 -Mode Preflight -SelectedSha $selectedSha
+.\scripts\deploy-sakura.ps1 -Mode Stage -SelectedSha $selectedSha
 $env:SAKURA_STAGED_RELEASE_ID = 'abroad-o-public-YYYYMMDD-HHMMSS'
-.\scripts\deploy-sakura.ps1 -Mode Promote
+.\scripts\deploy-sakura.ps1 -Mode Promote -SelectedSha $selectedSha
 ```
 
 ## 確認
