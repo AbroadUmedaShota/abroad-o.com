@@ -52,7 +52,7 @@ async function fillAndSubmit(page, name = '山田太郎') {
 try {
   const unknown = await openForm(['unknown_error', 'unknown_error', 'unknown_error']);
   await fillAndSubmit(unknown.page);
-  await unknown.page.waitForFunction(() => document.querySelector('#form-feedback').textContent.includes('送信できませんでした'));
+  await unknown.page.waitForFunction(() => document.querySelector('#form-feedback').textContent.includes('送信結果を確認できませんでした'));
   await unknown.page.evaluate(() => window.__turnstileOptions.callback('verified-token-2'));
   await unknown.page.locator('form').evaluate((form) => form.requestSubmit());
   await unknown.page.waitForFunction(() => window.__turnstileResets?.length === 2);
@@ -85,6 +85,13 @@ try {
   await review.page.waitForFunction(() => document.querySelector('#form-feedback').textContent.includes('受付記録は保存されました'));
   assert.equal(review.state.submits.length, 1);
   assert.match(await review.page.locator('#form-feedback').textContent(), /重複送信はせず/);
+  await review.page.evaluate(() => window.__turnstileOptions.callback('newly-solved-token'));
+  await review.page.locator('.btn-submit').click({ force: true });
+  await review.page.locator('form').evaluate((form) => form.requestSubmit());
+  await review.page.waitForTimeout(100);
+  assert.equal(review.state.submits.length, 1);
+  assert.equal(await review.page.locator('.btn-submit').isDisabled(), true);
+  assert.match(await review.page.locator('#form-feedback').textContent(), /受付記録は保存されました/);
   await review.context.close();
   console.log('Contact form recovery contract passed with mocked Worker and Turnstile endpoints.');
 } finally {

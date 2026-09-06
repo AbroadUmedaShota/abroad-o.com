@@ -58,7 +58,7 @@ function validEnv(overrides = {}) {
   };
 }
 
-function submitRequest(payload, headers = {}) {
+function submitRequest(payload, headers = {}, body = JSON.stringify(payload)) {
   return new Request('https://contact.example/submit', {
     method: 'POST',
     headers: {
@@ -67,7 +67,21 @@ function submitRequest(payload, headers = {}) {
       'CF-Connecting-IP': '203.0.113.42',
       ...headers,
     },
-    body: JSON.stringify(payload),
+    body,
+  });
+}
+
+function submitStreamRequest(body, headers = {}) {
+  return new Request('https://contact.example/submit', {
+    method: 'POST',
+    headers: {
+      Origin: ORIGIN,
+      'Content-Type': 'application/json',
+      'CF-Connecting-IP': '203.0.113.42',
+      ...headers,
+    },
+    body,
+    duplex: 'half',
   });
 }
 
@@ -145,6 +159,44 @@ test('reads request bodies at the byte boundary and cancels an oversized stream'
   });
   await assert.rejects(readLimitedText(tooLarge, 32 * 1024), { message: 'body_too_large' });
   assert.equal(cancelled, true);
+
+  const cancelFailure = new ReadableStream({
+    start(controller) {
+      controller.enqueue(new Uint8Array((32 * 1024) + 1));
+    },
+    cancel() {
+      throw new Error('cancel_failed');
+    },
+  });
+  await assert.rejects(readLimitedText(cancelFailure, 32 * 1024), { message: 'body_too_large' });
+  assert.equal(cancelFailure.locked, false);
+});
+
+test('returns request_too_large for declared, streamed, and encoded body limits', async () => {
+  const audit = silenceAudit();
+  try {
+    const responses = await Promise.all([
+      handleRequest(submitRequest(validPayload(), { 'Content-Length': String((32 * 1024) + 1) }), validEnv()),
+      handleRequest(submitStreamRequest(new ReadableStream({
+        start(controller) {
+          controller.enqueue(new Uint8Array(16 * 1024));
+          controller.enqueue(new Uint8Array((16 * 1024) + 1));
+        },
+      })), validEnv()),
+      handleRequest(submitStreamRequest(new ReadableStream({
+        start(controller) {
+          controller.enqueue(new Uint8Array(11 * 1024).fill(0xff));
+          controller.close();
+        },
+      })), validEnv()),
+    ]);
+    for (const response of responses) {
+      assert.equal(response.status, 413);
+      assert.deepEqual(await response.json(), { ok: false, code: 'request_too_large' });
+    }
+  } finally {
+    audit.restore();
+  }
 });
 
 test('serves public Turnstile configuration only to an allowed origin', async () => {

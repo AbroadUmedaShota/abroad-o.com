@@ -14,7 +14,7 @@ const unavailableMessage = '現在フォームを利用できません。時間�
 const expiredMessage = '確認の有効期限が切れました。もう一度確認してください。';
 const turnstileErrorMessage = 'bot対策の確認を読み込めませんでした。時間をおいて再度お試しいただくか、別の方法でご連絡ください。';
 const missingTokenMessage = 'bot対策の確認を完了してください。';
-const submitErrorMessage = '送信できませんでした。時間をおいて再度お試しいただくか、別の方法でご連絡ください。';
+const submitErrorMessage = '送信結果を確認できませんでした。入力内容は保持されています。同じ内容で手動で再送してください。';
 const expectedPayloadKeys = ['address', 'consent', 'department', 'email', 'enterprise', 'formStartedAt', 'inquiryDetails', 'name', 'phone', 'submissionId', 'turnstileToken', 'website'];
 const validValues = {
   enterprise: '株式会社テスト',
@@ -28,7 +28,7 @@ const validValues = {
 
 const generatedForm = fs.readFileSync(path.join(output, 'form.html'), 'utf8');
 assert.equal((generatedForm.match(new RegExp(`data-contact-api="${apiBase}"`, 'g')) || []).length, 1, 'The production contact API base changed or is duplicated.');
-assert.equal((generatedForm.match(/js\/contact-form\.js\?v=20260808-turnstile-light/g) || []).length, 1, 'The contact-form cache URL changed or is duplicated.');
+assert.equal((generatedForm.match(/js\/contact-form\.js\?v=20260906-contact-recovery/g) || []).length, 1, 'The contact-form cache URL changed or is duplicated.');
 
 const contentTypes = {
   '.css': 'text/css; charset=utf-8',

@@ -93,7 +93,7 @@ export async function handleRequest(request, env) {
 
     const declaredLength = Number(request.headers.get('Content-Length') || 0);
     if (Number.isFinite(declaredLength) && declaredLength > MAX_REQUEST_BYTES) {
-      return reject(requestId, 'request_too_large', 413, allowedOrigin);
+      return clientCodeResponse('request_too_large', allowedOrigin);
     }
 
     let requestText;
@@ -101,12 +101,12 @@ export async function handleRequest(request, env) {
       requestText = await readLimitedText(request.body, MAX_REQUEST_BYTES);
     } catch (error) {
       if (error && error.message === 'body_too_large') {
-        return reject(requestId, 'request_too_large', 413, allowedOrigin);
+        return clientCodeResponse('request_too_large', allowedOrigin);
       }
       throw error;
     }
     if (new TextEncoder().encode(requestText).byteLength > MAX_REQUEST_BYTES) {
-      return reject(requestId, 'request_too_large', 413, allowedOrigin);
+      return clientCodeResponse('request_too_large', allowedOrigin);
     }
 
     let input;
@@ -394,20 +394,28 @@ export async function readLimitedText(body, limit) {
   const decoder = new TextDecoder();
   let total = 0;
   let text = '';
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) {
-      break;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
+      total += value.byteLength;
+      if (total > limit) {
+        try {
+          await reader.cancel();
+        } catch {
+          // A cancelled transport still represents an oversized request.
+        }
+        throw new Error('body_too_large');
+      }
+      text += decoder.decode(value, { stream: true });
     }
-    total += value.byteLength;
-    if (total > limit) {
-      await reader.cancel();
-      throw new Error('body_too_large');
-    }
-    text += decoder.decode(value, { stream: true });
+    text += decoder.decode();
+    return text;
+  } finally {
+    reader.releaseLock();
   }
-  text += decoder.decode();
-  return text;
 }
 
 function requiredConfiguration(env) {

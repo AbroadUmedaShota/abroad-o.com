@@ -24,6 +24,7 @@
     let turnstileToken = '';
     let turnstileWidgetId = null;
     let submitting = false;
+    let deliveryReviewRequired = false;
 
     function createUuid(cryptoApi) {
         const bytes = new Uint8Array(16);
@@ -70,6 +71,13 @@
         lastSubmissionFingerprint = null;
         minimumSubmitAt = formStartedAt + 3000;
         resetTurnstile();
+    }
+
+    function setDeliveryReviewRequired() {
+        deliveryReviewRequired = true;
+        turnstileToken = '';
+        submitButton.disabled = true;
+        setFeedback('お問い合わせの受付記録は保存されましたが、配信状況を確認中です。重複送信はせず、担当者からの連絡をお待ちください。', true);
     }
 
     function loadTurnstileScript() {
@@ -119,16 +127,28 @@
             theme: 'light',
             callback: (token) => {
                 turnstileToken = token;
+                if (deliveryReviewRequired) {
+                    submitButton.disabled = true;
+                    return;
+                }
                 submitButton.disabled = false;
                 setFeedback('', false);
             },
             'expired-callback': () => {
                 turnstileToken = '';
+                if (deliveryReviewRequired) {
+                    submitButton.disabled = true;
+                    return;
+                }
                 submitButton.disabled = true;
                 setFeedback('確認の有効期限が切れました。もう一度確認してください。', true);
             },
             'error-callback': () => {
                 turnstileToken = '';
+                if (deliveryReviewRequired) {
+                    submitButton.disabled = true;
+                    return;
+                }
                 submitButton.disabled = true;
                 setFeedback('bot対策の確認を読み込めませんでした。時間をおいて再度お試しいただくか、別の方法でご連絡ください。', true);
             }
@@ -147,7 +167,7 @@
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
-        if (submitting) {
+        if (submitting || deliveryReviewRequired) {
             return;
         }
 
@@ -235,9 +255,8 @@
                     return;
                 }
                 if (result.code === 'delivery_review_required') {
-                    resetTurnstile();
                     submitting = false;
-                    setFeedback('お問い合わせの受付記録は保存されましたが、配信状況を確認中です。重複送信はせず、担当者からの連絡をお待ちください。', true);
+                    setDeliveryReviewRequired();
                     return;
                 }
                 if (result.code === 'rate_limited') {
@@ -260,7 +279,7 @@
             submitting = false;
             submitButton.disabled = true;
             resetTurnstile();
-            setFeedback('送信できませんでした。時間をおいて再度お試しいただくか、別の方法でご連絡ください。', true);
+            setFeedback('送信結果を確認できませんでした。入力内容は保持されています。同じ内容で手動で再送してください。', true);
         }
     });
 
