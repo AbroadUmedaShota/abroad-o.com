@@ -157,8 +157,8 @@ activeNav: "service"
                   <i class="far fa-copy fa-stack-1x fa-inverse"></i>
                 </span>
                   <h3 class="heading-visual">バラ・裁断可の原本</h3>
-                  <p>自動読取/A4サイズ/300dpi/白黒</p>
-                  <p class="heading-visual">4円〜</p>
+                  <p>自動読取/A4サイズ/{{ pricing.adf.dpi }}dpi/白黒</p>
+                  <p class="heading-visual">{{ pricing.adf.yen }}円〜</p>
                   <a class="btn btn-danger btn-lg" href="scan.html#scan-third"><strong>詳細はこちら</strong></a>
               </div>
             </div>
@@ -169,8 +169,8 @@ activeNav: "service"
                   <i class="fas fa-book fa-stack-1x fa-inverse"></i>
                 </span>
                 <h3 class="heading-visual">製本・非破壊の原本</h3>
-                <p>手動読取/A4サイズ/300dpi/白黒</p>
-                <p class="heading-visual">20円〜</p>
+                <p>手動読取/A4サイズ/{{ pricing.book.dpi }}dpi/白黒</p>
+                <p class="heading-visual">{{ pricing.book.yen }}円〜</p>
                 <a class="btn btn-danger btn-lg" href="scan.html#scan-third"><strong>詳細はこちら</strong></a>
               </div> 
             </div>
@@ -437,13 +437,13 @@ activeNav: "service"
               </tr>
               <tr>
                 <th>-</th>
-                <td>白黒二値　　　　200dpi</td>
-                <td>￥4/枚</td>
+                <td>白黒二値　　　　{{ pricing.adf.dpi }}dpi</td>
+                <td>￥{{ pricing.adf.yen }}/枚</td>
               </tr>
               <tr>
                 <th>-</th>
                 <td>白黒二値　　　　300dpi</td>
-                <td>￥6/枚</td>
+                <td>￥{{ pricing.adf.mono300Yen }}/枚</td>
               </tr>
               <tr>
                 <th>-</th>
@@ -487,8 +487,8 @@ activeNav: "service"
               </tr>
               <tr>
                 <th>-</th>
-                <td>白黒二値　　　　200dpi</td>
-                <td>￥20/枚</td>
+                <td>白黒二値　　　　{{ pricing.book.dpi }}dpi</td>
+                <td>￥{{ pricing.book.yen }}/枚</td>
               </tr>
               <tr>
                 <th>-</th>
@@ -523,7 +523,7 @@ activeNav: "service"
               <tr>
                 <th>-</th>
                 <td>フルカラー　　　300dpi</td>
-                <td>￥30/枚</td>
+                <td>￥{{ pricing.book.color300Yen }}/枚</td>
               </tr>
               <tr>
                  <th>-</th>
@@ -668,8 +668,8 @@ activeNav: "service"
              </tbody>
            </table>
            <div class="price_caution">
-            <p><b><span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>お支払例</b><br>例.A4片面1枚のアンケート10,000枚の白黒300dpiのスキャン費用・・・<br><br>　￥6×10,000枚=￥60,000（税別）<br><br></p>
-            <p>例.裁断不可の冊子300ページ×100冊のカラー300dpiのスキャン費用・・・<br><br>　￥30×100ページ×100冊=￥300,000（税別）<br><br></p> 
+            <p><b><span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>お支払例</b><br>例.A4片面1枚のアンケート{{ pricing.questionnaire.sheets }}枚の白黒300dpiのスキャン費用・・・<br><br>　￥{{ pricing.adf.mono300Yen }}×{{ pricing.questionnaire.sheets }}枚=￥{{ pricing.questionnaire.total }}（税別）<br><br></p>
+            <p>例.裁断不可の冊子{{ pricing.booklet.pages }}ページ×{{ pricing.booklet.copies }}冊のカラー300dpiのスキャン費用・・・<br><br>　￥{{ pricing.book.color300Yen }}×{{ pricing.booklet.pages }}ページ×{{ pricing.booklet.copies }}冊=￥{{ pricing.booklet.total }}（税別）<br><br></p>
             <p><b><span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>最低受注金額</b><br>合計金額が30,000円（税別）に満たない場合、一律30,000円（税別）でご案内<br><br></p>
             <p><b><span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>その他ご案内事項</b><br>※入力原稿の状態（文字がかすれていたり、読み難い手書き文字、個別に判断を要する場合等）や数量、納期、ご希望の仕様により上記単価と異なる場合がございますので、上記の価格はあくまでも目安としてご参照ください。内容を確認後、正式な金額をご案内致します。 
             <br>※入力サービスは100％を目指し対応しておりますが、100％の精度を補償するものではございません。<br>※全て税別価格となります。</p>
