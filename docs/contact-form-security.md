@@ -71,7 +71,22 @@ CONTACT_AUTOREPLY_ENABLED=true
 
 保存、内部通知、自動返信を一連で確認する。テストに実在する第三者のメールアドレスを使用しない。本番設定でも自動返信を有効にした状態で切り替える。
 
-## 旧Google Formsからの切替順序
+## 2026-09 問い合わせ安全性改修の公開順序
+
+この節は既存フォームの初回移行ではなく、Worker、Apps Script、Sakuraフォームを同時に更新する今回のupgrade専用手順である。下記を一つの承認とみなさず、各段階で対象、versionまたはSHA、検証結果、承認者、承認日時、戻し先を記録する。
+
+1. すべての対象PRをmasterへ統合し、選択したmaster SHAについてSite checksの`site-check`、`contact-worker`、`site-gate`が同じrun attemptで成功したことを記録する。
+2. 変更前のWorker deployment version、Apps Script deployment version、Sakuraのsanitized backupを戻し先として記録する。Worker source SHA、Apps Script `Code.gs` SHA-256、Sakura package SHA-256も記録する。
+3. Apps Script変更前に、既存Spreadsheetの`内部通知状態`と`自動返信状態`が`待機`の行について送信履歴を運用担当者が確認する。確認中の行を自動送信せず、未送信と判断した行だけ手動で`待機`へ戻す。
+4. Worker公開の明示承認を得て、先にWorkerを更新する。`/config`と新しい安全な応答コードを非送信で確認し、deployment versionと確認結果を記録する。
+5. Apps Script更新の明示承認を得て、次にApps Script deploymentを更新する。`getContactConfigurationStatus`を確認するが、実メール送信や本番問い合わせデータの作成は行わない。
+6. Sakura公開の明示承認を得て、最後にフォームJavaScriptとHTMLを公開する。選択SHAと同一のSakura package SHA-256、Preflight、Deploy、Audit結果を記録する。
+7. 主要ページ、フォーム表示、Turnstile、Worker `/config`を非送信で確認する。本番フォームPOSTはここでは実施しない。
+8. 本番フォームPOSTは別の明示承認を得た場合だけ、管理下の合成データとメールアドレスで1件実施する。承認がなければこの停止点を越えない。
+
+順序は`Worker → Apps Script → Sakura`とする。途中でversion不一致、`待機`行の判断未完了、設定不一致、検証失敗があれば次へ進まず、直前に記録したversionへ戻す。Apps Scriptの`送信中`または`結果不明`は自動再送しない。
+
+## 旧Google Formsからの初回切替順序
 
 1. 旧Google Formに紐づく自動返信元、回答受付、トリガーを特定し、切替操作と確認方法を確定する。この段階では通常運用を停止しない。
 2. 新しい問い合わせ台帳を既存の問い合わせ運用グループへ共有し、必要な担当者の閲覧可否と旧回答データが保持されていることを確認する。

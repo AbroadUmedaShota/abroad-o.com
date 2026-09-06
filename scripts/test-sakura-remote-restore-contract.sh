@@ -97,7 +97,7 @@ cp -p "$package" "$home/$release.tgz"
 mkdir -p "$home/.abroad-o-stages"
 printf '%s  %s  %s\n' "$(sha "$home/$release.tgz")" "$path_sha" "$evidence_sha" > "$home/.abroad-o-stages/$release.meta"
 run_promote() {
-  env PATH="${remote_test_path:-$remote_path}" HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 ${1:-} pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode Promote -ConfigPath "$config" -WorkDir "$work/promote-$RANDOM" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -StagedReleaseId "$release"
+  env PATH="${remote_test_path:-$remote_path}" HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 ${1:-} pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode Promote -SelectedSha "$(git rev-parse HEAD)" -ConfigPath "$config" -WorkDir "$work/promote-$RANDOM" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -StagedReleaseId "$release"
 }
 before_failed_promote=$(tree "$public")
 mkdir "$backups/.abroad-o-deploy.lock"

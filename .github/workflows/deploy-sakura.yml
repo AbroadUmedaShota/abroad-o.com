@@ -124,6 +124,8 @@ jobs:
         if: ${{ inputs.mode == 'preflight' }}
         shell: pwsh
         env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SAKURA_SELECTED_SHA: ${{ inputs.target_sha }}
           SAKURA_HOST: ${{ secrets.SAKURA_HOST }}
           SAKURA_USER: ${{ secrets.SAKURA_USER }}
           SAKURA_REMOTE_DIR: ${{ secrets.SAKURA_REMOTE_DIR }}
@@ -136,6 +138,8 @@ jobs:
         if: ${{ inputs.mode == 'deploy' }}
         shell: pwsh
         env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SAKURA_SELECTED_SHA: ${{ inputs.target_sha }}
           SAKURA_HOST: ${{ secrets.SAKURA_HOST }}
           SAKURA_USER: ${{ secrets.SAKURA_USER }}
           SAKURA_REMOTE_DIR: ${{ secrets.SAKURA_REMOTE_DIR }}

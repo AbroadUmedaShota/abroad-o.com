@@ -36,6 +36,14 @@ npm run check:site
 .\scripts\deploy-sakura.ps1 -Mode DryRun
 ```
 
+### 信頼済みSHAの必須gate
+
+`Preflight`、`Stage`、`Promote`、`Deploy`は、GitHub Actions経由でもローカル実行でも、選択SHA、cleanな作業ツリー、GitHub上のcurrent `master`、同じSHAの最新push run、同じattemptの成功した`site-gate`を公開スクリプト自身が確認する。取得失敗、pending、失敗、別SHA、別branch、gate不足はSSH/SCPより前にfail closedとする。
+
+public repositoryではGitHub APIを匿名で参照できるが、rate limitを避ける場合は`GITHUB_TOKEN`をプロセス環境だけに設定する。tokenをコマンド、Issue、ログへ出力しない。gateを省略するforce/skip optionはない。`Package`、`DryRun`は非公開処理のためgate対象外、`Audit`は読み取り専用、`RestoreSafe`は別の復元契約と明示承認に従う。
+
+問い合わせ安全性改修を公開する場合は`docs/contact-form-security.md`のupgrade手順に従い、Worker、Apps Script、Sakuraの順で個別承認・version記録・受入を行う。本番フォームPOSTはSakura公開とは別承認である。
+
 単一ファイルを公開する場合も、編集元の`site/pages/`ではなく`npm run build:site`で生成した`_site/<対象ファイル>`をアップロードする。
 
 FileZillaに保存されている接続先情報を確認する場合:
@@ -66,7 +74,9 @@ $env:SAKURA_USER = "abroad-o"
 $env:SAKURA_REMOTE_DIR = "/home/abroad-o/www/abroad-o.com"
 $env:SAKURA_SSH_KEY_PATH = "$HOME\.ssh\sakura_abroad_o"
 $env:SAKURA_PORT = "22"
-.\scripts\deploy-sakura.ps1 -Mode Deploy
+$selectedSha = git rev-parse HEAD
+.\scripts\deploy-sakura.ps1 -Mode Preflight -SelectedSha $selectedSha
+.\scripts\deploy-sakura.ps1 -Mode Deploy -SelectedSha $selectedSha
 ```
 
 `SAKURA_REMOTE_DIR` を省略した場合は `/home/<SAKURA_USER>/www` を使う。
@@ -75,14 +85,16 @@ FileZillaの保存情報から `SAKURA_HOST`, `SAKURA_USER`, `SAKURA_REMOTE_DIR`
 
 ```powershell
 .\scripts\deploy-sakura.ps1 -Mode DryRun -UseFileZillaConfig
-.\scripts\deploy-sakura.ps1 -Mode Deploy -UseFileZillaConfig
+$selectedSha = git rev-parse HEAD
+.\scripts\deploy-sakura.ps1 -Mode Preflight -SelectedSha $selectedSha -UseFileZillaConfig
+.\scripts\deploy-sakura.ps1 -Mode Deploy -SelectedSha $selectedSha -UseFileZillaConfig
 ```
 
 FileZillaがFTP/21番で保存されていても、このデプロイスクリプトは公開前バックアップと公開反映にSSH/SCPを使う。復元はsanitized backup と restoration contract の独立検証が完了するまで停止中である。FTPパスワードは表示・利用しない。
 
 ## GitHub Actions
 
-`.github/workflows/deploy-sakura.yml` は手動実行のみ。実行時は次の3モードから選択する。
+`.github/workflows/deploy-sakura.yml` は手動実行のみ。実行時は次の4モードから選択する。
 
 `preflight` と `deploy` では `target_sha` に **現在の `master` の完全な40文字SHA** を指定する。workflowは`master`から取得した共通gate helperで、指定SHAが現在の`master`と完全一致し、同じSHA・`master`・pushに対する `.github/workflows/site-check.yml`（`Site checks`）の**最新**runが成功し、そのrunの `site-gate` jobも成功していることを確認してから同じSHAをcheckoutする。APIエラー、run/job不足、別SHA、別ブランチ、後続の失敗runはいずれもfail-closedであり、Sakura接続前に停止する。`package` と読み取り専用の `audit` はこのgateを要求せず、`master`をcheckoutする。`contents: read` と `actions: read` 以外の権限は与えない。デプロイは単一の `sakura-deploy` concurrency group で直列化し、進行中の公開をキャンセルしない。
 

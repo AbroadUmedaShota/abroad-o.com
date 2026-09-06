@@ -13,6 +13,7 @@ param(
     [string]$BackupArchiveSha256 = $env:SAKURA_RESTORE_ARCHIVE_SHA256,
     [string]$BackupManifestSha256 = $env:SAKURA_RESTORE_MANIFEST_SHA256,
     [string]$StagedReleaseId = $env:SAKURA_STAGED_RELEASE_ID,
+    [string]$SelectedSha = $env:SAKURA_SELECTED_SHA,
     [switch]$RestoreApply,
     [switch]$UseFileZillaConfig
 )
@@ -26,6 +27,61 @@ function Resolve-RepoRoot {
         throw "This script must be run inside the git repository."
     }
     return (Resolve-Path $root).Path
+}
+
+function Get-GitHubRepositorySlug {
+    param([string]$RepoRoot)
+
+    $remoteUrl = (& git -C $RepoRoot remote get-url origin 2>$null)
+    if ($LASTEXITCODE -ne 0 -or -not $remoteUrl) {
+        throw "The origin Git remote is required for the trusted deployment gate."
+    }
+    if ([string]$remoteUrl -notmatch 'github\.com[:/](?<owner>[^/\s]+)/(?<repo>[^/\s]+?)(?:\.git)?$') {
+        throw "The origin Git remote must identify a GitHub owner/repository."
+    }
+    return "$($Matches.owner)/$($Matches.repo)"
+}
+
+function Assert-SakuraDeploySourceGate {
+    param([string]$RepoRoot, [string]$SelectedSha)
+
+    if (-not $SelectedSha -or $SelectedSha -notmatch '^[0-9a-fA-F]{40}$') {
+        throw "SelectedSha or SAKURA_SELECTED_SHA must be a full 40-character Git SHA for Preflight, Stage, Promote, and Deploy."
+    }
+    $headSha = (& git -C $RepoRoot rev-parse HEAD 2>$null)
+    if ($LASTEXITCODE -ne 0 -or -not $headSha) {
+        throw "Unable to resolve the deployment worktree HEAD."
+    }
+    if ([string]$headSha -ne $SelectedSha) {
+        throw "SelectedSha must exactly match the deployment worktree HEAD."
+    }
+    $dirty = @(& git -C $RepoRoot status --porcelain=v1 --untracked-files=all 2>$null)
+    if ($LASTEXITCODE -ne 0) {
+        throw "Unable to verify that the deployment worktree is clean."
+    }
+    if ($dirty.Count -gt 0) {
+        throw "Preflight, Stage, Promote, and Deploy require a clean deployment worktree."
+    }
+
+    if ($env:SAKURA_VALIDATE_REMOTE_SCRIPT -eq "1" -or $env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -eq "1") {
+        Write-Host "Trusted Site checks API gate omitted only inside the non-remote test harness."
+        return
+    }
+
+    $repository = Get-GitHubRepositorySlug -RepoRoot $RepoRoot
+    $savedTargetSha = $env:TARGET_SHA
+    $savedRepository = $env:GITHUB_REPOSITORY
+    try {
+        $env:TARGET_SHA = $SelectedSha
+        $env:GITHUB_REPOSITORY = $repository
+        & node (Join-Path $PSScriptRoot "check-sakura-site-gate.mjs")
+        if ($LASTEXITCODE -ne 0) {
+            throw "Trusted Site checks gate rejected the selected deployment SHA."
+        }
+    } finally {
+        $env:TARGET_SHA = $savedTargetSha
+        $env:GITHUB_REPOSITORY = $savedRepository
+    }
 }
 
 function Test-NameExcluded {
@@ -424,6 +480,7 @@ cleanup() {
   if [ -f "`$TEMP_FILES" ]; then while IFS= read -r temporary; do rm -f "`$temporary"; done < "`$TEMP_FILES"; fi
   rm -rf "`$STAGE_DIR"
 }
+
 release_lock() {
   if [ "`$LOCK_OWNED" = 1 ]; then rm -f "`$LOCK_DIR/owner"; rmdir "`$LOCK_DIR" 2>/dev/null || true; fi
 }
@@ -1115,6 +1172,12 @@ function Invoke-Verification {
 }
 
 $repoRoot = Resolve-RepoRoot
+if (($env:SAKURA_VALIDATE_REMOTE_SCRIPT -eq "1" -or $env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -eq "1") -and $Mode -in @("Stage", "Deploy")) {
+    throw "The non-remote test harness cannot authorize Stage or Deploy."
+}
+if ($Mode -in @("Preflight", "Stage", "Promote", "Deploy")) {
+    Assert-SakuraDeploySourceGate -RepoRoot $repoRoot -SelectedSha $SelectedSha
+}
 $configFullPath = if ([IO.Path]::IsPathRooted($ConfigPath)) { [IO.Path]::GetFullPath($ConfigPath) } else { Join-Path $repoRoot $ConfigPath }
 if (-not (Test-Path $configFullPath)) {
     throw "Config not found: $configFullPath"
