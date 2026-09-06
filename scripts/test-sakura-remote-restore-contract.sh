@@ -100,9 +100,21 @@ run_promote() {
   env PATH="${remote_test_path:-$remote_path}" HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 ${1:-} pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode Promote -ConfigPath "$config" -WorkDir "$work/promote-$RANDOM" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -StagedReleaseId "$release"
 }
 before_failed_promote=$(tree "$public")
+mkdir "$backups/.abroad-o-deploy.lock"
+printf 'mode=operator-held\n' > "$backups/.abroad-o-deploy.lock/owner"
+if run_promote >/dev/null 2>&1; then fail 'Promote accepted a second deployment lock'; fi
+[ -f "$backups/.abroad-o-deploy.lock/owner" ] || fail 'Promote removed an operator-held lock'
+[ "$before_failed_promote" = "$(tree "$public")" ] || fail 'locked Promote changed public root'
+rm -f "$backups/.abroad-o-deploy.lock/owner"; rmdir "$backups/.abroad-o-deploy.lock"
+if run_promote SAKURA_LOCAL_PROMOTE_FAIL_AFTER_TEMP=1 >/dev/null 2>&1; then fail 'Promote accepted injected temporary-file failure'; fi
+[ "$before_failed_promote" = "$(tree "$public")" ] || fail 'temporary-file failure changed public root'
+[ -z "$(find "$public" -type f -name '.*.codex.*' -print -quit)" ] || fail 'temporary-file failure left publish temp'
+[ ! -e "$backups/.abroad-o-deploy.lock" ] || fail 'temporary-file failure left deployment lock'
+find "$backups" -maxdepth 1 -type f -name 'abroad-o-before-*.sra.tgz' -delete
 if run_promote SAKURA_LOCAL_PROMOTE_CORRUPT_BACKUP=1 >/dev/null 2>&1; then fail 'corrupt Promote backup was accepted'; fi
 [ "$before_failed_promote" = "$(tree "$public")" ] || fail 'failed Promote changed public root'
 [ -z "$(find "$backups" -maxdepth 1 -type f -name 'abroad-o-before-*.sra.tgz' -print -quit)" ] || fail 'failed Promote left an invalid backup'
+[ ! -e "$backups/.abroad-o-deploy.lock" ] || fail 'failed Promote left deployment lock'
 [ -z "$(find "$home" -maxdepth 1 \( -name 'abroad-o-stage.*' -o -name 'abroad-o-backup.*' -o -name 'abroad-o-backup-verify.*' \) -print -quit)" ] || fail 'failed Promote left temp'
 run_promote >/dev/null
 mapfile -t promote_backups < <(find "$backups" -maxdepth 1 -type f -name 'abroad-o-before-*.sra.tgz' -print)
@@ -119,17 +131,25 @@ valid_archive="$archive"; valid_archive_sha="$archive_sha"
 for p in TOOL/index.html pdfjs/build/pdf.js pdfjs/web/viewer.html pdfjs/LICENSE; do absent "$public/$p"; done
 [ ! -e "$home/$release.tgz" ] || fail 'Promote did not remove staged package'
 [ -z "$(find "$home" -maxdepth 1 \( -name 'abroad-o-stage.*' -o -name 'abroad-o-backup.*' -o -name 'abroad-o-backup-verify.*' \) -print -quit)" ] || fail 'successful Promote left temp'
+[ ! -e "$backups/.abroad-o-deploy.lock" ] || fail 'successful Promote left deployment lock'
 
 # RestoreSafe now consumes the archive produced by the real Promote shell.
 printf changed > "$public/index.html"; printf changed > "$public/foo/foo.map"; printf changed > "$public/woff/font.woff"; printf changed > "$public/woff2/font.woff2"
 for p in 1c_abroad.pdf 2c_abroad.pdf 4c_abroad.pdf; do printf changed > "$public/pdfjs/$p"; done
 dry=$(tree "$public"); run 0 >/dev/null; [ "$dry" = "$(tree "$public")" ] || fail 'DryRun changed public root'
+mkdir "$backups/.abroad-o-deploy.lock"
+printf 'mode=operator-held\n' > "$backups/.abroad-o-deploy.lock/owner"
+if run 1 >/dev/null 2>&1; then fail 'RestoreSafe accepted a second deployment lock'; fi
+[ -f "$backups/.abroad-o-deploy.lock/owner" ] || fail 'RestoreSafe removed an operator-held lock'
+[ "$dry" = "$(tree "$public")" ] || fail 'locked RestoreSafe changed public root'
+rm -f "$backups/.abroad-o-deploy.lock/owner"; rmdir "$backups/.abroad-o-deploy.lock"
 run 1 >/dev/null
 for p in index.html foo/foo.map woff/font.woff woff2/font.woff2; do [ "$(sha "$public/$p")" = "$(sha "$previous/$p")" ] || fail "prefix collision restore failed: $p"; done
 absent "$public/style.css"; [ "$(cat "$public/unknown.txt")" = unknown ] || fail 'unknown changed'
 for p in TOOL/index.html pdfjs/build/pdf.js pdfjs/web/viewer.html pdfjs/LICENSE; do absent "$public/$p"; done
 for p in 1c_abroad.pdf 2c_abroad.pdf 4c_abroad.pdf; do [ "$(sha "$public/pdfjs/$p")" = "$(sha "$previous/pdfjs/$p")" ] || fail "PDF changed: $p"; done
 [ -z "$(find "$home" -maxdepth 1 -name 'abroad-o-restore.*' -print -quit)" ] || fail 'successful restore left temp'
+[ ! -e "$backups/.abroad-o-deploy.lock" ] || fail 'successful RestoreSafe left deployment lock'
 baseline=$(tree "$public")
 
 # The helper must fail closed before Apply when neither supported hash command

@@ -3,6 +3,7 @@
 ## 目的
 
 FileZillaの手作業に依存せず、Git管理された公開ファイルだけをさくらサーバーの公開ディレクトリへ同期する。
+CI/Sakuraの実装追跡は Issue #70 で行う。問い合わせフォームのbrowser recoveryテストはcontact作業の責務であり、このデプロイ契約から直接実行しない。
 
 ## 公開対象
 
@@ -83,6 +84,8 @@ FileZillaがFTP/21番で保存されていても、このデプロイスクリ�
 
 `.github/workflows/deploy-sakura.yml` は手動実行のみ。実行時は次の3モードから選択する。
 
+`preflight` と `deploy` では `target_sha` に **現在の `master` の完全な40文字SHA** を指定する。workflowは`master`から取得した共通gate helperで、指定SHAが現在の`master`と完全一致し、同じSHA・`master`・pushに対する `.github/workflows/site-check.yml`（`Site checks`）の**最新**runが成功し、そのrunの `site-gate` jobも成功していることを確認してから同じSHAをcheckoutする。APIエラー、run/job不足、別SHA、別ブランチ、後続の失敗runはいずれもfail-closedであり、Sakura接続前に停止する。`package` と読み取り専用の `audit` はこのgateを要求せず、`master`をcheckoutする。`contents: read` と `actions: read` 以外の権限は与えない。デプロイは単一の `sakura-deploy` concurrency group で直列化し、進行中の公開をキャンセルしない。
+
 - `package`: Eleventyビルドと公開パッケージ作成のみ。SecretsとSakura接続は不要。
 - `audit`: SSHで本番を読み取り、Gitから生成した公開物とSHA-256を照合する。本番は更新しない。
 - `preflight`: SSHで公開ルート、symlink、sanitized snapshotに必要な空き容量、管理外ファイル件数を確認する。本番は更新しない。
@@ -101,6 +104,10 @@ GitHub repository secrets:
 
 `audit` は生のSHA-256を優先し、差分があるテキストファイルだけCRLF/LFを正規化したSHA-256も比較する。内容が同一で改行だけが異なる場合は `line-ending-only` として件数を分け、内容差分には含めない。
 
+### CIの費用プロファイル（2026-09-06確認）
+
+リポジトリは public で、`master` の branch protection API は「Branch not protected」だった。利用枠・請求主体・残量はこの作業から取得できず、**unknown** として扱う。直近の `Site checks` 成功run（2026-08-28、run 33208741428）は約8分で、今回追加した `contact-worker` は `npm ci`、`npm test`、`npm run check` の独立Linux jobである。概算は既存site job約8分 + worker jobの実測未取得（最低1分に丸め）で、最低約9 runner分/run、実績取得までは上振れunknownとする。PRとmaster pushの両方で実行されるため、月間見積りは `PR回数 + master push回数` にこの実測前概算を掛ける。新たな高コストmatrixや手動の検証runは追加していない。枠が判明するまで、頻繁な不要pushや手動再実行は避け、実行後にjobごとの実測時間でこの記録を更新する。
+
 さくらサーバー側で国外IPアドレスフィルターが有効な場合、GitHub ActionsからのSSH/SFTP接続が拒否される可能性がある。広く無効化せず、必要な許可リスト運用を優先する。
 
 ## バックアップと復元
@@ -108,6 +115,8 @@ GitHub repository secrets:
 `Restore` は恒久的に停止している。生のサイト全体backupを復元する機能は持たない。
 
 `Promote` 前には、今回のRC path manifestに列挙されたファイルのうち、公開前に存在するものだけを `restore-contract-v1/` 形式のsanitized archiveとして保存する。`TOOL/`、`pdfjs/build/`、`pdfjs/web/`、`pdfjs/LICENSE`、管理外ファイルはarchiveに入らない。3件のPDFはバイト数とSHA-256を照合し、archiveに必ず含める。archive内metadataはformat version、固定公開ルート、対象RCのpath manifest SHA-256、content evidence SHA-256を結び付ける。archive SHA-256はarchive作成後に出力する。
+
+`Promote` と `RestoreSafe -RestoreApply` は既存backup directory内の `.abroad-o-deploy.lock` を `mkdir` で原子的に取得する。owner metadataにはモード、UTC開始時刻、host、pid、userを記録する。既存lockは古く見えても自動削除せず、運用者が確認して解消するまでfail-closedとする。Promoteではlockがbackup、ファイル反映、反映後SHA監査までを、RestoreSafeでは復元・削除・復元後SHA監査までを包含する。Preflight、Audit、RestoreSafe DryRunは読み取り専用でlockを取得しない。
 
 このarchiveは「今回のRCにより上書きされる既存管理ファイル」の安全な復元用であり、旧サイト全体の完全snapshotではない。過去の所有manifestがないため、現行RCにない旧ファイルを管理対象と推定して保存・復活させない。退役ファイルを戻す必要がある場合は、この契約を拡張せず、別の証跡と明示承認を用意する。
 
@@ -125,6 +134,8 @@ $env:SAKURA_RESTORE_MANIFEST_SHA256 = '<restore manifest sha256>'
 `Deploy` は `Preflight`、`Stage`、限定 `Promote` の順で実行する。Preflightは読み取り専用で、公開ディレクトリがシンボリックリンクでないこと、sanitized snapshotに必要な空き容量、管理外ファイル数を確認する。管理外ファイルは一覧出力せずtop-level集計だけを示し、Promoteでは変更・削除しない。manifest記載ファイルと明示削除allowlistだけが公開操作の対象である。
 
 `Stage` は公開tarballをホームディレクトリに置くだけで、公開ディレクトリを変更しない。`Promote` はmanifest記載ファイルだけを上書きし、公開ルートや管理ディレクトリを一括削除しない。反映前に `~/abroad-o-backups/abroad-o-before-<timestamp>.sra.tgz` を作り、package SHA-256、path manifest SHA-256、content evidence SHA-256を区別して出力する。
+
+各ファイルは公開先と同一ディレクトリの固有temporary fileへコピー、存在確認後にrenameする。asset類を先に、HTMLを後に反映する。これはファイル単位の切替であり、サイト全体が単一時点で切り替わるという主張はしない。失敗時は今回作成した固有temporary filesだけを掃除し、公開ルート全体は削除しない。
 
 これらのモードはSSH/SCP鍵認証が必須である。FileZillaにFTP/21の設定しかない場合は、このスクリプトで接続・公開しない。FTPパスワードの読取り、表示、またはFTPへのフォールバックは行わない。
 
