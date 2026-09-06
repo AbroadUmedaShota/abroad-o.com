@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   handleRequest,
   keyedHash,
+  readLimitedText,
   validateSubmission,
 } from '../src/index.js';
 
@@ -57,7 +58,7 @@ function validEnv(overrides = {}) {
   };
 }
 
-function submitRequest(payload, headers = {}) {
+function submitRequest(payload, headers = {}, body = JSON.stringify(payload)) {
   return new Request('https://contact.example/submit', {
     method: 'POST',
     headers: {
@@ -66,7 +67,21 @@ function submitRequest(payload, headers = {}) {
       'CF-Connecting-IP': '203.0.113.42',
       ...headers,
     },
-    body: JSON.stringify(payload),
+    body,
+  });
+}
+
+function submitStreamRequest(body, headers = {}) {
+  return new Request('https://contact.example/submit', {
+    method: 'POST',
+    headers: {
+      Origin: ORIGIN,
+      'Content-Type': 'application/json',
+      'CF-Connecting-IP': '203.0.113.42',
+      ...headers,
+    },
+    body,
+    duplex: 'half',
   });
 }
 
@@ -108,6 +123,102 @@ test('rejects honeypot, fast submission, malformed fields and URL flooding', () 
   assert.equal(validateSubmission(validPayload({
     inquiryDetails: 'https://a.test https://b.test https://c.test https://d.test https://e.test https://f.test',
   })).reason, 'field_validation_failed');
+});
+
+test('returns form_expired as a safe client recovery code', async () => {
+  const audit = silenceAudit();
+  try {
+    const response = await handleRequest(submitRequest(validPayload({
+      formStartedAt: Date.now() - ((2 * 60 * 60 * 1000) + 1),
+    })), validEnv());
+    assert.equal(response.status, 400);
+    assert.deepEqual(await response.json(), { ok: false, code: 'form_expired' });
+    assert.equal(audit.entries.length, 1);
+    assert.equal(JSON.parse(audit.entries[0]).outcome, 'rejected');
+  } finally {
+    audit.restore();
+  }
+});
+
+test('empty and oversized requests preserve one rejection audit event', async () => {
+  for (const [body, headers, status, code] of [
+    [null, {}, 400, 'request_rejected'],
+    ['', {}, 400, 'request_rejected'],
+    ['x', { 'Content-Length': '32769' }, 413, 'request_too_large'],
+    ['x'.repeat(32769), {}, 413, 'request_too_large'],
+  ]) {
+    const audit = silenceAudit();
+    try {
+      const response = await handleRequest(submitRequest({}, headers, body), validEnv());
+      assert.equal(response.status, status);
+      assert.deepEqual(await response.json(), { ok: false, code });
+      assert.equal(audit.entries.length, 1);
+      const entry = JSON.parse(audit.entries[0]);
+      assert.equal(entry.outcome, 'rejected');
+      assert.equal(entry.reason, status === 413 ? 'request_too_large' : 'invalid_json');
+    } finally { audit.restore(); }
+  }
+});
+
+test('reads request bodies at the byte boundary and cancels an oversized stream', async () => {
+  const atLimit = new ReadableStream({
+    start(controller) {
+      controller.enqueue(new TextEncoder().encode('a'.repeat(32 * 1024)));
+      controller.close();
+    },
+  });
+  assert.equal((await readLimitedText(atLimit, 32 * 1024)).length, 32 * 1024);
+
+  let cancelled = false;
+  const tooLarge = new ReadableStream({
+    start(controller) {
+      controller.enqueue(new TextEncoder().encode('a'.repeat(16 * 1024)));
+      controller.enqueue(new TextEncoder().encode('b'.repeat((16 * 1024) + 1)));
+    },
+    cancel() {
+      cancelled = true;
+    },
+  });
+  await assert.rejects(readLimitedText(tooLarge, 32 * 1024), { message: 'body_too_large' });
+  assert.equal(cancelled, true);
+
+  const cancelFailure = new ReadableStream({
+    start(controller) {
+      controller.enqueue(new Uint8Array((32 * 1024) + 1));
+    },
+    cancel() {
+      throw new Error('cancel_failed');
+    },
+  });
+  await assert.rejects(readLimitedText(cancelFailure, 32 * 1024), { message: 'body_too_large' });
+  assert.equal(cancelFailure.locked, false);
+});
+
+test('returns request_too_large for declared, streamed, and encoded body limits', async () => {
+  const audit = silenceAudit();
+  try {
+    const responses = await Promise.all([
+      handleRequest(submitRequest(validPayload(), { 'Content-Length': String((32 * 1024) + 1) }), validEnv()),
+      handleRequest(submitStreamRequest(new ReadableStream({
+        start(controller) {
+          controller.enqueue(new Uint8Array(16 * 1024));
+          controller.enqueue(new Uint8Array((16 * 1024) + 1));
+        },
+      })), validEnv()),
+      handleRequest(submitStreamRequest(new ReadableStream({
+        start(controller) {
+          controller.enqueue(new Uint8Array(11 * 1024).fill(0xff));
+          controller.close();
+        },
+      })), validEnv()),
+    ]);
+    for (const response of responses) {
+      assert.equal(response.status, 413);
+      assert.deepEqual(await response.json(), { ok: false, code: 'request_too_large' });
+    }
+  } finally {
+    audit.restore();
+  }
 });
 
 test('serves public Turnstile configuration only to an allowed origin', async () => {
@@ -257,6 +368,28 @@ test('forwards a valid request with an HMAC signature and safe control flags', a
   } finally {
     globalThis.fetch = originalFetch;
     audit.restore();
+  }
+});
+
+test('propagates approved receiver recovery codes without changing success compatibility', async () => {
+  for (const [code, status] of [
+    ['request_id_conflict', 409],
+    ['delivery_review_required', 202],
+  ]) {
+    const env = validEnv();
+    const audit = silenceAudit();
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async (url) => String(url).includes('/siteverify')
+      ? Response.json({ success: true, hostname: 'www.abroad-o.com', action: 'contact-submit' })
+      : Response.json({ ok: false, code });
+    try {
+      const response = await handleRequest(submitRequest(validPayload()), env);
+      assert.equal(response.status, status);
+      assert.deepEqual(await response.json(), { ok: false, code });
+    } finally {
+      globalThis.fetch = originalFetch;
+      audit.restore();
+    }
   }
 });
 
