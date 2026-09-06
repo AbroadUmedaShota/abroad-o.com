@@ -21,6 +21,7 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run check:site
+      - run: npm run check:sakura-site-gate
       - run: npm run check:restore-contract
       - run: npm run check:ie-shims
       - run: npm run check:csp-report-only
