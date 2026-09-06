@@ -21,6 +21,11 @@ const browser = await chromium.launch();
 
 async function openForm(submitCodes) {
   const context = await browser.newContext();
+  await context.addInitScript(() => {
+    let currentTime = Date.now();
+    Date.now = () => currentTime;
+    window.__advanceTestClock = (milliseconds) => { currentTime += milliseconds; };
+  });
   const page = await context.newPage();
   page.setDefaultTimeout(5000);
   const state = { submits: [], resets: [] };
@@ -31,7 +36,8 @@ async function openForm(submitCodes) {
     if (url.hostname === workerHost && url.pathname === '/submit') {
       state.submits.push(request.postDataJSON());
       const code = submitCodes.shift();
-      return route.fulfill({ status: code === 'delivery_review_required' ? 202 : 409, contentType: 'application/json', body: JSON.stringify({ ok: false, code }) });
+      const success = code === 'success';
+      return route.fulfill({ status: success ? 200 : code === 'delivery_review_required' ? 202 : 409, contentType: 'application/json', body: JSON.stringify(success ? { ok: true } : { ok: false, code }) });
     }
     if (url.hostname === turnstileHost) return route.fulfill({ status: 200, contentType: 'application/javascript', body: `window.turnstile={render:(node,options)=>{window.__turnstileOptions=options;return 'widget-1'},reset:(id)=>window.__turnstileResets=(window.__turnstileResets||[]).concat(id)}` });
     if (!['127.0.0.1', 'localhost'].includes(url.hostname)) return route.abort();
@@ -79,19 +85,49 @@ try {
   assert.equal(new Set(equivalent.state.submits.map(p => p.submissionId)).size, 1);
   await equivalent.context.close();
 
-  const expired = await openForm(['form_expired']);
+  const expired = await openForm(['form_expired', 'success']);
+  await expired.page.evaluate(() => window.__advanceTestClock(10000));
   await fillAndSubmit(expired.page);
   await expired.page.waitForFunction(() => document.querySelector('#form-feedback').textContent.includes('有効期限が切れました'));
   assert.equal(expired.state.submits.length, 1);
   assert.match(await expired.page.locator('#form-feedback').textContent(), /3秒ほど待って/);
   assert.deepEqual(await expired.page.evaluate(() => window.__turnstileResets), ['widget-1']);
+  assert.equal(await expired.page.locator('#inquiry_details').inputValue(), 'お問い合わせです。');
+  await expired.page.evaluate(() => window.__turnstileOptions.callback('renewed-expired-token'));
+  await expired.page.locator('form').evaluate((form) => form.requestSubmit());
+  await expired.page.waitForTimeout(50);
+  assert.equal(expired.state.submits.length, 1);
+  assert.match(await expired.page.locator('#form-feedback').textContent(), /3秒ほど待って/);
+  await expired.page.evaluate(() => window.__advanceTestClock(3000));
+  await expired.page.locator('form').evaluate((form) => form.requestSubmit());
+  await expired.page.waitForFunction(() => location.pathname.endsWith('/thank.html'));
+  assert.equal(expired.state.submits.length, 2);
+  assert.notEqual(expired.state.submits[0].submissionId, expired.state.submits[1].submissionId);
+  assert.ok(expired.state.submits[1].formStartedAt > expired.state.submits[0].formStartedAt);
+  assert.equal(expired.state.submits[1].inquiryDetails, 'お問い合わせです。');
+  assert.equal(expired.state.submits[1].turnstileToken, 'renewed-expired-token');
   await expired.context.close();
 
-  const conflict = await openForm(['request_id_conflict']);
+  const conflict = await openForm(['request_id_conflict', 'success']);
+  await conflict.page.evaluate(() => window.__advanceTestClock(10000));
   await fillAndSubmit(conflict.page);
   await conflict.page.waitForFunction(() => document.querySelector('#form-feedback').textContent.includes('確認が必要'));
   assert.equal(conflict.state.submits.length, 1);
   assert.deepEqual(await conflict.page.evaluate(() => window.__turnstileResets), ['widget-1']);
+  assert.equal(await conflict.page.locator('#inquiry_details').inputValue(), 'お問い合わせです。');
+  await conflict.page.evaluate(() => window.__turnstileOptions.callback('renewed-conflict-token'));
+  await conflict.page.locator('form').evaluate((form) => form.requestSubmit());
+  await conflict.page.waitForTimeout(50);
+  assert.equal(conflict.state.submits.length, 1);
+  assert.match(await conflict.page.locator('#form-feedback').textContent(), /3秒ほど待って/);
+  await conflict.page.evaluate(() => window.__advanceTestClock(3000));
+  await conflict.page.locator('form').evaluate((form) => form.requestSubmit());
+  await conflict.page.waitForFunction(() => location.pathname.endsWith('/thank.html'));
+  assert.equal(conflict.state.submits.length, 2);
+  assert.notEqual(conflict.state.submits[0].submissionId, conflict.state.submits[1].submissionId);
+  assert.ok(conflict.state.submits[1].formStartedAt > conflict.state.submits[0].formStartedAt);
+  assert.equal(conflict.state.submits[1].inquiryDetails, 'お問い合わせです。');
+  assert.equal(conflict.state.submits[1].turnstileToken, 'renewed-conflict-token');
   await conflict.context.close();
 
   const review = await openForm(['delivery_review_required']);
