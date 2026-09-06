@@ -25,6 +25,10 @@ function createHarness(propertyOverrides = {}, options = {}) {
   const logs = [];
   const publishedTemplate = options.publishedTemplate || null;
   let remainingMailFailures = options.mailFailures || 0;
+  let remainingSetValueFailures = options.setValueFailures || 0;
+  let remainingFlushFailures = options.flushFailures || 0;
+  let setValueCall = 0;
+  let flushCall = 0;
 
   const sheet = {
     appendRow(row) {
@@ -64,6 +68,14 @@ function createHarness(propertyOverrides = {}, options = {}) {
             .map((row) => row.slice(startColumn - 1, startColumn - 1 + columnCount));
         },
         setValue(value) {
+          setValueCall += 1;
+          if (
+            (options.setValueFailureCalls && options.setValueFailureCalls.includes(setValueCall))
+            || remainingSetValueFailures > 0
+          ) {
+            remainingSetValueFailures -= 1;
+            throw new Error('sheet_state_write_failed');
+          }
           rows[startRow - 1][startColumn - 1] = value;
           return this;
         },
@@ -152,6 +164,16 @@ function createHarness(propertyOverrides = {}, options = {}) {
     SpreadsheetApp: {
       openById() {
         return spreadsheet;
+      },
+      flush() {
+        flushCall += 1;
+        if (
+          (options.flushFailureCalls && options.flushFailureCalls.includes(flushCall))
+          || remainingFlushFailures > 0
+        ) {
+          remainingFlushFailures -= 1;
+          throw new Error('sheet_flush_failed');
+        }
       },
     },
     MailApp: {
@@ -493,21 +515,124 @@ test('Apps Script auto-reply falls back safely when the published template is in
   assert.equal(logText.includes('テスト株式会社'), false);
 });
 
-test('Apps Script receiver resumes a pending notification after a mail failure', () => {
+test('Apps Script receiver does not send when the pre-send state write fails', () => {
+  const harness = createHarness({}, { setValueFailures: 1 });
+  const result = harness.context.doPost(signedEvent());
+
+  assert.deepEqual(JSON.parse(result.text), { ok: false, code: 'delivery_review_required' });
+  assert.equal(harness.rows.length, 2);
+  assert.equal(harness.rows[1][9], '待機');
+  assert.equal(harness.sentEmails.length, 0);
+  assert.equal(harness.cache.size, 0);
+});
+
+test('Apps Script receiver does not send when the pre-send flush fails', () => {
+  const harness = createHarness({}, { flushFailures: 1 });
+  const result = harness.context.doPost(signedEvent());
+
+  assert.deepEqual(JSON.parse(result.text), { ok: false, code: 'delivery_review_required' });
+  assert.equal(harness.rows[1][9], '送信中');
+  assert.equal(harness.sentEmails.length, 0);
+  assert.equal(harness.cache.size, 0);
+});
+
+test('Apps Script receiver retains an ambiguous state and suppresses retry after a mail failure', () => {
   const harness = createHarness({}, { mailFailures: 1 });
   const event = signedEvent();
 
   const failed = harness.context.doPost(event);
-  assert.deepEqual(JSON.parse(failed.text), { ok: false, code: 'receiver_error' });
+  assert.deepEqual(JSON.parse(failed.text), { ok: false, code: 'delivery_review_required' });
   assert.equal(harness.rows.length, 2);
-  assert.equal(harness.rows[1][9], '待機');
+  assert.equal(harness.rows[1][9], '結果不明');
   assert.equal(harness.cache.size, 0);
 
   const retried = harness.context.doPost(event);
-  assert.deepEqual(JSON.parse(retried.text), { ok: true, duplicate: true });
+  assert.deepEqual(JSON.parse(retried.text), { ok: false, code: 'delivery_review_required', duplicate: true });
   assert.equal(harness.rows.length, 2);
-  assert.equal(harness.rows[1][9], '完了');
+  assert.equal(harness.rows[1][9], '結果不明');
+  assert.equal(harness.sentEmails.length, 0);
+});
+
+test('Apps Script receiver retains an ambiguous state when completion persistence fails', () => {
+  const harness = createHarness({}, { setValueFailureCalls: [2] });
+  const event = signedEvent();
+  const failed = harness.context.doPost(event);
+
+  assert.deepEqual(JSON.parse(failed.text), { ok: false, code: 'delivery_review_required' });
+  assert.equal(harness.rows[1][9], '結果不明');
   assert.equal(harness.sentEmails.length, 1);
+
+  const retried = harness.context.doPost(event);
+  assert.deepEqual(JSON.parse(retried.text), { ok: false, code: 'delivery_review_required', duplicate: true });
+  assert.equal(harness.sentEmails.length, 1);
+});
+
+test('Apps Script receiver retains an ambiguous state when completion flush fails', () => {
+  const harness = createHarness({}, { flushFailureCalls: [2] });
+  const event = signedEvent();
+  const failed = harness.context.doPost(event);
+
+  assert.deepEqual(JSON.parse(failed.text), { ok: false, code: 'delivery_review_required' });
+  assert.equal(harness.rows[1][9], '結果不明');
+  assert.equal(harness.sentEmails.length, 1);
+
+  const retried = harness.context.doPost(event);
+  assert.deepEqual(JSON.parse(retried.text), { ok: false, code: 'delivery_review_required', duplicate: true });
+  assert.equal(harness.rows[1][9], '結果不明');
+  assert.equal(harness.sentEmails.length, 1);
+});
+
+test('Apps Script receiver retains 送信中 when the unknown-state marker cannot be written', () => {
+  const harness = createHarness({}, { mailFailures: 1, setValueFailureCalls: [2] });
+  const event = signedEvent();
+  const failed = harness.context.doPost(event);
+
+  assert.deepEqual(JSON.parse(failed.text), { ok: false, code: 'delivery_review_required' });
+  assert.equal(harness.rows[1][9], '送信中');
+  assert.equal(harness.sentEmails.length, 0);
+
+  const retried = harness.context.doPost(event);
+  assert.deepEqual(JSON.parse(retried.text), { ok: false, code: 'delivery_review_required', duplicate: true });
+  assert.equal(harness.rows[1][9], '送信中');
+  assert.equal(harness.sentEmails.length, 0);
+});
+
+test('Apps Script receiver requires review for an unrecognized delivery state', () => {
+  const harness = createHarness();
+  const event = signedEvent();
+  assert.deepEqual(JSON.parse(harness.context.doPost(event).text), { ok: true });
+  harness.rows[1][9] = '';
+
+  const retried = harness.context.doPost(event);
+  assert.deepEqual(JSON.parse(retried.text), { ok: false, code: 'delivery_review_required', duplicate: true });
+  assert.equal(harness.sentEmails.length, 1);
+});
+
+test('Apps Script receiver resumes a confirmed-unsent manual reset despite a completed cache entry', () => {
+  const harness = createHarness();
+  const event = signedEvent();
+  assert.deepEqual(JSON.parse(harness.context.doPost(event).text), { ok: true });
+  assert.equal(harness.cache.size, 1);
+
+  harness.rows[1][9] = '待機';
+  const retried = harness.context.doPost(event);
+  assert.deepEqual(JSON.parse(retried.text), { ok: true, duplicate: true });
+  assert.equal(harness.rows[1][9], '完了');
+  assert.equal(harness.sentEmails.length, 2);
+});
+
+test('Apps Script receiver handles notification and auto-reply ambiguity independently', () => {
+  const harness = createHarness({ CONTACT_AUTOREPLY_ENABLED: 'true' }, { mailFailures: 1 });
+  const result = harness.context.doPost(signedEvent({}, {
+    notificationEnabled: true,
+    autoReplyEnabled: true,
+  }));
+
+  assert.deepEqual(JSON.parse(result.text), { ok: false, code: 'delivery_review_required' });
+  assert.equal(harness.rows[1][9], '結果不明');
+  assert.equal(harness.rows[1][10], '完了');
+  assert.equal(harness.sentEmails.length, 1);
+  assert.equal(harness.sentEmails[0].to, 'visitor@example.net');
 });
 
 test('Apps Script receiver honors an emergency mail stop before resuming pending work', () => {
@@ -521,12 +646,12 @@ test('Apps Script receiver honors an emergency mail stop before resuming pending
   });
 
   const failed = harness.context.doPost(event);
-  assert.deepEqual(JSON.parse(failed.text), { ok: false, code: 'receiver_error' });
-  assert.equal(harness.rows[1][10], '待機');
+  assert.deepEqual(JSON.parse(failed.text), { ok: false, code: 'delivery_review_required' });
+  assert.equal(harness.rows[1][10], '結果不明');
 
   harness.properties.CONTACT_AUTOREPLY_ENABLED = 'false';
   const retried = harness.context.doPost(event);
-  assert.deepEqual(JSON.parse(retried.text), { ok: true, duplicate: true });
-  assert.equal(harness.rows[1][10], '停止');
+  assert.deepEqual(JSON.parse(retried.text), { ok: false, code: 'delivery_review_required', duplicate: true });
+  assert.equal(harness.rows[1][10], '結果不明');
   assert.equal(harness.sentEmails.length, 0);
 });

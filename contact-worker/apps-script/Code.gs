@@ -135,17 +135,14 @@ function doPost(event) {
     try {
       const fingerprint = payloadFingerprint_(payload, secret);
       const cachedFingerprint = cache.get(cacheKey);
-      if (cachedFingerprint) {
-        if (!constantTimeHexEqual_(cachedFingerprint, fingerprint)) {
-          console.warn(JSON.stringify({
-            event: 'contact_receiver',
-            outcome: 'rejected',
-            reason: 'request_id_conflict',
-            requestId: requestId,
-          }));
-          return json_({ ok: false, code: 'request_id_conflict' });
-        }
-        return json_({ ok: true, duplicate: true });
+      if (cachedFingerprint && !constantTimeHexEqual_(cachedFingerprint, fingerprint)) {
+        console.warn(JSON.stringify({
+          event: 'contact_receiver',
+          outcome: 'rejected',
+          reason: 'request_id_conflict',
+          requestId: requestId,
+        }));
+        return json_({ ok: false, code: 'request_id_conflict' });
       }
 
       const sheet = getContactSheet_(properties);
@@ -163,7 +160,10 @@ function doPost(event) {
           }));
           return json_({ ok: false, code: 'request_id_conflict' });
         }
-        resumeDelivery_(properties, payload, sheet, existingRowNumber, deliveryState);
+        const delivery = resumeDelivery_(properties, payload, sheet, existingRowNumber, deliveryState);
+        if (delivery.requiresReview) {
+          return json_({ ok: false, code: 'delivery_review_required', duplicate: true });
+        }
         cache.put(cacheKey, fingerprint, 21600);
         console.log(JSON.stringify({
           event: 'contact_receiver',
@@ -179,11 +179,14 @@ function doPost(event) {
 
       sheet.appendRow(buildRow_(payload, notifyEnabled, autoReplyEnabled, fingerprint));
       const rowNumber = sheet.getLastRow();
-      resumeDelivery_(properties, payload, sheet, rowNumber, [
+      const delivery = resumeDelivery_(properties, payload, sheet, rowNumber, [
         notifyEnabled ? '待機' : '停止',
         autoReplyEnabled ? '待機' : '停止',
         fingerprint,
       ]);
+      if (delivery.requiresReview) {
+        return json_({ ok: false, code: 'delivery_review_required' });
+      }
       cache.put(cacheKey, fingerprint, 21600);
 
       console.log(JSON.stringify({
@@ -287,25 +290,78 @@ function buildRow_(payload, notifyEnabled, autoReplyEnabled, fingerprint) {
 }
 
 function resumeDelivery_(properties, payload, sheet, rowNumber, deliveryState) {
-  if (deliveryState[0] === '待機') {
-    const notifyStillEnabled = propertyIsTrue_(properties, 'CONTACT_NOTIFY_ENABLED')
-      && payload.controls.notificationEnabled === true;
-    if (notifyStillEnabled) {
-      sendInternalNotification_(properties, payload, sheet, rowNumber);
-      sheet.getRange(rowNumber, 10).setValue('完了');
-    } else {
-      sheet.getRange(rowNumber, 10).setValue('停止');
+  const notification = deliverMailChannel_(
+    sheet,
+    rowNumber,
+    10,
+    deliveryState[0],
+    propertyIsTrue_(properties, 'CONTACT_NOTIFY_ENABLED') && payload.controls.notificationEnabled === true,
+    function () { sendInternalNotification_(properties, payload, sheet, rowNumber); }
+  );
+  const autoReply = deliverMailChannel_(
+    sheet,
+    rowNumber,
+    11,
+    deliveryState[1],
+    propertyIsTrue_(properties, 'CONTACT_AUTOREPLY_ENABLED') && payload.controls.autoReplyEnabled === true,
+    function () { sendAutoReply_(properties, payload); }
+  );
+  return { requiresReview: notification.requiresReview || autoReply.requiresReview };
+}
+
+function deliverMailChannel_(sheet, rowNumber, column, state, enabled, send) {
+  if (state === '送信中' || state === '結果不明') {
+    return { requiresReview: true };
+  }
+  if (state === '完了' || state === '停止') {
+    return { requiresReview: false };
+  }
+  if (state !== '待機') {
+    return { requiresReview: true };
+  }
+  if (!enabled) {
+    try {
+      setDeliveryState_(sheet, rowNumber, column, '停止');
+      return { requiresReview: false };
+    } catch (error) {
+      return { requiresReview: true };
     }
   }
-  if (deliveryState[1] === '待機') {
-    const autoReplyStillEnabled = propertyIsTrue_(properties, 'CONTACT_AUTOREPLY_ENABLED')
-      && payload.controls.autoReplyEnabled === true;
-    if (autoReplyStillEnabled) {
-      sendAutoReply_(properties, payload);
-      sheet.getRange(rowNumber, 11).setValue('完了');
-    } else {
-      sheet.getRange(rowNumber, 11).setValue('停止');
-    }
+
+  try {
+    setDeliveryState_(sheet, rowNumber, column, '送信中');
+  } catch (error) {
+    // No mail has been handed to MailApp. An operator may reset a confirmed-
+    // unsent row to 待機, after checking the actual sheet state.
+    return { requiresReview: true };
+  }
+
+  try {
+    send();
+  } catch (error) {
+    markDeliveryResultUnknown_(sheet, rowNumber, column);
+    return { requiresReview: true };
+  }
+
+  try {
+    setDeliveryState_(sheet, rowNumber, column, '完了');
+    return { requiresReview: false };
+  } catch (error) {
+    markDeliveryResultUnknown_(sheet, rowNumber, column);
+    return { requiresReview: true };
+  }
+}
+
+function setDeliveryState_(sheet, rowNumber, column, state) {
+  sheet.getRange(rowNumber, column).setValue(state);
+  SpreadsheetApp.flush();
+}
+
+function markDeliveryResultUnknown_(sheet, rowNumber, column) {
+  try {
+    setDeliveryState_(sheet, rowNumber, column, '結果不明');
+  } catch (error) {
+    // Keep the persisted 送信中 state when the ambiguity marker cannot be saved.
   }
 }
 
