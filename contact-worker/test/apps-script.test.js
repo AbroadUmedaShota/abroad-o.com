@@ -567,6 +567,47 @@ test('Apps Script receiver retains an ambiguous state when completion persistenc
   assert.equal(harness.sentEmails.length, 1);
 });
 
+test('Apps Script receiver retains an ambiguous state when completion flush fails', () => {
+  const harness = createHarness({}, { flushFailureCalls: [2] });
+  const event = signedEvent();
+  const failed = harness.context.doPost(event);
+
+  assert.deepEqual(JSON.parse(failed.text), { ok: false, code: 'delivery_review_required' });
+  assert.equal(harness.rows[1][9], '結果不明');
+  assert.equal(harness.sentEmails.length, 1);
+
+  const retried = harness.context.doPost(event);
+  assert.deepEqual(JSON.parse(retried.text), { ok: false, code: 'delivery_review_required', duplicate: true });
+  assert.equal(harness.rows[1][9], '結果不明');
+  assert.equal(harness.sentEmails.length, 1);
+});
+
+test('Apps Script receiver retains 送信中 when the unknown-state marker cannot be written', () => {
+  const harness = createHarness({}, { mailFailures: 1, setValueFailureCalls: [2] });
+  const event = signedEvent();
+  const failed = harness.context.doPost(event);
+
+  assert.deepEqual(JSON.parse(failed.text), { ok: false, code: 'delivery_review_required' });
+  assert.equal(harness.rows[1][9], '送信中');
+  assert.equal(harness.sentEmails.length, 0);
+
+  const retried = harness.context.doPost(event);
+  assert.deepEqual(JSON.parse(retried.text), { ok: false, code: 'delivery_review_required', duplicate: true });
+  assert.equal(harness.rows[1][9], '送信中');
+  assert.equal(harness.sentEmails.length, 0);
+});
+
+test('Apps Script receiver requires review for an unrecognized delivery state', () => {
+  const harness = createHarness();
+  const event = signedEvent();
+  assert.deepEqual(JSON.parse(harness.context.doPost(event).text), { ok: true });
+  harness.rows[1][9] = '';
+
+  const retried = harness.context.doPost(event);
+  assert.deepEqual(JSON.parse(retried.text), { ok: false, code: 'delivery_review_required', duplicate: true });
+  assert.equal(harness.sentEmails.length, 1);
+});
+
 test('Apps Script receiver resumes a confirmed-unsent manual reset despite a completed cache entry', () => {
   const harness = createHarness();
   const event = signedEvent();

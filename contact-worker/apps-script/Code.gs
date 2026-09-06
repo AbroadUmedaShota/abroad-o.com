@@ -136,13 +136,13 @@ function doPost(event) {
       const fingerprint = payloadFingerprint_(payload, secret);
       const cachedFingerprint = cache.get(cacheKey);
       if (cachedFingerprint && !constantTimeHexEqual_(cachedFingerprint, fingerprint)) {
-          console.warn(JSON.stringify({
-            event: 'contact_receiver',
-            outcome: 'rejected',
-            reason: 'request_id_conflict',
-            requestId: requestId,
-          }));
-          return json_({ ok: false, code: 'request_id_conflict' });
+        console.warn(JSON.stringify({
+          event: 'contact_receiver',
+          outcome: 'rejected',
+          reason: 'request_id_conflict',
+          requestId: requestId,
+        }));
+        return json_({ ok: false, code: 'request_id_conflict' });
       }
 
       const sheet = getContactSheet_(properties);
@@ -313,8 +313,11 @@ function deliverMailChannel_(sheet, rowNumber, column, state, enabled, send) {
   if (state === '送信中' || state === '結果不明') {
     return { requiresReview: true };
   }
-  if (state !== '待機') {
+  if (state === '完了' || state === '停止') {
     return { requiresReview: false };
+  }
+  if (state !== '待機') {
+    return { requiresReview: true };
   }
   if (!enabled) {
     try {
