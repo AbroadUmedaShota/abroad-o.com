@@ -415,15 +415,19 @@ DEPLOYMENT_PATH_MANIFEST_SHA='$($Package.PathManifestSha256)'
 DEPLOYMENT_EVIDENCE_SHA='$($Package.EvidenceSha256)'
 STAGE_DIR=`$(mktemp -d "`$HOME/abroad-o-stage.XXXXXX")
 TEMP_FILES="`$STAGE_DIR/publish-temp-files"
+CURRENT_TEMP=''
 LOCK_DIR=''
 LOCK_OWNED=0
 : > "`$TEMP_FILES"
 cleanup() {
+  if [ -n "`$CURRENT_TEMP" ]; then rm -f "`$CURRENT_TEMP"; fi
   if [ -f "`$TEMP_FILES" ]; then while IFS= read -r temporary; do rm -f "`$temporary"; done < "`$TEMP_FILES"; fi
   rm -rf "`$STAGE_DIR"
+}
+release_lock() {
   if [ "`$LOCK_OWNED" = 1 ]; then rm -f "`$LOCK_DIR/owner"; rmdir "`$LOCK_DIR" 2>/dev/null || true; fi
 }
-trap cleanup EXIT
+trap 'cleanup; release_lock' EXIT
 test -f "`$REMOTE_PACKAGE"
 test "`$(realpath "`$REMOTE_DIR")" = "`$REMOTE_DIR"
 test "`$(realpath "`$(dirname "`$REMOTE_BACKUP")")" = "`$(dirname "`$REMOTE_BACKUP")" || { echo 'Backup directory has a symlink component.' >&2; exit 1; }
@@ -459,7 +463,7 @@ backup_cleanup() {
   rm -rf "`$BACKUP_STAGE"
   if [ "`$backup_verified" != 1 ]; then rm -f "`$REMOTE_BACKUP"; fi
 }
-trap 'cleanup; backup_cleanup' EXIT
+trap 'cleanup; backup_cleanup; release_lock' EXIT
 mkdir -p "`$BACKUP_STAGE/`$ARCHIVE_ROOT/payload"
 protected_paths="`$BACKUP_STAGE/protected-paths"
 find "`$REMOTE_DIR" -type l -print -quit | grep -q . && { echo 'Remote directory contains a symlink before backup.' >&2; exit 1; }
@@ -498,7 +502,7 @@ archive_sha=`$(sakura_sha256 "`$REMOTE_BACKUP")
 $promoteArchiveFault
 VERIFY_STAGE=`$(mktemp -d "`$HOME/abroad-o-backup-verify.XXXXXX")
 verify_cleanup() { rm -rf "`$VERIFY_STAGE"; }
-trap 'cleanup; backup_cleanup; verify_cleanup' EXIT
+trap 'cleanup; backup_cleanup; verify_cleanup; release_lock' EXIT
 test "`$(realpath "`$REMOTE_BACKUP")" = "`$REMOTE_BACKUP"
 validate_sanitized_archive "`$REMOTE_BACKUP" "`$VERIFY_STAGE" "`$archive_sha" "`$manifest_sha" "`$ARCHIVE_ROOT" "`$REMOTE_DIR" "`$DEPLOYMENT_PATH_MANIFEST_SHA" "`$DEPLOYMENT_EVIDENCE_SHA"
 tar -tzf "`$REMOTE_BACKUP" | awk -v root="`$ARCHIVE_ROOT" '
@@ -542,6 +546,8 @@ publish_file() {
   name=`$(basename "`$destination")
   mkdir -p "`$directory"
   temporary=`$(mktemp "`$directory/.`$name.codex.XXXXXX")
+  CURRENT_TEMP="`$temporary"
+  if [ "`${SAKURA_LOCAL_PROMOTE_FAIL_AFTER_MKTEMP:-0}" = 1 ]; then echo 'Injected temporary-registration failure.' >&2; exit 1; fi
   printf '%s\n' "`$temporary" >> "`$TEMP_FILES"
   cp -p "`$STAGE_DIR/`$path" "`$temporary"
   test -f "`$temporary"
@@ -549,6 +555,7 @@ publish_file() {
   test "`$(sakura_sha256 "`$temporary")" = "`$(sakura_sha256 "`$STAGE_DIR/`$path")"
   if [ "`${SAKURA_LOCAL_PROMOTE_FAIL_AFTER_TEMP:-0}" = 1 ]; then echo 'Injected temporary-file failure.' >&2; exit 1; fi
   mv -f "`$temporary" "`$destination"
+  CURRENT_TEMP=''
 }
 # Files are individually atomic within their destination directory. Assets are
 # promoted first, then HTML; this is intentionally not a whole-site atomic claim.
@@ -615,7 +622,13 @@ mkdir -p "`$(dirname "`$METADATA")"
 printf '%s  %s  %s\n' "`$archive_sha" '$($Package.PathManifestSha256)' '$($Package.EvidenceSha256)' > "`$METADATA"
 printf '%s\n' "`$PACKAGE"
 "@
-    $remotePackage = (Invoke-RemoteScriptOutput -Script $script | Select-Object -Last 1).Trim()
+    $stageOutput = Invoke-RemoteScriptOutput -Script $script
+    if ($env:SAKURA_VALIDATE_REMOTE_SCRIPT -eq "1") {
+        return "/home/syntax-only/$ReleaseId.tgz"
+    }
+    $remotePackage = ($stageOutput | Select-Object -Last 1)
+    if ($null -eq $remotePackage) { throw "Remote stage did not return a package path." }
+    $remotePackage = $remotePackage.Trim()
     if ($remotePackage -notmatch '^/home/') { throw "Remote stage did not return an absolute package path." }
     Write-Host "Stage SHA-256 verified: $localPackageHash pathManifestSha256=$($Package.PathManifestSha256) evidenceSha256=$($Package.EvidenceSha256) release=$ReleaseId"
     return $remotePackage
@@ -639,7 +652,13 @@ actual_sha=`$(sakura_sha256 "`$PACKAGE")
 test "`$actual_sha" = "`$archive_sha"
 printf '%s\n' "`$PACKAGE"
 "@
-    return (Invoke-RemoteScriptOutput -Script $script | Select-Object -Last 1).Trim()
+    $stageOutput = Invoke-RemoteScriptOutput -Script $script
+    if ($env:SAKURA_VALIDATE_REMOTE_SCRIPT -eq "1") {
+        return "/home/syntax-only/$ReleaseId.tgz"
+    }
+    $remotePackage = ($stageOutput | Select-Object -Last 1)
+    if ($null -eq $remotePackage) { throw "Verified staged package did not return a package path." }
+    return $remotePackage.Trim()
 }
 
 function Get-SshTarget {

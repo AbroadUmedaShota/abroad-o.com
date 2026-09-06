@@ -111,6 +111,11 @@ if run_promote SAKURA_LOCAL_PROMOTE_FAIL_AFTER_TEMP=1 >/dev/null 2>&1; then fail
 [ -z "$(find "$public" -type f -name '.*.codex.*' -print -quit)" ] || fail 'temporary-file failure left publish temp'
 [ ! -e "$backups/.abroad-o-deploy.lock" ] || fail 'temporary-file failure left deployment lock'
 find "$backups" -maxdepth 1 -type f -name 'abroad-o-before-*.sra.tgz' -delete
+if run_promote SAKURA_LOCAL_PROMOTE_FAIL_AFTER_MKTEMP=1 >/dev/null 2>&1; then fail 'Promote accepted injected temporary-registration failure'; fi
+[ "$before_failed_promote" = "$(tree "$public")" ] || fail 'temporary-registration failure changed public root'
+[ -z "$(find "$public" -type f -name '.*.codex.*' -print -quit)" ] || fail 'temporary-registration failure left publish temp'
+[ ! -e "$backups/.abroad-o-deploy.lock" ] || fail 'temporary-registration failure left deployment lock'
+find "$backups" -maxdepth 1 -type f -name 'abroad-o-before-*.sra.tgz' -delete
 if run_promote SAKURA_LOCAL_PROMOTE_CORRUPT_BACKUP=1 >/dev/null 2>&1; then fail 'corrupt Promote backup was accepted'; fi
 [ "$before_failed_promote" = "$(tree "$public")" ] || fail 'failed Promote changed public root'
 [ -z "$(find "$backups" -maxdepth 1 -type f -name 'abroad-o-before-*.sra.tgz' -print -quit)" ] || fail 'failed Promote left an invalid backup'
