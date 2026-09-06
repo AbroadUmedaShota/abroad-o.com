@@ -65,6 +65,20 @@ try {
   assert.notEqual(unknown.state.submits[1].submissionId, unknown.state.submits[2].submissionId);
   await unknown.context.close();
 
+  const equivalent = await openForm(['unknown_error', 'unknown_error', 'unknown_error']);
+  await fillAndSubmit(equivalent.page, 'か\u3099');
+  await equivalent.page.waitForFunction(() => window.__turnstileResets?.length === 1);
+  await equivalent.page.locator('#name').fill('が');
+  await equivalent.page.evaluate(() => window.__turnstileOptions.callback('canonical-token'));
+  await equivalent.page.locator('form').evaluate((form) => form.requestSubmit());
+  await equivalent.page.waitForFunction(() => window.__turnstileResets?.length === 2);
+  await equivalent.page.locator('#enterprise').fill(' 株式会社テスト ');
+  await equivalent.page.evaluate(() => window.__turnstileOptions.callback('whitespace-token'));
+  await equivalent.page.locator('form').evaluate((form) => form.requestSubmit());
+  await equivalent.page.waitForFunction(() => window.__turnstileResets?.length === 3);
+  assert.equal(new Set(equivalent.state.submits.map(p => p.submissionId)).size, 1);
+  await equivalent.context.close();
+
   const expired = await openForm(['form_expired']);
   await fillAndSubmit(expired.page);
   await expired.page.waitForFunction(() => document.querySelector('#form-feedback').textContent.includes('有効期限が切れました'));

@@ -93,19 +93,25 @@ export async function handleRequest(request, env) {
 
     const declaredLength = Number(request.headers.get('Content-Length') || 0);
     if (Number.isFinite(declaredLength) && declaredLength > MAX_REQUEST_BYTES) {
+      audit('rejected', requestId, 'request_too_large');
       return clientCodeResponse('request_too_large', allowedOrigin);
     }
 
+    if (!request.body) {
+      return reject(requestId, 'invalid_json', 400, allowedOrigin);
+    }
     let requestText;
     try {
       requestText = await readLimitedText(request.body, MAX_REQUEST_BYTES);
     } catch (error) {
       if (error && error.message === 'body_too_large') {
+        audit('rejected', requestId, 'request_too_large');
         return clientCodeResponse('request_too_large', allowedOrigin);
       }
       throw error;
     }
     if (new TextEncoder().encode(requestText).byteLength > MAX_REQUEST_BYTES) {
+      audit('rejected', requestId, 'request_too_large');
       return clientCodeResponse('request_too_large', allowedOrigin);
     }
 
@@ -119,6 +125,7 @@ export async function handleRequest(request, env) {
     const validation = validateSubmission(input);
     if (!validation.ok) {
       if (SAFE_CLIENT_CODES.has(validation.reason)) {
+        audit('rejected', requestId, validation.reason);
         return clientCodeResponse(validation.reason, allowedOrigin);
       }
       return reject(requestId, validation.reason, 400, allowedOrigin, validation.fields);

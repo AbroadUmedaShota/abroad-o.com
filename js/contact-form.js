@@ -209,7 +209,10 @@
             consent: consentCheckbox.checked,
             website: document.getElementById('honeypot_email').value
         };
-        const fingerprint = JSON.stringify(fields);
+        // Match the Worker's NFC/trim normalization when deciding whether a
+        // retry contains a new inquiry; cosmetic edits must retain its ID.
+        const fingerprint = JSON.stringify(Object.fromEntries(Object.entries(fields)
+            .map(([key, value]) => [key, typeof value === 'string' ? value.normalize('NFC').trim() : value])));
         if (lastSubmissionFingerprint !== null && lastSubmissionFingerprint !== fingerprint) {
             submissionId = createSubmissionId();
         }

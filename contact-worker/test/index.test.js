@@ -133,8 +133,30 @@ test('returns form_expired as a safe client recovery code', async () => {
     })), validEnv());
     assert.equal(response.status, 400);
     assert.deepEqual(await response.json(), { ok: false, code: 'form_expired' });
+    assert.equal(audit.entries.length, 1);
+    assert.equal(JSON.parse(audit.entries[0]).outcome, 'rejected');
   } finally {
     audit.restore();
+  }
+});
+
+test('empty and oversized requests preserve one rejection audit event', async () => {
+  for (const [body, headers, status, code] of [
+    [null, {}, 400, 'request_rejected'],
+    ['', {}, 400, 'request_rejected'],
+    ['x', { 'Content-Length': '32769' }, 413, 'request_too_large'],
+    ['x'.repeat(32769), {}, 413, 'request_too_large'],
+  ]) {
+    const audit = silenceAudit();
+    try {
+      const response = await handleRequest(submitRequest({}, headers, body), validEnv());
+      assert.equal(response.status, status);
+      assert.deepEqual(await response.json(), { ok: false, code });
+      assert.equal(audit.entries.length, 1);
+      const entry = JSON.parse(audit.entries[0]);
+      assert.equal(entry.outcome, 'rejected');
+      assert.equal(entry.reason, status === 413 ? 'request_too_large' : 'invalid_json');
+    } finally { audit.restore(); }
   }
 });
 
