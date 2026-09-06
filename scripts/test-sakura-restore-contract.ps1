@@ -120,10 +120,13 @@ try {
     $savedShellValidation = $env:SAKURA_VALIDATE_REMOTE_SCRIPT
     try {
         $env:SAKURA_VALIDATE_REMOTE_SCRIPT = "1"
-        & pwsh -NoProfile -File $deployScript -Mode Preflight -HostName "syntax-only.invalid" -UserName "abroad-o" -RemoteDir "/home/abroad-o/www/abroad-o.com" -SshKeyPath "ignored"
+        $selectedSha = (& git -C $repoRoot rev-parse HEAD)
+        & pwsh -NoProfile -File $deployScript -Mode Preflight -SelectedSha $selectedSha -HostName "syntax-only.invalid" -UserName "abroad-o" -RemoteDir "/home/abroad-o/www/abroad-o.com" -SshKeyPath "ignored"
         if ($LASTEXITCODE -ne 0) { throw "Generated Preflight shell syntax check failed." }
         & pwsh -NoProfile -File $deployScript -Mode RestoreSafe -HostName "syntax-only.invalid" -UserName "abroad-o" -RemoteDir "/home/abroad-o/www/abroad-o.com" -SshKeyPath "ignored" -BackupFile "/home/abroad-o/abroad-o-backups/abroad-o-before-test.sra.tgz" -BackupArchiveSha256 ("a" * 64) -BackupManifestSha256 ("b" * 64)
         if ($LASTEXITCODE -ne 0) { throw "Generated RestoreSafe shell syntax check failed." }
+        & pwsh -NoProfile -File $deployScript -Mode Promote -SelectedSha $selectedSha -HostName "syntax-only.invalid" -UserName "abroad-o" -RemoteDir "/home/abroad-o/www/abroad-o.com" -SshKeyPath "ignored" -StagedReleaseId "syntax-only-release"
+        if ($LASTEXITCODE -ne 0) { throw "Generated Promote shell syntax check failed." }
     }
     finally {
         $env:SAKURA_VALIDATE_REMOTE_SCRIPT = $savedShellValidation

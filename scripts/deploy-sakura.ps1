@@ -13,6 +13,7 @@ param(
     [string]$BackupArchiveSha256 = $env:SAKURA_RESTORE_ARCHIVE_SHA256,
     [string]$BackupManifestSha256 = $env:SAKURA_RESTORE_MANIFEST_SHA256,
     [string]$StagedReleaseId = $env:SAKURA_STAGED_RELEASE_ID,
+    [string]$SelectedSha = $env:SAKURA_SELECTED_SHA,
     [switch]$RestoreApply,
     [switch]$UseFileZillaConfig
 )
@@ -26,6 +27,61 @@ function Resolve-RepoRoot {
         throw "This script must be run inside the git repository."
     }
     return (Resolve-Path $root).Path
+}
+
+function Get-GitHubRepositorySlug {
+    param([string]$RepoRoot)
+
+    $remoteUrl = (& git -C $RepoRoot remote get-url origin 2>$null)
+    if ($LASTEXITCODE -ne 0 -or -not $remoteUrl) {
+        throw "The origin Git remote is required for the trusted deployment gate."
+    }
+    if ([string]$remoteUrl -notmatch 'github\.com[:/](?<owner>[^/\s]+)/(?<repo>[^/\s]+?)(?:\.git)?$') {
+        throw "The origin Git remote must identify a GitHub owner/repository."
+    }
+    return "$($Matches.owner)/$($Matches.repo)"
+}
+
+function Assert-SakuraDeploySourceGate {
+    param([string]$RepoRoot, [string]$SelectedSha)
+
+    if (-not $SelectedSha -or $SelectedSha -notmatch '^[0-9a-fA-F]{40}$') {
+        throw "SelectedSha or SAKURA_SELECTED_SHA must be a full 40-character Git SHA for Preflight, Stage, Promote, and Deploy."
+    }
+    $headSha = (& git -C $RepoRoot rev-parse HEAD 2>$null)
+    if ($LASTEXITCODE -ne 0 -or -not $headSha) {
+        throw "Unable to resolve the deployment worktree HEAD."
+    }
+    if ([string]$headSha -ne $SelectedSha) {
+        throw "SelectedSha must exactly match the deployment worktree HEAD."
+    }
+    $dirty = @(& git -C $RepoRoot status --porcelain=v1 --untracked-files=all 2>$null)
+    if ($LASTEXITCODE -ne 0) {
+        throw "Unable to verify that the deployment worktree is clean."
+    }
+    if ($dirty.Count -gt 0) {
+        throw "Preflight, Stage, Promote, and Deploy require a clean deployment worktree."
+    }
+
+    if ($env:SAKURA_VALIDATE_REMOTE_SCRIPT -eq "1" -or $env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -eq "1") {
+        Write-Host "Trusted Site checks API gate omitted only inside the non-remote test harness."
+        return
+    }
+
+    $repository = Get-GitHubRepositorySlug -RepoRoot $RepoRoot
+    $savedTargetSha = $env:TARGET_SHA
+    $savedRepository = $env:GITHUB_REPOSITORY
+    try {
+        $env:TARGET_SHA = $SelectedSha
+        $env:GITHUB_REPOSITORY = $repository
+        & node (Join-Path $PSScriptRoot "check-sakura-site-gate.mjs")
+        if ($LASTEXITCODE -ne 0) {
+            throw "Trusted Site checks gate rejected the selected deployment SHA."
+        }
+    } finally {
+        $env:TARGET_SHA = $savedTargetSha
+        $env:GITHUB_REPOSITORY = $savedRepository
+    }
 }
 
 function Test-NameExcluded {
@@ -414,8 +470,21 @@ ARCHIVE_ROOT='$archiveRoot'
 DEPLOYMENT_PATH_MANIFEST_SHA='$($Package.PathManifestSha256)'
 DEPLOYMENT_EVIDENCE_SHA='$($Package.EvidenceSha256)'
 STAGE_DIR=`$(mktemp -d "`$HOME/abroad-o-stage.XXXXXX")
-cleanup() { rm -rf "`$STAGE_DIR"; }
-trap cleanup EXIT
+TEMP_FILES="`$STAGE_DIR/publish-temp-files"
+CURRENT_TEMP=''
+LOCK_DIR=''
+LOCK_OWNED=0
+: > "`$TEMP_FILES"
+cleanup() {
+  if [ -n "`$CURRENT_TEMP" ]; then rm -f "`$CURRENT_TEMP"; fi
+  if [ -f "`$TEMP_FILES" ]; then while IFS= read -r temporary; do rm -f "`$temporary"; done < "`$TEMP_FILES"; fi
+  rm -rf "`$STAGE_DIR"
+}
+
+release_lock() {
+  if [ "`$LOCK_OWNED" = 1 ]; then rm -f "`$LOCK_DIR/owner"; rmdir "`$LOCK_DIR" 2>/dev/null || true; fi
+}
+trap 'cleanup; release_lock' EXIT
 test -f "`$REMOTE_PACKAGE"
 test "`$(realpath "`$REMOTE_DIR")" = "`$REMOTE_DIR"
 test "`$(realpath "`$(dirname "`$REMOTE_BACKUP")")" = "`$(dirname "`$REMOTE_BACKUP")" || { echo 'Backup directory has a symlink component.' >&2; exit 1; }
@@ -435,13 +504,23 @@ if [ -n "`$archive_links" ]; then
   exit 1
 fi
 test "`$(dirname "`$REMOTE_BACKUP")" = "`$BACKUP_DIRECTORY"
+mkdir -p "`$BACKUP_DIRECTORY"
+test ! -L "`$BACKUP_DIRECTORY"
+test "`$(realpath "`$BACKUP_DIRECTORY")" = "`$BACKUP_DIRECTORY" || { echo 'Backup directory has a symlink component.' >&2; exit 1; }
+LOCK_DIR="`$BACKUP_DIRECTORY/.abroad-o-deploy.lock"
+if ! mkdir "`$LOCK_DIR" 2>/dev/null; then
+  echo "Deployment lock already exists: `$LOCK_DIR (stale locks require operator review and are never removed automatically)." >&2
+  exit 1
+fi
+LOCK_OWNED=1
+printf 'mode=Promote\nstartedAt=%s\nhost=%s\npid=%s\nuser=%s\n' "`$(date -u +%Y-%m-%dT%H:%M:%SZ)" "`$(hostname)" "`$$" "`$(id -un)" > "`$LOCK_DIR/owner"
 BACKUP_STAGE=`$(mktemp -d "`$HOME/abroad-o-backup.XXXXXX")
 backup_verified=0
 backup_cleanup() {
   rm -rf "`$BACKUP_STAGE"
   if [ "`$backup_verified" != 1 ]; then rm -f "`$REMOTE_BACKUP"; fi
 }
-trap 'cleanup; backup_cleanup' EXIT
+trap 'cleanup; backup_cleanup; release_lock' EXIT
 mkdir -p "`$BACKUP_STAGE/`$ARCHIVE_ROOT/payload"
 protected_paths="`$BACKUP_STAGE/protected-paths"
 find "`$REMOTE_DIR" -type l -print -quit | grep -q . && { echo 'Remote directory contains a symlink before backup.' >&2; exit 1; }
@@ -480,7 +559,7 @@ archive_sha=`$(sakura_sha256 "`$REMOTE_BACKUP")
 $promoteArchiveFault
 VERIFY_STAGE=`$(mktemp -d "`$HOME/abroad-o-backup-verify.XXXXXX")
 verify_cleanup() { rm -rf "`$VERIFY_STAGE"; }
-trap 'cleanup; backup_cleanup; verify_cleanup' EXIT
+trap 'cleanup; backup_cleanup; verify_cleanup; release_lock' EXIT
 test "`$(realpath "`$REMOTE_BACKUP")" = "`$REMOTE_BACKUP"
 validate_sanitized_archive "`$REMOTE_BACKUP" "`$VERIFY_STAGE" "`$archive_sha" "`$manifest_sha" "`$ARCHIVE_ROOT" "`$REMOTE_DIR" "`$DEPLOYMENT_PATH_MANIFEST_SHA" "`$DEPLOYMENT_EVIDENCE_SHA"
 tar -tzf "`$REMOTE_BACKUP" | awk -v root="`$ARCHIVE_ROOT" '
@@ -517,10 +596,48 @@ if find "`$STAGE_DIR" -type l -print -quit | grep -q .; then
   echo 'Extracted staging directory contains a symlink; refusing deployment.' >&2
   exit 1
 fi
+publish_file() {
+  path="`$1"
+  destination="`$REMOTE_DIR/`$path"
+  directory=`$(dirname "`$destination")
+  name=`$(basename "`$destination")
+  mkdir -p "`$directory"
+  temporary=`$(mktemp "`$directory/.`$name.codex.XXXXXX")
+  CURRENT_TEMP="`$temporary"
+  if [ "`${SAKURA_LOCAL_PROMOTE_FAIL_AFTER_MKTEMP:-0}" = 1 ]; then echo 'Injected temporary-registration failure.' >&2; exit 1; fi
+  printf '%s\n' "`$temporary" >> "`$TEMP_FILES"
+  cp -p "`$STAGE_DIR/`$path" "`$temporary"
+  test -f "`$temporary"
+  test "`$(wc -c < "`$temporary" | tr -d ' ')" = "`$(wc -c < "`$STAGE_DIR/`$path" | tr -d ' ')"
+  test "`$(sakura_sha256 "`$temporary")" = "`$(sakura_sha256 "`$STAGE_DIR/`$path")"
+  if [ "`${SAKURA_LOCAL_PROMOTE_FAIL_AFTER_TEMP:-0}" = 1 ]; then echo 'Injected temporary-file failure.' >&2; exit 1; fi
+  mv -f "`$temporary" "`$destination"
+  CURRENT_TEMP=''
+}
+# Files are individually atomic within their destination directory. Assets are
+# promoted first, then HTML; this is intentionally not a whole-site atomic claim.
+NON_HTML_MANIFEST="`$STAGE_DIR/non-html-manifest"
+HTML_MANIFEST="`$STAGE_DIR/html-manifest"
+awk '!/\.html`$/' > "`$NON_HTML_MANIFEST" <<'CODEX_MANIFEST'
+$manifestBody
+CODEX_MANIFEST
+awk '/\.html`$/' > "`$HTML_MANIFEST" <<'CODEX_MANIFEST'
+$manifestBody
+CODEX_MANIFEST
 while IFS= read -r path; do
+  [ -n "`$path" ] || continue
   test -f "`$STAGE_DIR/`$path"
-  mkdir -p "`$(dirname "`$REMOTE_DIR/`$path")"
-  cp -p "`$STAGE_DIR/`$path" "`$REMOTE_DIR/`$path"
+  publish_file "`$path"
+done < "`$NON_HTML_MANIFEST"
+while IFS= read -r path; do
+  [ -n "`$path" ] || continue
+  test -f "`$STAGE_DIR/`$path"
+  publish_file "`$path"
+done < "`$HTML_MANIFEST"
+# Audit the promoted manifest while the deployment lock is still held.
+while IFS= read -r path; do
+  test -f "`$REMOTE_DIR/`$path"
+  test "`$(sakura_sha256 "`$REMOTE_DIR/`$path")" = "`$(sakura_sha256 "`$STAGE_DIR/`$path")"
 done <<'CODEX_MANIFEST'
 $manifestBody
 CODEX_MANIFEST
@@ -562,7 +679,13 @@ mkdir -p "`$(dirname "`$METADATA")"
 printf '%s  %s  %s\n' "`$archive_sha" '$($Package.PathManifestSha256)' '$($Package.EvidenceSha256)' > "`$METADATA"
 printf '%s\n' "`$PACKAGE"
 "@
-    $remotePackage = (Invoke-RemoteScriptOutput -Script $script | Select-Object -Last 1).Trim()
+    $stageOutput = Invoke-RemoteScriptOutput -Script $script
+    if ($env:SAKURA_VALIDATE_REMOTE_SCRIPT -eq "1") {
+        return "/home/syntax-only/$ReleaseId.tgz"
+    }
+    $remotePackage = ($stageOutput | Select-Object -Last 1)
+    if ($null -eq $remotePackage) { throw "Remote stage did not return a package path." }
+    $remotePackage = $remotePackage.Trim()
     if ($remotePackage -notmatch '^/home/') { throw "Remote stage did not return an absolute package path." }
     Write-Host "Stage SHA-256 verified: $localPackageHash pathManifestSha256=$($Package.PathManifestSha256) evidenceSha256=$($Package.EvidenceSha256) release=$ReleaseId"
     return $remotePackage
@@ -586,7 +709,13 @@ actual_sha=`$(sakura_sha256 "`$PACKAGE")
 test "`$actual_sha" = "`$archive_sha"
 printf '%s\n' "`$PACKAGE"
 "@
-    return (Invoke-RemoteScriptOutput -Script $script | Select-Object -Last 1).Trim()
+    $stageOutput = Invoke-RemoteScriptOutput -Script $script
+    if ($env:SAKURA_VALIDATE_REMOTE_SCRIPT -eq "1") {
+        return "/home/syntax-only/$ReleaseId.tgz"
+    }
+    $remotePackage = ($stageOutput | Select-Object -Last 1)
+    if ($null -eq $remotePackage) { throw "Verified staged package did not return a package path." }
+    return $remotePackage.Trim()
 }
 
 function Get-SshTarget {
@@ -865,6 +994,7 @@ function Invoke-RemoteSanitizedRestore {
 set -eu
 REMOTE_DIR='$RemoteDirectory'
 REMOTE_ARCHIVE='$RemoteArchive'
+BACKUP_DIRECTORY='$backupDirectory'
 EXPECTED_ARCHIVE_SHA='$($ExpectedArchiveSha256.ToLowerInvariant())'
 EXPECTED_MANIFEST_SHA='$($ExpectedManifestSha256.ToLowerInvariant())'
 EXPECTED_DEPLOYMENT_PATH_MANIFEST_SHA='$($Package.PathManifestSha256)'
@@ -872,8 +1002,24 @@ EXPECTED_DEPLOYMENT_EVIDENCE_SHA='$($Package.EvidenceSha256)'
 ARCHIVE_ROOT='$archiveRoot'
 APPLY='$applyFlag'
 RESTORE_STAGE=`$(mktemp -d "`$HOME/abroad-o-restore.XXXXXX")
-cleanup_restore() { rm -rf "`$RESTORE_STAGE"; }
+LOCK_DIR=''
+LOCK_OWNED=0
+cleanup_restore() {
+  rm -rf "`$RESTORE_STAGE"
+  if [ "`$LOCK_OWNED" = 1 ]; then rm -f "`$LOCK_DIR/owner"; rmdir "`$LOCK_DIR" 2>/dev/null || true; fi
+}
 trap cleanup_restore EXIT
+if [ "`$APPLY" = 1 ]; then
+  test -d "`$BACKUP_DIRECTORY" && test ! -L "`$BACKUP_DIRECTORY"
+  test "`$(realpath "`$BACKUP_DIRECTORY")" = "`$BACKUP_DIRECTORY" || { echo 'Backup directory has a symlink component.' >&2; exit 1; }
+  LOCK_DIR="`$BACKUP_DIRECTORY/.abroad-o-deploy.lock"
+  if ! mkdir "`$LOCK_DIR" 2>/dev/null; then
+    echo "Deployment lock already exists: `$LOCK_DIR (stale locks require operator review and are never removed automatically)." >&2
+    exit 1
+  fi
+  LOCK_OWNED=1
+  printf 'mode=RestoreSafe\nstartedAt=%s\nhost=%s\npid=%s\nuser=%s\n' "`$(date -u +%Y-%m-%dT%H:%M:%SZ)" "`$(hostname)" "`$$" "`$(id -un)" > "`$LOCK_DIR/owner"
+fi
 test -d "`$REMOTE_DIR" && test ! -L "`$REMOTE_DIR"
 test "`$(realpath "`$REMOTE_DIR")" = "`$REMOTE_DIR"
 find "`$REMOTE_DIR" -type l -print -quit | grep -q . && { echo 'Restore target contains a symlink; refusing restore.' >&2; exit 1; }
@@ -970,6 +1116,12 @@ while IFS= read -r path; do
   [ -n "`$path" ] || continue
   if ! manifest_has_path "`$path"; then rm -f "`$REMOTE_DIR/`$path"; fi
 done < "`$current_manifest"
+# The lock covers RestoreSafe's file transaction and its post-write audit.
+while IFS= read -r path; do
+  test -f "`$REMOTE_DIR/`$path"
+  expected=`$(awk -F '\t' -v path="`$path" '`$1 == path { print `$2 }' "`$manifest_hashes")
+  test "`$(sakura_sha256 "`$REMOTE_DIR/`$path")" = "`$expected"
+done < "`$manifest_paths"
 echo 'RestoreSafe apply completed.'
 "@
     Invoke-RemoteScript -Script $script
@@ -1020,6 +1172,12 @@ function Invoke-Verification {
 }
 
 $repoRoot = Resolve-RepoRoot
+if (($env:SAKURA_VALIDATE_REMOTE_SCRIPT -eq "1" -or $env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -eq "1") -and $Mode -in @("Stage", "Deploy")) {
+    throw "The non-remote test harness cannot authorize Stage or Deploy."
+}
+if ($Mode -in @("Preflight", "Stage", "Promote", "Deploy")) {
+    Assert-SakuraDeploySourceGate -RepoRoot $repoRoot -SelectedSha $SelectedSha
+}
 $configFullPath = if ([IO.Path]::IsPathRooted($ConfigPath)) { [IO.Path]::GetFullPath($ConfigPath) } else { Join-Path $repoRoot $ConfigPath }
 if (-not (Test-Path $configFullPath)) {
     throw "Config not found: $configFullPath"

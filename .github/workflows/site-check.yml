@@ -21,6 +21,7 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run check:site
+      - run: npm run check:sakura-site-gate
       - run: npm run check:restore-contract
       - run: npm run check:ie-shims
       - run: npm run check:csp-report-only
@@ -63,3 +64,36 @@ jobs:
       - name: Show Apache test log on failure
         if: failure()
         run: sudo cat /tmp/abroad-apache-error.log || true
+
+  contact-worker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: contact-worker
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: contact-worker/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run check
+
+  site-gate:
+    # This is the stable terminal check for branch protection. It must run even
+    # when an upstream job fails, and fails unless every required job succeeded.
+    if: ${{ always() }}
+    needs: [site-check, contact-worker]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Require all Site checks jobs to succeed
+        env:
+          SITE_CHECK_RESULT: ${{ needs.site-check.result }}
+          CONTACT_WORKER_RESULT: ${{ needs.contact-worker.result }}
+        run: |
+          test "$SITE_CHECK_RESULT" = success
+          test "$CONTACT_WORKER_RESULT" = success

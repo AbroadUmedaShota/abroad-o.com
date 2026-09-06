@@ -13,18 +13,47 @@ on:
           - "audit"
           - "preflight"
           - "deploy"
+      target_sha:
+        description: "Exact current master commit SHA already passed trusted Site checks."
+        required: false
+        type: string
 
 permissions:
   contents: read
+  actions: read
+
+concurrency:
+  group: sakura-deploy
+  cancel-in-progress: false
 
 jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout trusted gate implementation from master
+        if: ${{ inputs.mode == 'preflight' || inputs.mode == 'deploy' }}
+        uses: actions/checkout@v7
+        with:
+          ref: master
+      - name: Require current master and its successful trusted Site checks
+        if: ${{ inputs.mode == 'preflight' || inputs.mode == 'deploy' }}
+        run: node scripts/check-sakura-site-gate.mjs
+        env:
+          TARGET_SHA: ${{ inputs.target_sha }}
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REF: ${{ github.ref }}
+
   deploy:
+    needs: gate
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     steps:
-      - name: Checkout
+      - name: Checkout selected master SHA
         uses: actions/checkout@v7
+        with:
+          ref: ${{ (inputs.mode == 'preflight' || inputs.mode == 'deploy') && inputs.target_sha || 'master' }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v7
@@ -95,6 +124,8 @@ jobs:
         if: ${{ inputs.mode == 'preflight' }}
         shell: pwsh
         env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SAKURA_SELECTED_SHA: ${{ inputs.target_sha }}
           SAKURA_HOST: ${{ secrets.SAKURA_HOST }}
           SAKURA_USER: ${{ secrets.SAKURA_USER }}
           SAKURA_REMOTE_DIR: ${{ secrets.SAKURA_REMOTE_DIR }}
@@ -107,6 +138,8 @@ jobs:
         if: ${{ inputs.mode == 'deploy' }}
         shell: pwsh
         env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SAKURA_SELECTED_SHA: ${{ inputs.target_sha }}
           SAKURA_HOST: ${{ secrets.SAKURA_HOST }}
           SAKURA_USER: ${{ secrets.SAKURA_USER }}
           SAKURA_REMOTE_DIR: ${{ secrets.SAKURA_REMOTE_DIR }}

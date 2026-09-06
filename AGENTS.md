@@ -14,11 +14,13 @@
 3. 一時 worktree で次を実行する。
 
    ```powershell
+   $selectedSha = git rev-parse HEAD
    .\scripts\deploy-sakura.ps1 -Mode DryRun
-   .\scripts\deploy-sakura.ps1 -Mode Deploy -UseFileZillaConfig
+   .\scripts\deploy-sakura.ps1 -Mode Preflight -SelectedSha $selectedSha -UseFileZillaConfig
+   .\scripts\deploy-sakura.ps1 -Mode Deploy -SelectedSha $selectedSha -UseFileZillaConfig
    ```
 
-4. `DryRun` が成功する前に `Deploy` を実行しない。
+4. `DryRun` が成功する前に `Deploy` を実行しない。Preflight・Stage・Promote・Deployは、選択SHAがcleanなcurrent `master`で、同じSHAのSite checks終端gateが成功していない限り実行できない。
 5. `deploy-sakura.ps1` の実アップロードは SSH/SCP を使用する。FileZilla が FTP 接続でも SSH 鍵は別途必要なため、SSH 鍵または SSH Agent が使えない環境ではこの経路を使用しない。
 
 ## 単一ファイルだけを公開する場合
