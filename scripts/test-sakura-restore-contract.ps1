@@ -118,18 +118,25 @@ try {
     Assert-True ($deployScriptText.Contains('Write-Host "Package SHA-256: $($package.PackageSha256)"')) "DryRun reports the RC package SHA-256"
 
     $savedShellValidation = $env:SAKURA_VALIDATE_REMOTE_SCRIPT
+    $savedNetworkBlockMarker = $env:SAKURA_TEST_NETWORK_BLOCK_MARKER
+    $networkBlockMarker = Join-Path $testRoot "network-attempts.log"
     try {
         $env:SAKURA_VALIDATE_REMOTE_SCRIPT = "1"
+        $env:SAKURA_TEST_NETWORK_BLOCK_MARKER = $networkBlockMarker
         $selectedSha = (& git -C $repoRoot rev-parse HEAD)
         & pwsh -NoProfile -File $deployScript -Mode Preflight -SelectedSha $selectedSha -HostName "syntax-only.invalid" -UserName "abroad-o" -RemoteDir "/home/abroad-o/www/abroad-o.com" -SshKeyPath "ignored"
         if ($LASTEXITCODE -ne 0) { throw "Generated Preflight shell syntax check failed." }
+        Assert-True (-not (Test-Path -LiteralPath $networkBlockMarker)) "Preflight syntax validation makes no external network attempt"
         & pwsh -NoProfile -File $deployScript -Mode RestoreSafe -HostName "syntax-only.invalid" -UserName "abroad-o" -RemoteDir "/home/abroad-o/www/abroad-o.com" -SshKeyPath "ignored" -BackupFile "/home/abroad-o/abroad-o-backups/abroad-o-before-test.sra.tgz" -BackupArchiveSha256 ("a" * 64) -BackupManifestSha256 ("b" * 64)
         if ($LASTEXITCODE -ne 0) { throw "Generated RestoreSafe shell syntax check failed." }
+        Assert-True (-not (Test-Path -LiteralPath $networkBlockMarker)) "RestoreSafe syntax validation makes no external network attempt"
         & pwsh -NoProfile -File $deployScript -Mode Promote -SelectedSha $selectedSha -HostName "syntax-only.invalid" -UserName "abroad-o" -RemoteDir "/home/abroad-o/www/abroad-o.com" -SshKeyPath "ignored" -StagedReleaseId "syntax-only-release"
         if ($LASTEXITCODE -ne 0) { throw "Generated Promote shell syntax check failed." }
+        Assert-True (-not (Test-Path -LiteralPath $networkBlockMarker)) "Promote syntax validation makes no external network attempt"
     }
     finally {
         $env:SAKURA_VALIDATE_REMOTE_SCRIPT = $savedShellValidation
+        $env:SAKURA_TEST_NETWORK_BLOCK_MARKER = $savedNetworkBlockMarker
     }
 
     Write-Host "Sakura sanitized restore contract tests passed."
