@@ -126,6 +126,24 @@ try {
     try {
         $env:SAKURA_VALIDATE_REMOTE_SCRIPT = "1"
         $env:SAKURA_TEST_NETWORK_BLOCK_MARKER = $networkBlockMarker
+
+        $networkGuardDefinition = [regex]::Match($deployScriptText, '(?ms)^function Assert-ExternalNetworkAllowed \{.*?^\}')
+        Assert-True $networkGuardDefinition.Success "external network guard can be exercised independently"
+        Invoke-Expression $networkGuardDefinition.Value
+        foreach ($protocol in @("http", "ssh", "scp")) {
+            Remove-Item -LiteralPath $networkBlockMarker -Force -ErrorAction SilentlyContinue
+            $blockedMessage = $null
+            try {
+                Assert-ExternalNetworkAllowed -Protocol $protocol
+            }
+            catch {
+                $blockedMessage = $_.Exception.Message
+            }
+            Assert-True ($blockedMessage -eq "External $protocol access is blocked by the test harness.") "$protocol is blocked before an external operation"
+            Assert-True ((Get-Content -LiteralPath $networkBlockMarker -Raw).Trim() -eq $protocol) "$protocol attempt is recorded observably"
+        }
+        Remove-Item -LiteralPath $networkBlockMarker -Force
+
         $selectedSha = (& git -C $repoRoot rev-parse HEAD)
         & pwsh -NoProfile -File $deployScript -Mode Preflight -SelectedSha $selectedSha -HostName "syntax-only.invalid" -UserName "abroad-o" -RemoteDir "/home/abroad-o/www/abroad-o.com" -SshKeyPath "ignored"
         if ($LASTEXITCODE -ne 0) { throw "Generated Preflight shell syntax check failed." }

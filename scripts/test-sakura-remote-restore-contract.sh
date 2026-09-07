@@ -16,6 +16,7 @@ fi
 repo=$(cd "$(dirname "$0")/.." && pwd)
 work=$(mktemp -d "${TMPDIR:-/tmp}/abroad-o-remote-restore.XXXXXX")
 home="$work/home" public="$work/public" backups="$work/backups" previous="$work/previous"
+network_attempts="$work/network-attempts"
 cleanup() { rm -rf "$work" "$repo/_site/foo" "$repo/_site/woff" "$repo/_site/woff2"; }
 trap cleanup EXIT
 fail() { printf 'FAIL: %s\n' "$*" >&2; exit 1; }
@@ -61,7 +62,7 @@ for (const key of ['includeDirectories', 'managedDirectories']) c[key] = [...new
 c.restoreContract.remotePublicRoot = root; c.restoreContract.backupDirectory = backups;
 fs.writeFileSync(out, JSON.stringify(c));
 NODE
-pkgout=$(env SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode Package -ConfigPath "$config" -WorkDir "$work/package")
+pkgout=$(env SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 SAKURA_TEST_NETWORK_BLOCK_MARKER="$network_attempts" pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode Package -ConfigPath "$config" -WorkDir "$work/package")
 package=$(printf '%s\n' "$pkgout" | sed -n 's/^Package: //p' | tail -1)
 manifest=$(printf '%s\n' "$pkgout" | sed -n 's/^Manifest: //p' | tail -1)
 path_sha=$(printf '%s\n' "$pkgout" | sed -n 's/^Path manifest SHA-256: //p' | tail -1)
@@ -84,7 +85,7 @@ invocations="$work/remote-script-invocations"
 invocation_count() { if [ -f "$invocations" ]; then wc -l < "$invocations" | tr -d ' '; else printf '0\n'; fi; }
 run() {
   local apply=${1:-0}
-  env PATH="${remote_test_path:-$remote_path}" HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 SAKURA_LOCAL_REMOTE_SCRIPT_MARKER="$invocations" pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode RestoreSafe -ConfigPath "$config" -WorkDir "$work/pkg-$RANDOM" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -BackupFile "$archive" -BackupArchiveSha256 "$archive_sha" -BackupManifestSha256 "$manifest_sha" $( [ "$apply" = 1 ] && printf '%s' -RestoreApply )
+  env PATH="${remote_test_path:-$remote_path}" HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 SAKURA_LOCAL_REMOTE_SCRIPT_MARKER="$invocations" SAKURA_TEST_NETWORK_BLOCK_MARKER="$network_attempts" pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode RestoreSafe -ConfigPath "$config" -WorkDir "$work/pkg-$RANDOM" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -BackupFile "$archive" -BackupArchiveSha256 "$archive_sha" -BackupManifestSha256 "$manifest_sha" $( [ "$apply" = 1 ] && printf '%s' -RestoreApply )
 }
 
 # Execute the exact generated Promote shell. The first run corrupts its newly
@@ -97,7 +98,7 @@ cp -p "$package" "$home/$release.tgz"
 mkdir -p "$home/.abroad-o-stages"
 printf '%s  %s  %s\n' "$(sha "$home/$release.tgz")" "$path_sha" "$evidence_sha" > "$home/.abroad-o-stages/$release.meta"
 run_promote() {
-  env PATH="${remote_test_path:-$remote_path}" HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 ${1:-} pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode Promote -SelectedSha "$(git rev-parse HEAD)" -ConfigPath "$config" -WorkDir "$work/promote-$RANDOM" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -StagedReleaseId "$release"
+  env PATH="${remote_test_path:-$remote_path}" HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 SAKURA_TEST_NETWORK_BLOCK_MARKER="$network_attempts" ${1:-} pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode Promote -SelectedSha "$(git rev-parse HEAD)" -ConfigPath "$config" -WorkDir "$work/promote-$RANDOM" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -StagedReleaseId "$release"
 }
 before_failed_promote=$(tree "$public")
 mkdir "$backups/.abroad-o-deploy.lock"
@@ -249,14 +250,15 @@ ln -s "$public" "$work/public-link"; link_config="$work/link-config.json"
 node - "$config" "$link_config" "$work/public-link" "$backups" <<'NODE'
 const fs=require('fs'); const c=JSON.parse(fs.readFileSync(process.argv[2])); c.restoreContract.remotePublicRoot=process.argv[4]; c.restoreContract.backupDirectory=process.argv[5]; fs.writeFileSync(process.argv[3],JSON.stringify(c));
 NODE
-if env HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode RestoreSafe -ConfigPath "$link_config" -WorkDir "$work/link-pkg" -HostName local.invalid -UserName abroad-o -RemoteDir "$work/public-link" -SshKeyPath ignored -BackupFile "$valid_archive" -BackupArchiveSha256 "$valid_archive_sha" -BackupManifestSha256 "$manifest_sha" -RestoreApply >/dev/null 2>&1; then fail 'symlink public root accepted'; fi
+if env HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 SAKURA_TEST_NETWORK_BLOCK_MARKER="$network_attempts" pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode RestoreSafe -ConfigPath "$link_config" -WorkDir "$work/link-pkg" -HostName local.invalid -UserName abroad-o -RemoteDir "$work/public-link" -SshKeyPath ignored -BackupFile "$valid_archive" -BackupArchiveSha256 "$valid_archive_sha" -BackupManifestSha256 "$manifest_sha" -RestoreApply >/dev/null 2>&1; then fail 'symlink public root accepted'; fi
 [ "$baseline" = "$(tree "$public")" ] || fail 'symlink public root changed contents'
 
 ln -s "$backups" "$work/backups-link"; backup_link_config="$work/backup-link-config.json"
 node - "$config" "$backup_link_config" "$public" "$work/backups-link" <<'NODE'
 const fs=require('fs'); const c=JSON.parse(fs.readFileSync(process.argv[2])); c.restoreContract.remotePublicRoot=process.argv[4]; c.restoreContract.backupDirectory=process.argv[5]; fs.writeFileSync(process.argv[3],JSON.stringify(c));
 NODE
-if env HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode RestoreSafe -ConfigPath "$backup_link_config" -WorkDir "$work/backup-link-pkg" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -BackupFile "$work/backups-link/abroad-o-before-contract.sra.tgz" -BackupArchiveSha256 "$valid_archive_sha" -BackupManifestSha256 "$manifest_sha" -RestoreApply >/dev/null 2>&1; then fail 'symlink backup parent accepted'; fi
+if env HOME="$home" SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE=1 SAKURA_TEST_NETWORK_BLOCK_MARKER="$network_attempts" pwsh -NoProfile -File scripts/deploy-sakura.ps1 -Mode RestoreSafe -ConfigPath "$backup_link_config" -WorkDir "$work/backup-link-pkg" -HostName local.invalid -UserName abroad-o -RemoteDir "$public" -SshKeyPath ignored -BackupFile "$work/backups-link/abroad-o-before-contract.sra.tgz" -BackupArchiveSha256 "$valid_archive_sha" -BackupManifestSha256 "$manifest_sha" -RestoreApply >/dev/null 2>&1; then fail 'symlink backup parent accepted'; fi
 [ "$baseline" = "$(tree "$public")" ] || fail 'symlink backup parent changed contents'
+[ ! -e "$network_attempts" ] || fail 'remote shell harness attempted external network access'
 
 printf 'Sakura remote RestoreSafe shell E2E passed.\n'
