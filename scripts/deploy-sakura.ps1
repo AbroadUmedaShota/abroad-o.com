@@ -1301,6 +1301,6 @@ if ($Mode -eq "Promote") {
     $remotePackagePath = Get-VerifiedStagedPackage -Package $package -ReleaseId $StagedReleaseId
 }
 Invoke-RemotePromote -Package $package -RemoteDirectory $remoteDirValue -RemotePackage $remotePackagePath -RemoteBackup $remoteBackupPath -Config $config
-if ($env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -ne "1") {
+if ($env:SAKURA_VALIDATE_REMOTE_SCRIPT -ne "1" -and $env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -ne "1") {
     Invoke-Verification -Config $config
 }

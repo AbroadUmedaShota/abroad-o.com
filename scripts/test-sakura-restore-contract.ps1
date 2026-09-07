@@ -116,6 +116,9 @@ try {
     $deployScriptText = Get-Content -LiteralPath $deployScript -Raw
     Assert-True (-not $deployScriptText.Contains("-printf")) "remote shell avoids GNU-only find -printf"
     Assert-True ($deployScriptText.Contains('Write-Host "Package SHA-256: $($package.PackageSha256)"')) "DryRun reports the RC package SHA-256"
+    Assert-True ($deployScriptText.Contains('if ($env:SAKURA_VALIDATE_REMOTE_SCRIPT -ne "1" -and $env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -ne "1")')) "only non-remote harnesses omit post-Promote verification"
+    Assert-True (([regex]::Matches($deployScriptText, 'Assert-ExternalNetworkAllowed -Protocol "ssh"')).Count -eq 2) "both SSH execution boundaries are guarded"
+    Assert-True (([regex]::Matches($deployScriptText, 'Assert-ExternalNetworkAllowed -Protocol "scp"')).Count -eq 1) "the SCP execution boundary is guarded"
 
     $savedShellValidation = $env:SAKURA_VALIDATE_REMOTE_SCRIPT
     $savedNetworkBlockMarker = $env:SAKURA_TEST_NETWORK_BLOCK_MARKER
@@ -133,6 +136,13 @@ try {
         & pwsh -NoProfile -File $deployScript -Mode Promote -SelectedSha $selectedSha -HostName "syntax-only.invalid" -UserName "abroad-o" -RemoteDir "/home/abroad-o/www/abroad-o.com" -SshKeyPath "ignored" -StagedReleaseId "syntax-only-release"
         if ($LASTEXITCODE -ne 0) { throw "Generated Promote shell syntax check failed." }
         Assert-True (-not (Test-Path -LiteralPath $networkBlockMarker)) "Promote syntax validation makes no external network attempt"
+
+        $env:SAKURA_VALIDATE_REMOTE_SCRIPT = $savedShellValidation
+        $verifyOutput = @(& pwsh -NoProfile -File $deployScript -Mode Verify 2>&1)
+        $verifyExitCode = $LASTEXITCODE
+        Assert-True ($verifyExitCode -ne 0) "ordinary Verify reaches the guarded HTTP boundary"
+        Assert-True ((Get-Content -LiteralPath $networkBlockMarker -Raw).Trim() -eq "http") "ordinary Verify records one blocked HTTP attempt before any request"
+        Remove-Item -LiteralPath $networkBlockMarker -Force
     }
     finally {
         $env:SAKURA_VALIDATE_REMOTE_SCRIPT = $savedShellValidation
