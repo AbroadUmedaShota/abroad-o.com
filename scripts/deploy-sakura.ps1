@@ -751,6 +751,20 @@ function Get-ScpArgs {
     return $args
 }
 
+function Assert-ExternalNetworkAllowed {
+    param([ValidateSet("http", "ssh", "scp")][string]$Protocol)
+
+    if (-not $env:SAKURA_TEST_NETWORK_BLOCK_MARKER) {
+        return
+    }
+    [System.IO.File]::AppendAllText(
+        $env:SAKURA_TEST_NETWORK_BLOCK_MARKER,
+        "$Protocol`n",
+        [System.Text.UTF8Encoding]::new($false)
+    )
+    throw "External $Protocol access is blocked by the test harness."
+}
+
 function Invoke-RemoteScript {
     param([string]$Script)
     $scriptPath = Join-Path $workDirFullPath "remote-script.sh"
@@ -774,6 +788,7 @@ function Invoke-RemoteScript {
         }
         return
     }
+    Assert-ExternalNetworkAllowed -Protocol "ssh"
     $target = Get-SshTarget
     $sshArgs = Get-SshArgs
     if ($IsWindows) {
@@ -808,6 +823,7 @@ function Invoke-RemoteScriptOutput {
         }
         return @($output)
     }
+    Assert-ExternalNetworkAllowed -Protocol "ssh"
     $target = Get-SshTarget
     $sshArgs = Get-SshArgs
     if ($IsWindows) {
@@ -1133,6 +1149,7 @@ function Invoke-Verification {
     $failed = $false
 
     foreach ($url in $Config.verification.expectedOk) {
+        Assert-ExternalNetworkAllowed -Protocol "http"
         try {
             $response = Invoke-WebRequest -Uri $url -Method Head -MaximumRedirection 5 -UseBasicParsing
             if ($response.StatusCode -ne 200) {
@@ -1148,6 +1165,7 @@ function Invoke-Verification {
     }
 
     foreach ($url in $Config.verification.expectedNotFound) {
+        Assert-ExternalNetworkAllowed -Protocol "http"
         try {
             $response = Invoke-WebRequest -Uri $url -Method Head -MaximumRedirection 0 -UseBasicParsing
             Write-Error "Expected 404 but got $($response.StatusCode): $url"
@@ -1267,6 +1285,7 @@ if ($Mode -eq "Preflight") {
 
 $scpArgs = Get-ScpArgs
 if ($Mode -in @("Stage", "Deploy")) {
+    Assert-ExternalNetworkAllowed -Protocol "scp"
     & scp @scpArgs $package.PackagePath "${target}:$remotePackageForScp"
     if ($LASTEXITCODE -ne 0) {
         throw "scp failed while uploading deployment package."
@@ -1282,6 +1301,6 @@ if ($Mode -eq "Promote") {
     $remotePackagePath = Get-VerifiedStagedPackage -Package $package -ReleaseId $StagedReleaseId
 }
 Invoke-RemotePromote -Package $package -RemoteDirectory $remoteDirValue -RemotePackage $remotePackagePath -RemoteBackup $remoteBackupPath -Config $config
-if ($env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -ne "1") {
+if ($env:SAKURA_VALIDATE_REMOTE_SCRIPT -ne "1" -and $env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -ne "1") {
     Invoke-Verification -Config $config
 }

@@ -116,20 +116,55 @@ try {
     $deployScriptText = Get-Content -LiteralPath $deployScript -Raw
     Assert-True (-not $deployScriptText.Contains("-printf")) "remote shell avoids GNU-only find -printf"
     Assert-True ($deployScriptText.Contains('Write-Host "Package SHA-256: $($package.PackageSha256)"')) "DryRun reports the RC package SHA-256"
+    Assert-True ($deployScriptText.Contains('if ($env:SAKURA_VALIDATE_REMOTE_SCRIPT -ne "1" -and $env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -ne "1")')) "only non-remote harnesses omit post-Promote verification"
+    Assert-True (([regex]::Matches($deployScriptText, 'Assert-ExternalNetworkAllowed -Protocol "ssh"')).Count -eq 2) "both SSH execution boundaries are guarded"
+    Assert-True (([regex]::Matches($deployScriptText, 'Assert-ExternalNetworkAllowed -Protocol "scp"')).Count -eq 1) "the SCP execution boundary is guarded"
 
     $savedShellValidation = $env:SAKURA_VALIDATE_REMOTE_SCRIPT
+    $savedNetworkBlockMarker = $env:SAKURA_TEST_NETWORK_BLOCK_MARKER
+    $networkBlockMarker = Join-Path $testRoot "network-attempts.log"
     try {
         $env:SAKURA_VALIDATE_REMOTE_SCRIPT = "1"
+        $env:SAKURA_TEST_NETWORK_BLOCK_MARKER = $networkBlockMarker
+
+        $networkGuardDefinition = [regex]::Match($deployScriptText, '(?ms)^function Assert-ExternalNetworkAllowed \{.*?^\}')
+        Assert-True $networkGuardDefinition.Success "external network guard can be exercised independently"
+        Invoke-Expression $networkGuardDefinition.Value
+        foreach ($protocol in @("http", "ssh", "scp")) {
+            Remove-Item -LiteralPath $networkBlockMarker -Force -ErrorAction SilentlyContinue
+            $blockedMessage = $null
+            try {
+                Assert-ExternalNetworkAllowed -Protocol $protocol
+            }
+            catch {
+                $blockedMessage = $_.Exception.Message
+            }
+            Assert-True ($blockedMessage -eq "External $protocol access is blocked by the test harness.") "$protocol is blocked before an external operation"
+            Assert-True ((Get-Content -LiteralPath $networkBlockMarker -Raw).Trim() -eq $protocol) "$protocol attempt is recorded observably"
+        }
+        Remove-Item -LiteralPath $networkBlockMarker -Force
+
         $selectedSha = (& git -C $repoRoot rev-parse HEAD)
         & pwsh -NoProfile -File $deployScript -Mode Preflight -SelectedSha $selectedSha -HostName "syntax-only.invalid" -UserName "abroad-o" -RemoteDir "/home/abroad-o/www/abroad-o.com" -SshKeyPath "ignored"
         if ($LASTEXITCODE -ne 0) { throw "Generated Preflight shell syntax check failed." }
+        Assert-True (-not (Test-Path -LiteralPath $networkBlockMarker)) "Preflight syntax validation makes no external network attempt"
         & pwsh -NoProfile -File $deployScript -Mode RestoreSafe -HostName "syntax-only.invalid" -UserName "abroad-o" -RemoteDir "/home/abroad-o/www/abroad-o.com" -SshKeyPath "ignored" -BackupFile "/home/abroad-o/abroad-o-backups/abroad-o-before-test.sra.tgz" -BackupArchiveSha256 ("a" * 64) -BackupManifestSha256 ("b" * 64)
         if ($LASTEXITCODE -ne 0) { throw "Generated RestoreSafe shell syntax check failed." }
+        Assert-True (-not (Test-Path -LiteralPath $networkBlockMarker)) "RestoreSafe syntax validation makes no external network attempt"
         & pwsh -NoProfile -File $deployScript -Mode Promote -SelectedSha $selectedSha -HostName "syntax-only.invalid" -UserName "abroad-o" -RemoteDir "/home/abroad-o/www/abroad-o.com" -SshKeyPath "ignored" -StagedReleaseId "syntax-only-release"
         if ($LASTEXITCODE -ne 0) { throw "Generated Promote shell syntax check failed." }
+        Assert-True (-not (Test-Path -LiteralPath $networkBlockMarker)) "Promote syntax validation makes no external network attempt"
+
+        $env:SAKURA_VALIDATE_REMOTE_SCRIPT = $savedShellValidation
+        $verifyOutput = @(& pwsh -NoProfile -File $deployScript -Mode Verify 2>&1)
+        $verifyExitCode = $LASTEXITCODE
+        Assert-True ($verifyExitCode -ne 0) "ordinary Verify reaches the guarded HTTP boundary"
+        Assert-True ((Get-Content -LiteralPath $networkBlockMarker -Raw).Trim() -eq "http") "ordinary Verify records one blocked HTTP attempt before any request"
+        Remove-Item -LiteralPath $networkBlockMarker -Force
     }
     finally {
         $env:SAKURA_VALIDATE_REMOTE_SCRIPT = $savedShellValidation
+        $env:SAKURA_TEST_NETWORK_BLOCK_MARKER = $savedNetworkBlockMarker
     }
 
     Write-Host "Sakura sanitized restore contract tests passed."
