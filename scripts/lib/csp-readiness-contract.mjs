@@ -37,7 +37,7 @@ const pageStyleFingerprints = new Map([
   ['/css/pages/news-260615.css', '742a7665333f'],
   ['/css/pages/news-260616.css', '5a684272925a'],
   ['/css/pages/service.css', 'b543ac64b22a'],
-  ['/css/pages/speed-ad.css', 'ced0b1a7dc18']
+  ['/css/pages/speed-ad.css', 'be4b562e261e']
 ]);
 
 function visit(node, callback) {

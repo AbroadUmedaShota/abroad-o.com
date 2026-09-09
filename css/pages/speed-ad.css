@@ -57,6 +57,28 @@
         margin-top: 34px;
       }
 
+      .speed-ad-help-link {
+        margin: 8px 0 0;
+        font-size: 15px;
+      }
+
+      .speed-ad-help-link a {
+        color: #082E5D;
+        font-weight: 700;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+      }
+
+      .speed-ad-help-link a:hover,
+      .speed-ad-help-link a:focus {
+        color: #b20009;
+      }
+
+      .speed-ad-help-link a:focus-visible {
+        outline: 3px solid #b20009;
+        outline-offset: 4px;
+      }
+
       .speed-ad-product-mock {
         position: relative;
         background-color: #fff;
