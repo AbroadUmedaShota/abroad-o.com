@@ -24,6 +24,7 @@ function Assert-RejectedBeforeRemote {
 }
 
 Assert-RejectedBeforeRemote -Arguments @('-Mode', 'Preflight') -ExpectedMessage 'SelectedSha or SAKURA_SELECTED_SHA must be a full 40-character Git SHA'
+Assert-RejectedBeforeRemote -Arguments @('-Mode', 'Metadata') -ExpectedMessage 'SelectedSha or SAKURA_SELECTED_SHA must be a full 40-character Git SHA'
 Assert-RejectedBeforeRemote -Arguments @('-Mode', 'Deploy', '-SelectedSha', ('0' * 40)) -ExpectedMessage 'SelectedSha must exactly match the deployment worktree HEAD'
 $savedValidation = $env:SAKURA_VALIDATE_REMOTE_SCRIPT
 try {

@@ -38,9 +38,23 @@ npm run check:site
 
 ### 信頼済みSHAの必須gate
 
-`Preflight`、`Stage`、`Promote`、`Deploy`は、GitHub Actions経由でもローカル実行でも、選択SHA、cleanな作業ツリー、GitHub上のcurrent `master`、同じSHAの最新push run、同じattemptの成功した`site-gate`を公開スクリプト自身が確認する。取得失敗、pending、失敗、別SHA、別branch、gate不足はSSH/SCPより前にfail closedとする。
+`Metadata`、`Preflight`、`Stage`、`Promote`、`Deploy`は、GitHub Actions経由でもローカル実行でも、選択SHA、cleanな作業ツリー、GitHub上のcurrent `master`、同じSHAの最新push run、同じattemptの成功した`site-gate`を公開スクリプト自身が確認する。取得失敗、pending、失敗、別SHA、別branch、gate不足はSSH/SCPより前にfail closedとする。
 
 public repositoryではGitHub APIを匿名で参照できるが、rate limitを避ける場合は`GITHUB_TOKEN`をプロセス環境だけに設定する。tokenをコマンド、Issue、ログへ出力しない。gateを省略するforce/skip optionはない。`Package`、`DryRun`は非公開処理のためgate対象外、`Audit`は読み取り専用、`RestoreSafe`は別の復元契約と明示承認に従う。
+
+### 固定リモートメタデータ確認
+
+GitHub Actionsの`Deploy to Sakura`で`metadata`を選び、`target_sha`へ検査対象のcurrent `master` SHAを指定する。`metadata`も秘密情報を使用する前のworkflow gateとスクリプト内部のsource gateを通る。任意コマンド、任意パス、任意接続先を入力する欄はない。
+
+`metadata`は固定configの公開ルート、バックアップディレクトリ、デプロイロック、sanitized archive、廃止対象4件について、状態・型・件数・合計byteだけを1回のSSH接続で読み取る。ファイルサイズはBSD/GNU両dialectの`stat`メタデータだけから取得し、本文を開く`wc`・hash・内容読取へのfallbackは行わない。archiveは`abroad-o-before-YYYYMMDD-HHmmss.sra.tgz`形式に一致する最新basenameとsizeだけを表示し、lock owner、ファイル名一覧、ファイル内容、秘密情報は表示しない。この結果はarchiveの内容やhashの正常性を証明しない。build、`npm ci`、package、remote temporary file、lock、backup、Stage、Promote、Deploy、Restore、削除は行わない。
+
+本番用`Metadata`は、追跡済みの標準config、固定host/user/port/public root、既存workflowが配置するSSH鍵だけを受け付ける。代替config・host・pathを使えるのは、外部接続を行わない明示的なローカルtest harnessに限る。
+
+lockは存在判定とsymlink判定を分け、dangling symlinkも`absent`にしない。公開ルート、バックアップディレクトリ、廃止対象の途中または配下にsymlinkがある場合や、固定ルート外へ解決される場合はfail closedとする。`READY value=false`は公開準備完了を意味せず、対象を変更・削除せずに停止判断へ戻すための結果である。
+
+この読み取りは実行時までのsnapshotでありTOCTOUを解消しない。実際のDeployでは、既存のatomic lock取得、直前symlink検査、新しいsanitized backupの作成・検証を完了してから`publish_file`へ進むguardを維持する。
+
+固定10行・2 KiBの出力契約は、SSH子プロセスのstdout/stderrを捕捉し終えた後、表示前に検証する上限である。transport受信中のstreaming memory capやプロセス単位のtimeoutではなく、workflow全体のtimeoutとも別の契約として扱う。
 
 問い合わせ安全性改修を公開する場合は`docs/contact-form-security.md`のupgrade手順に従い、Worker、Apps Script、Sakuraの順で個別承認・version記録・受入を行う。本番フォームPOSTはSakura公開とは別承認である。
 
