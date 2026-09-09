@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("Package", "DryRun", "Audit", "Preflight", "Stage", "Promote", "Deploy", "Verify", "Restore", "RestoreSafe")]
+    [ValidateSet("Package", "DryRun", "Audit", "Metadata", "Preflight", "Stage", "Promote", "Deploy", "Verify", "Restore", "RestoreSafe")]
     [string]$Mode = "DryRun",
 
     [string]$ConfigPath = "deploy/sakura-public-files.json",
@@ -46,7 +46,7 @@ function Assert-SakuraDeploySourceGate {
     param([string]$RepoRoot, [string]$SelectedSha)
 
     if (-not $SelectedSha -or $SelectedSha -notmatch '^[0-9a-fA-F]{40}$') {
-        throw "SelectedSha or SAKURA_SELECTED_SHA must be a full 40-character Git SHA for Preflight, Stage, Promote, and Deploy."
+        throw "SelectedSha or SAKURA_SELECTED_SHA must be a full 40-character Git SHA for Metadata, Preflight, Stage, Promote, and Deploy."
     }
     $headSha = (& git -C $RepoRoot rev-parse HEAD 2>$null)
     if ($LASTEXITCODE -ne 0 -or -not $headSha) {
@@ -60,7 +60,7 @@ function Assert-SakuraDeploySourceGate {
         throw "Unable to verify that the deployment worktree is clean."
     }
     if ($dirty.Count -gt 0) {
-        throw "Preflight, Stage, Promote, and Deploy require a clean deployment worktree."
+        throw "Metadata, Preflight, Stage, Promote, and Deploy require a clean deployment worktree."
     }
 
     if ($env:SAKURA_VALIDATE_REMOTE_SCRIPT -eq "1" -or $env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -eq "1") {
@@ -838,6 +838,190 @@ function Invoke-RemoteScriptOutput {
     return @($output)
 }
 
+function Assert-SakuraMetadataConfig {
+    param([Parameter(Mandatory)][object]$Config, [Parameter(Mandatory)][string]$RemoteDirectory)
+
+    $publicRoot = [string]$Config.restoreContract.remotePublicRoot
+    $backupDirectory = [string]$Config.restoreContract.backupDirectory
+    if ($RemoteDirectory -ne $publicRoot) {
+        throw "Metadata only supports the fixed configured public root."
+    }
+    if ($publicRoot -notmatch '^/[A-Za-z0-9_./-]+$' -or $publicRoot -match '(^|/)\.\.(/|$)') {
+        throw "Metadata public root is unsafe."
+    }
+    if ($backupDirectory -notmatch '^/[A-Za-z0-9_./-]+$' -or $backupDirectory -match '(^|/)\.\.(/|$)') {
+        throw "Metadata backup directory is unsafe."
+    }
+    $deletePaths = @($Config.deletePaths | ForEach-Object { [string]$_ })
+    $deletePrefixes = @($Config.deletePrefixes | ForEach-Object { [string]$_ })
+    if ($deletePaths.Count -ne 1 -or $deletePaths[0] -ne 'pdfjs/LICENSE') {
+        throw "Metadata requires the fixed retired exact path contract."
+    }
+    $expectedPrefixes = @('TOOL/', 'pdfjs/build/', 'pdfjs/web/')
+    if ($deletePrefixes.Count -ne $expectedPrefixes.Count) {
+        throw "Metadata requires the fixed retired prefix contract."
+    }
+    for ($index = 0; $index -lt $expectedPrefixes.Count; $index++) {
+        if ($deletePrefixes[$index] -ne $expectedPrefixes[$index]) {
+            throw "Metadata requires the fixed retired prefix contract."
+        }
+    }
+}
+
+function Test-SakuraMetadataLocalHarness {
+    return $env:SAKURA_VALIDATE_REMOTE_SCRIPT -eq "1" -or $env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -eq "1"
+}
+
+function Assert-SakuraMetadataInvocationContract {
+    param(
+        [Parameter(Mandatory)][string]$RepoRoot,
+        [Parameter(Mandatory)][string]$ConfigFullPath,
+        [Parameter(Mandatory)][string]$RemoteDirectory
+    )
+
+    if (Test-SakuraMetadataLocalHarness) { return }
+    $canonicalConfig = [IO.Path]::GetFullPath((Join-Path $RepoRoot "deploy/sakura-public-files.json"))
+    if ([IO.Path]::GetFullPath($ConfigFullPath) -ne $canonicalConfig) {
+        throw "Metadata requires the tracked canonical deployment config."
+    }
+    if ($HostName -ne "abroad-o.sakura.ne.jp" -or $UserName -ne "abroad-o" -or $Port -ne 22) {
+        throw "Metadata requires the fixed Sakura connection."
+    }
+    if ($RemoteDirectory -ne "/home/abroad-o/www/abroad-o.com") {
+        throw "Metadata requires the fixed Sakura public root."
+    }
+    $expectedSshKeyPath = [IO.Path]::GetFullPath((Join-Path $HOME ".ssh/sakura_deploy_key"))
+    $providedSshKeyPath = if ([string]::IsNullOrWhiteSpace($SshKeyPath)) { $null } else { [IO.Path]::GetFullPath($SshKeyPath) }
+    if (-not [string]::Equals($providedSshKeyPath, $expectedSshKeyPath, [StringComparison]::Ordinal) -or -not (Test-Path -LiteralPath $expectedSshKeyPath -PathType Leaf)) {
+        throw "Metadata requires the existing workflow SSH key path."
+    }
+    $script:SshKeyPath = $expectedSshKeyPath
+}
+
+function Invoke-SakuraCapturedProcess {
+    param(
+        [Parameter(Mandatory)][string]$FileName,
+        [Parameter(Mandatory)][string[]]$Arguments,
+        [Parameter(Mandatory)][string]$StandardInput
+    )
+
+    $start = [Diagnostics.ProcessStartInfo]::new()
+    $start.FileName = $FileName
+    $start.UseShellExecute = $false
+    $start.RedirectStandardInput = $true
+    $start.RedirectStandardOutput = $true
+    $start.RedirectStandardError = $true
+    foreach ($argument in $Arguments) { $start.ArgumentList.Add($argument) }
+    $process = [Diagnostics.Process]::new()
+    $process.StartInfo = $start
+    try {
+        if (-not $process.Start()) { throw "Metadata process could not be started." }
+        $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+        $stderrTask = $process.StandardError.ReadToEndAsync()
+        $process.StandardInput.Write($StandardInput)
+        $process.StandardInput.Close()
+        $process.WaitForExit()
+        return [pscustomobject]@{
+            ExitCode = $process.ExitCode
+            Stdout = $stdoutTask.GetAwaiter().GetResult()
+            Stderr = $stderrTask.GetAwaiter().GetResult()
+        }
+    } finally {
+        $process.Dispose()
+    }
+}
+
+function Invoke-SakuraMetadataTransport {
+    param([Parameter(Mandatory)][string]$Script)
+
+    $normalizedScript = ($Script -replace "`r`n", "`n") -replace "`r", "`n"
+    if ($env:SAKURA_VALIDATE_REMOTE_SCRIPT -eq "1") {
+        $result = Invoke-SakuraCapturedProcess -FileName "bash" -Arguments @("-n", "-") -StandardInput $normalizedScript
+        if ($result.ExitCode -ne 0 -or -not [string]::IsNullOrEmpty($result.Stderr)) {
+            throw "Generated remote metadata shell syntax validation failed."
+        }
+        Write-Host "Generated remote metadata shell syntax passed."
+        return @()
+    }
+    if ($env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -eq "1") {
+        if ($env:SAKURA_LOCAL_REMOTE_SCRIPT_MARKER) {
+            [System.IO.File]::AppendAllText($env:SAKURA_LOCAL_REMOTE_SCRIPT_MARKER, "invoke-metadata`n", [System.Text.UTF8Encoding]::new($false))
+        }
+        $result = Invoke-SakuraCapturedProcess -FileName "bash" -Arguments @("-s") -StandardInput $normalizedScript
+    } else {
+        $metadataProtocol = "ssh"
+        Assert-ExternalNetworkAllowed -Protocol $metadataProtocol
+        $target = Get-SshTarget
+        $arguments = @((Get-SshArgs) + @($target, "sh -s"))
+        $result = Invoke-SakuraCapturedProcess -FileName "ssh" -Arguments $arguments -StandardInput $normalizedScript
+    }
+    if ($result.ExitCode -ne 0) { throw "Remote metadata command failed." }
+    if (-not [string]::IsNullOrEmpty($result.Stderr)) { throw "Remote metadata command emitted unexpected stderr." }
+    $stdout = (($result.Stdout -replace "`r`n", "`n") -replace "`r", "`n").TrimEnd("`n")
+    if ([string]::IsNullOrEmpty($stdout)) { return @() }
+    return @($stdout -split "`n")
+}
+
+function Assert-SakuraMetadataOutput {
+    param([Parameter(Mandatory)][object[]]$Lines)
+
+    $text = @($Lines | ForEach-Object { [string]$_ })
+    if ($text.Count -ne 10 -or ($text -join "`n").Length -gt 2048) {
+        throw "Remote metadata output did not match the fixed bounded contract."
+    }
+    $patterns = @(
+        '^METADATA schema=1$',
+        '^PUBLIC_ROOT state=directory symlink=false realpath=true$',
+        '^BACKUP_DIRECTORY state=(absent symlink=false realpath=false|directory symlink=false realpath=true)$',
+        '^DEPLOY_LOCK (exists=false symlink=false ready=true|exists=true symlink=(false|true) ready=false)$',
+        '^LATEST_ARCHIVE present=(false basename=- bytes=0|true basename=abroad-o-before-[0-9]{8}-[0-9]{6}\.sra\.tgz bytes=[0-9]+)$',
+        '^RETIRED id=pdfjs_license (exists=false type=absent files=0 bytes=0|exists=true type=file files=1 bytes=[0-9]+)$',
+        '^RETIRED id=tool (exists=false type=absent files=0 bytes=0|exists=true type=directory files=[0-9]+ bytes=[0-9]+)$',
+        '^RETIRED id=pdfjs_build (exists=false type=absent files=0 bytes=0|exists=true type=directory files=[0-9]+ bytes=[0-9]+)$',
+        '^RETIRED id=pdfjs_web (exists=false type=absent files=0 bytes=0|exists=true type=directory files=[0-9]+ bytes=[0-9]+)$',
+        '^READY value=(true|false)$'
+    )
+    for ($index = 0; $index -lt $patterns.Count; $index++) {
+        if ($text[$index] -notmatch $patterns[$index]) {
+            throw "Remote metadata output did not match the fixed bounded contract."
+        }
+    }
+    $expectedReady = $text[3] -eq 'DEPLOY_LOCK exists=false symlink=false ready=true'
+    foreach ($index in 5..8) {
+        if ($text[$index] -notmatch ' exists=false type=absent files=0 bytes=0$') { $expectedReady = $false }
+    }
+    if ($text[9] -ne "READY value=$($expectedReady.ToString().ToLowerInvariant())") {
+        throw "Remote metadata output did not match the fixed bounded contract."
+    }
+    return $text
+}
+
+function Invoke-SakuraRemoteMetadata {
+    param([Parameter(Mandatory)][object]$Config, [Parameter(Mandatory)][string]$RemoteDirectory)
+
+    Assert-SakuraMetadataConfig -Config $Config -RemoteDirectory $RemoteDirectory
+    $helperPath = Join-Path $PSScriptRoot "lib/sakura-remote-metadata.sh"
+    if (-not (Test-Path -LiteralPath $helperPath -PathType Leaf)) {
+        throw "Sakura remote metadata helper is missing."
+    }
+    $helper = Get-Content -LiteralPath $helperPath -Raw
+    $script = @"
+SAKURA_METADATA_PUBLIC_ROOT='$([string]$Config.restoreContract.remotePublicRoot)'
+SAKURA_METADATA_BACKUP_DIRECTORY='$([string]$Config.restoreContract.backupDirectory)'
+SAKURA_METADATA_RETIRED_EXACT='pdfjs/LICENSE'
+SAKURA_METADATA_RETIRED_PREFIX_1='TOOL/'
+SAKURA_METADATA_RETIRED_PREFIX_2='pdfjs/build/'
+SAKURA_METADATA_RETIRED_PREFIX_3='pdfjs/web/'
+export SAKURA_METADATA_PUBLIC_ROOT SAKURA_METADATA_BACKUP_DIRECTORY SAKURA_METADATA_RETIRED_EXACT
+export SAKURA_METADATA_RETIRED_PREFIX_1 SAKURA_METADATA_RETIRED_PREFIX_2 SAKURA_METADATA_RETIRED_PREFIX_3
+$helper
+"@
+    $output = @(Invoke-SakuraMetadataTransport -Script $script)
+    if ($env:SAKURA_VALIDATE_REMOTE_SCRIPT -eq "1") { return }
+    $sanitized = Assert-SakuraMetadataOutput -Lines $output
+    foreach ($line in $sanitized) { Write-Host $line }
+}
+
 function Invoke-ContentAudit {
     param(
         [object]$Package,
@@ -1193,7 +1377,7 @@ $repoRoot = Resolve-RepoRoot
 if (($env:SAKURA_VALIDATE_REMOTE_SCRIPT -eq "1" -or $env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -eq "1") -and $Mode -in @("Stage", "Deploy")) {
     throw "The non-remote test harness cannot authorize Stage or Deploy."
 }
-if ($Mode -in @("Preflight", "Stage", "Promote", "Deploy")) {
+if ($Mode -in @("Metadata", "Preflight", "Stage", "Promote", "Deploy")) {
     Assert-SakuraDeploySourceGate -RepoRoot $repoRoot -SelectedSha $SelectedSha
 }
 $configFullPath = if ([IO.Path]::IsPathRooted($ConfigPath)) { [IO.Path]::GetFullPath($ConfigPath) } else { Join-Path $repoRoot $ConfigPath }
@@ -1204,14 +1388,25 @@ if (-not (Test-Path $configFullPath)) {
 $config = Get-Content -Path $configFullPath -Raw | ConvertFrom-Json
 Assert-SakuraRestoreConfig -Config $config
 $workDirFullPath = if ([IO.Path]::IsPathRooted($WorkDir)) { [IO.Path]::GetFullPath($WorkDir) } else { Join-Path $repoRoot $WorkDir }
-New-Item -ItemType Directory -Path $workDirFullPath -Force | Out-Null
+if ($Mode -ne "Metadata") { New-Item -ItemType Directory -Path $workDirFullPath -Force | Out-Null }
 
-if ($config.publicRoot -and $Mode -notin @("Verify", "Restore") -and $env:SAKURA_VALIDATE_REMOTE_SCRIPT -ne "1" -and $env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -ne "1") {
+if ($config.publicRoot -and $Mode -notin @("Verify", "Restore", "Metadata") -and $env:SAKURA_VALIDATE_REMOTE_SCRIPT -ne "1" -and $env:SAKURA_LOCAL_REMOTE_SCRIPT_EXECUTE -ne "1") {
     $npmCommand = if ($IsWindows) { "npm.cmd" } else { "npm" }
     & $npmCommand run build:site
     if ($LASTEXITCODE -ne 0) {
         throw "Eleventy site build failed. Run npm ci before packaging."
     }
+}
+
+if ($Mode -eq "Metadata") {
+    if ($UseFileZillaConfig) {
+        throw "Metadata does not accept FileZilla connection input."
+    }
+    $remoteDirValue = Get-RemoteDir
+    Assert-RemoteInput -Directory $remoteDirValue
+    Assert-SakuraMetadataInvocationContract -RepoRoot $repoRoot -ConfigFullPath $configFullPath -RemoteDirectory $remoteDirValue
+    Invoke-SakuraRemoteMetadata -Config $config -RemoteDirectory $remoteDirValue
+    exit 0
 }
 
 if ($UseFileZillaConfig) {

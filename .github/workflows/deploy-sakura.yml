@@ -4,13 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "Package, audit, preflight, or deploy to Sakura."
+        description: "Package, audit, metadata, preflight, or deploy to Sakura."
         required: true
         default: "package"
         type: choice
         options:
           - "package"
           - "audit"
+          - "metadata"
           - "preflight"
           - "deploy"
       target_sha:
@@ -32,12 +33,12 @@ jobs:
     timeout-minutes: 3
     steps:
       - name: Checkout trusted gate implementation from master
-        if: ${{ inputs.mode == 'preflight' || inputs.mode == 'deploy' }}
+        if: ${{ inputs.mode == 'metadata' || inputs.mode == 'preflight' || inputs.mode == 'deploy' }}
         uses: actions/checkout@v7
         with:
           ref: master
       - name: Require current master and its successful trusted Site checks
-        if: ${{ inputs.mode == 'preflight' || inputs.mode == 'deploy' }}
+        if: ${{ inputs.mode == 'metadata' || inputs.mode == 'preflight' || inputs.mode == 'deploy' }}
         run: node scripts/check-sakura-site-gate.mjs
         env:
           TARGET_SHA: ${{ inputs.target_sha }}
@@ -53,15 +54,17 @@ jobs:
       - name: Checkout selected master SHA
         uses: actions/checkout@v7
         with:
-          ref: ${{ (inputs.mode == 'preflight' || inputs.mode == 'deploy') && inputs.target_sha || 'master' }}
+          ref: ${{ (inputs.mode == 'metadata' || inputs.mode == 'preflight' || inputs.mode == 'deploy') && inputs.target_sha || 'master' }}
 
       - name: Setup Node.js
+        if: ${{ inputs.mode != 'metadata' }}
         uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
 
       - name: Install site dependencies
+        if: ${{ inputs.mode != 'metadata' }}
         run: npm ci
 
       - name: Package only
@@ -70,7 +73,7 @@ jobs:
         run: ./scripts/deploy-sakura.ps1 -Mode DryRun
 
       - name: Validate Sakura secrets
-        if: ${{ inputs.mode == 'audit' || inputs.mode == 'preflight' || inputs.mode == 'deploy' }}
+        if: ${{ inputs.mode == 'audit' || inputs.mode == 'metadata' || inputs.mode == 'preflight' || inputs.mode == 'deploy' }}
         shell: bash
         env:
           SAKURA_HOST: ${{ secrets.SAKURA_HOST }}
@@ -93,7 +96,7 @@ jobs:
           fi
 
       - name: Install SSH key
-        if: ${{ inputs.mode == 'audit' || inputs.mode == 'preflight' || inputs.mode == 'deploy' }}
+        if: ${{ inputs.mode == 'audit' || inputs.mode == 'metadata' || inputs.mode == 'preflight' || inputs.mode == 'deploy' }}
         shell: bash
         env:
           SAKURA_HOST: ${{ secrets.SAKURA_HOST }}
@@ -107,6 +110,20 @@ jobs:
           chmod 600 "$HOME/.ssh/sakura_deploy_key"
           ssh-keygen -y -f "$HOME/.ssh/sakura_deploy_key" > /dev/null
           ssh-keygen -F "$SAKURA_HOST" -f "$HOME/.ssh/known_hosts" > /dev/null
+
+      - name: Read Sakura deployment metadata
+        if: ${{ inputs.mode == 'metadata' }}
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SAKURA_SELECTED_SHA: ${{ inputs.target_sha }}
+          SAKURA_HOST: ${{ secrets.SAKURA_HOST }}
+          SAKURA_USER: ${{ secrets.SAKURA_USER }}
+          SAKURA_REMOTE_DIR: ${{ secrets.SAKURA_REMOTE_DIR }}
+          SAKURA_PORT: ${{ secrets.SAKURA_PORT }}
+        run: |
+          $env:SAKURA_SSH_KEY_PATH = Join-Path $HOME ".ssh/sakura_deploy_key"
+          ./scripts/deploy-sakura.ps1 -Mode Metadata
 
       - name: Audit Sakura public files
         if: ${{ inputs.mode == 'audit' }}
