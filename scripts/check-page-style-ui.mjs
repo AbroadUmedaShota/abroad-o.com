@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import { chromium } from '@playwright/test';
+import sharp from 'sharp';
 
 const root = path.resolve(import.meta.dirname, '..');
 const output = path.resolve(process.env.PAGE_STYLE_OUTPUT_ROOT || path.join(root, '_site'));
@@ -23,7 +24,7 @@ const server = http.createServer((request, response) => {
     missingLocalAssets.push(pathname);
     return response.writeHead(404).end();
   }
-  const types = { '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript', '.png': 'image/png', '.webp': 'image/webp', '.woff': 'font/woff', '.woff2': 'font/woff2' };
+  const types = { '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript', '.jpg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.woff': 'font/woff', '.woff2': 'font/woff2' };
   response.writeHead(200, { 'content-type': types[path.extname(file).toLowerCase()] || 'application/octet-stream' }).end(fs.readFileSync(file));
 });
 await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
@@ -59,6 +60,31 @@ try {
       await page.close();
     }
     console.log(`Page stylesheet UI passed at ${width}px.`);
+  }
+  for (const width of [320, 375, 1440]) {
+    const page = await browser.newPage({ viewport: { width, height: 900 } });
+    await page.route('**/*', (route) => ['127.0.0.1', 'localhost'].includes(new URL(route.request().url()).hostname) ? route.continue() : route.fulfill({ status: 204, body: '' }));
+    await page.goto(`http://127.0.0.1:${server.address().port}/index.html`, { waitUntil: 'load' });
+    const iso = page.locator('.certification-marks__iso');
+    await iso.scrollIntoViewIfNeeded();
+    await iso.evaluate((image) => image.decode());
+    const layout = await page.evaluate(() => {
+      const marks = document.querySelector('.certification-marks');
+      const isoImage = document.querySelector('.certification-marks__iso');
+      return {
+        background: getComputedStyle(marks).backgroundColor,
+        isolation: getComputedStyle(marks).isolation,
+        blend: getComputedStyle(isoImage).mixBlendMode,
+        overflow: document.body.scrollWidth > innerWidth
+      };
+    });
+    const { data, info } = await sharp(await iso.screenshot()).raw().toBuffer({ resolveWithObject: true });
+    const whiteBackgroundPixel = [...data.subarray((10 * info.width + 10) * info.channels, (10 * info.width + 10) * info.channels + 3)];
+    if (layout.background !== 'rgb(238, 238, 238)' || layout.isolation !== 'isolate' || layout.blend !== 'darken' || layout.overflow || whiteBackgroundPixel.some((channel) => channel !== 238)) {
+      throw new Error(`Homepage ISO background did not blend with #EEEEEE at ${width}px: ${JSON.stringify({ layout, whiteBackgroundPixel })}`);
+    }
+    await page.close();
+    console.log(`Homepage ISO background UI passed at ${width}px.`);
   }
 } finally {
   await browser.close();
