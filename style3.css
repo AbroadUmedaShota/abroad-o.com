@@ -843,6 +843,8 @@ section#pre_footer {
   width: 354px;
   max-width: 100%;
   margin: 0 auto;
+  background-color: #EEEEEE;
+  isolation: isolate;
 }
 .certification-marks__privacy {
   display: block;
@@ -860,6 +862,7 @@ section#pre_footer {
   aspect-ratio: 189 / 149;
   object-fit: cover;
   object-position: right;
+  mix-blend-mode: darken;
 }
 @media screen and (max-width: 991px) {
   section#pre_footer .col-md-7 p {
