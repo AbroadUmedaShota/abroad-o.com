@@ -20,7 +20,7 @@ preloadTopImage: true
 
     <!-- CSSファイルの読み込み -->
     <link rel="stylesheet" href="/vendor/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" href="style3.css">
+    <link rel="stylesheet" href="style3.css?v=pmark07-top-20261008">
     <link rel="stylesheet" href="slick/slick.css">
     <link rel="stylesheet" href="slick/slick-theme.css">
 {% include "partials/styles-modern-icons.njk" %}
@@ -162,7 +162,10 @@ preloadTopImage: true
         <!-- 資格の詳細説明 -->
         <div class="row">
           <div class="col-sm-12 col-md-5 center">
-            <a href="https://privacymark.jp/" target="_blank" rel="noopener noreferrer"><img class="image-intrinsic" src="image/ANAB_font.jpg" alt="ANAB認証マーク" width="354" height="149" decoding="async" loading="lazy"></a>
+            <div class="certification-marks">
+              <a class="certification-marks__privacy" href="https://privacymark.jp/" target="_blank" rel="noopener noreferrer"><img class="image-intrinsic" src="image/pmark07.png" alt="プライバシーマーク 10862401(07)" width="200" height="200" decoding="async" loading="lazy"></a>
+              <img class="certification-marks__iso" src="image/ANAB_font.jpg" alt="EQA・ANAB認証マーク" width="354" height="149" decoding="async" loading="lazy">
+            </div>
           </div>
           <div class="col-sm-12 col-md-7">
             <p>弊社では、以下の認証資格を取得しております。</p>
