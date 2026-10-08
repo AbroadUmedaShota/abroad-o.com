@@ -31,7 +31,8 @@ const cases = [
     image('image/top2_middle.png', '業務フロー標準化のイメージ', 512, 512, { loading: 'lazy' }),
     image('image/top2_right.png', '高品質・高セキュリティなリソース', 512, 512, { loading: 'lazy' }),
     ...['防衛省のロゴ', '電通のロゴ', '東京大学のロゴ', '京都大学のロゴ', '東北大学のロゴ', '弘前大学のロゴ', '中央大学のロゴ', '東京海上日動のロゴ', '三省堂書店のロゴ', 'STCのロゴ'].map((alt, index) => image(`image/c-${String(index).padStart(3, '0')}.png`, alt, 380, 100, { loading: 'lazy' })),
-    image('image/ANAB_font.jpg', 'ANAB認証マーク', 354, 149, { loading: 'lazy' })
+    image('image/pmark07.png', 'プライバシーマーク 10862401(07)', 200, 200, { loading: 'lazy' }),
+    image('image/ANAB_font.jpg', 'EQA・ANAB認証マーク', 354, 149, { class: 'certification-marks__iso', loading: 'lazy' })
   ]],
   ['service.html', [
     image('/image/rogo.png', 'アブロードアウトソーシング株式会社のロゴ', 852, 165),
