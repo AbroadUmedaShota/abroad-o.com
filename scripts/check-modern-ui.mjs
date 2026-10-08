@@ -14,7 +14,7 @@ const overflowBaseline = {
 const containerWidths = { 375: 375, 768: 720, 1440: 1140 };
 const headerHeights = { 375: 224.8, 768: 143, 1440: 143 };
 const bodyHeights = {
-  index: { 375: 5161.9, 768: 3827.8, 1440: 4054.8 },
+  index: { 375: 5619.2, 768: 4164.8, 1440: 4054.8 },
   scan: { 375: 6695.0, 768: 5285.7, 1440: 5262.0 }
 };
 const carouselHeights = { 375: 446.1, 768: 308, 1440: 370 };
