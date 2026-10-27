@@ -871,12 +871,49 @@ section#pre_footer {
   height: auto;
 }
 .certification-marks__iso {
-  display: block;
+  position: relative;
+  flex: 0 0 auto;
   width: 189px;
   height: 149px;
-  aspect-ratio: 189 / 149;
-  object-fit: cover;
-  object-position: right;
+}
+.certification-marks__iso-frame {
+  position: absolute;
+  top: 23px;
+  left: 4px;
+  box-sizing: border-box;
+  width: 160px;
+  height: 82px;
+  border: 1px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+.certification-marks__eqa {
+  display: block;
+  width: 70px;
+  height: auto;
+}
+.certification-marks__anab {
+  display: block;
+  width: 68px;
+  height: auto;
+}
+.certification-marks__iso-caption {
+  position: absolute;
+  top: 106px;
+  left: 0;
+  width: 100%;
+  height: 28px;
+  box-sizing: border-box;
+  padding-top: 1px;
+  background: #fff;
+  color: #000;
+  font: 8px/1.25 Arial, sans-serif;
+  text-align: center;
+  white-space: nowrap;
+}
+.certification-marks__iso-caption span {
+  display: block;
 }
 .certification-copy {
   min-width: 0;

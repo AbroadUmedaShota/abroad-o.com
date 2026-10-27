@@ -20,7 +20,7 @@ preloadTopImage: true
 
     <!-- CSSファイルの読み込み -->
     <link rel="stylesheet" href="/vendor/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" href="style3.css?v=cert-readability-v1">
+    <link rel="stylesheet" href="style3.css?v=iso-cert-20261027">
     <link rel="stylesheet" href="slick/slick.css">
     <link rel="stylesheet" href="slick/slick-theme.css">
 {% include "partials/styles-modern-icons.njk" %}
@@ -164,14 +164,23 @@ preloadTopImage: true
           <div class="certification-panel">
             <div class="certification-marks">
               <a class="certification-marks__privacy" href="https://privacymark.jp/" target="_blank" rel="noopener noreferrer"><img class="image-intrinsic" src="image/pmark07.png" alt="プライバシーマーク 10862401(07)" width="200" height="200" decoding="async" loading="lazy"></a>
-              <img class="certification-marks__iso" src="image/ANAB_font.jpg" alt="EQA・ANAB認証マーク" width="354" height="149" decoding="async" loading="lazy">
+              <div class="certification-marks__iso">
+                <div class="certification-marks__iso-frame">
+                  <img class="certification-marks__eqa" src="image/eqa-2026.jpg" alt="EQA認証マーク" width="261" height="119" decoding="async" loading="lazy">
+                  <img class="certification-marks__anab" src="image/anab-2026.png" alt="ANAB認定マーク" width="2500" height="2133" decoding="async" loading="lazy">
+                </div>
+                <div class="certification-marks__iso-caption">
+                  <span>ISO 9001:2015 &amp; JIS Q 9001:2015</span>
+                  <span>ISO/IEC 27001:2022 &amp; JIS Q 27001:2023</span>
+                </div>
+              </div>
             </div>
           </div>
           <div class="certification-copy">
             <p>弊社では、以下の認証資格を取得しております。</p>
             <ul class="certification-list">
               <li><a href="https://privacymark.jp/" target="_blank" rel="noopener noreferrer"><strong>プライバシーマーク</strong></a><span>10862401(07)</span></li>
-              <li><a href="https://www.eqajapan.com/html/iso/27001.htm#27001_1" target="_blank" rel="noopener noreferrer"><strong>ISMS（情報セキュリティマネジメントシステム）</strong></a><span>ISO/IEC 27001:2013 / JIS Q 27001:2014</span></li>
+              <li><a href="https://www.eqajapan.com/html/iso/27001.htm#27001_1" target="_blank" rel="noopener noreferrer"><strong>ISMS（情報セキュリティマネジメントシステム）</strong></a><span>ISO/IEC 27001:2022 / JIS Q 27001:2023</span></li>
               <li><a href="https://www.eqajapan.com/html/iso/9001.htm#9001_1" target="_blank" rel="noopener noreferrer"><strong>QMS（品質マネジメントシステム）</strong></a><span>ISO 9001:2015 &amp; JIS Q 9001:2015</span></li>
             </ul>
             <p>また、<a href="https://www.jiima.or.jp/qualification/docinfo_sv/intro/" target="_blank" rel="noopener noreferrer">文書情報管理士</a>在籍で、皆様にご安心してご依頼頂けるよう、適切な個人情報の取扱・運営を行っております。</p>

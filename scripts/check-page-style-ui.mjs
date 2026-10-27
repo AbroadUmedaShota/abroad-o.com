@@ -70,7 +70,7 @@ try {
     const iso = page.locator('.certification-marks__iso');
     await iso.scrollIntoViewIfNeeded();
     await page.locator('.certification-marks__privacy img').evaluate((image) => image.decode());
-    await iso.evaluate((image) => image.decode());
+    await iso.locator('img').evaluateAll((images) => Promise.all(images.map((image) => image.decode())));
     const layout = await page.evaluate(() => {
       const section = document.querySelector('#pre_footer');
       const outer = document.querySelector('.certification-layout');
@@ -78,6 +78,9 @@ try {
       const marks = document.querySelector('.certification-marks');
       const privacy = document.querySelector('.certification-marks__privacy img');
       const isoImage = document.querySelector('.certification-marks__iso');
+      const eqa = isoImage.querySelector('.certification-marks__eqa');
+      const anab = isoImage.querySelector('.certification-marks__anab');
+      const isoCaption = document.querySelector('.certification-marks__iso-caption');
       const copy = document.querySelector('.certification-copy');
       const list = document.querySelector('.certification-list');
       const link = list.querySelector('a');
@@ -98,10 +101,12 @@ try {
         textColor: getComputedStyle(copy).color,
         linkColor: getComputedStyle(link).color,
         listGap: getComputedStyle(list).rowGap,
-        section: rect(section), panel: rect(panel), privacy: rect(privacy), iso: rect(isoImage), copy: rect(copy),
+        section: rect(section), panel: rect(panel), privacy: rect(privacy), iso: rect(isoImage), caption: rect(isoCaption), copy: rect(copy),
         overflow: document.documentElement.scrollWidth > innerWidth,
-        imagesLoaded: privacy.complete && privacy.naturalWidth === 200 && isoImage.complete && isoImage.naturalWidth === 354,
-        isoCrop: getComputedStyle(isoImage).objectFit === 'cover' && getComputedStyle(isoImage).objectPosition === '100% 50%',
+        imagesLoaded: privacy.complete && privacy.naturalWidth === 200 && eqa.complete && eqa.naturalWidth === 261 && anab.complete && anab.naturalWidth === 2500,
+        isoAssets: eqa.getAttribute('src') === 'image/eqa-2026.jpg' && anab.getAttribute('src') === 'image/anab-2026.png' && eqa.getBoundingClientRect().right < anab.getBoundingClientRect().left,
+        captionBackground: getComputedStyle(isoCaption).backgroundColor,
+        captionLines: [...isoCaption.querySelectorAll('span')].map((line) => line.textContent),
         certifications: [...list.querySelectorAll('li')].map((item) => ({
           name: item.querySelector('a').textContent,
           url: item.querySelector('a').getAttribute('href'),
@@ -120,13 +125,20 @@ try {
     const grayContrast = (relativeLuminance([238, 238, 238]) + 0.05) / (relativeLuminance(linkRgb) + 0.05);
     const expectedCertifications = [
       { name: 'プライバシーマーク', url: 'https://privacymark.jp/', detail: '10862401(07)' },
-      { name: 'ISMS（情報セキュリティマネジメントシステム）', url: 'https://www.eqajapan.com/html/iso/27001.htm#27001_1', detail: 'ISO/IEC 27001:2013 / JIS Q 27001:2014' },
+      { name: 'ISMS（情報セキュリティマネジメントシステム）', url: 'https://www.eqajapan.com/html/iso/27001.htm#27001_1', detail: 'ISO/IEC 27001:2022 / JIS Q 27001:2023' },
       { name: 'QMS（品質マネジメントシステム）', url: 'https://www.eqajapan.com/html/iso/9001.htm#9001_1', detail: 'ISO 9001:2015 & JIS Q 9001:2015' }
     ];
     const shouldStack = width < 576;
     const shouldGrid = width >= 1200;
     const near = (actual, expected) => Math.abs(actual - expected) < 1;
-    if (layout.sectionBackground !== 'rgb(238, 238, 238)' || layout.panelBackground !== 'rgb(255, 255, 255)' || layout.panelBorder !== 'rgb(215, 222, 230)' || layout.panelRadius !== '6px' || layout.panelPadding !== '20px' || layout.panelSizing !== 'border-box' || layout.isolation !== 'auto' || layout.blend !== 'normal' || layout.direction !== (shouldStack ? 'column' : 'row') || layout.gridColumns !== (shouldGrid ? 2 : 1) || layout.fontSize !== '16px' || !near(parseFloat(layout.lineHeight), 27.2) || layout.textColor !== 'rgb(34, 34, 34)' || layout.listGap !== '12px' || layout.panel.width > 396 || !near(layout.privacy.width, 149) || !near(layout.privacy.height, 149) || !near(layout.iso.width, 189) || !near(layout.iso.height, 149) || (shouldGrid ? !(layout.panel.x < layout.copy.x) : !(layout.panel.y < layout.copy.y)) || layout.overflow || !layout.imagesLoaded || !layout.isoCrop || contrast < 4.5 || grayContrast < 4.5 || JSON.stringify(layout.certifications) !== JSON.stringify(expectedCertifications) || panelPixel.some((channel) => channel !== 255)) {
+    const expectedCaption = ['ISO 9001:2015 & JIS Q 9001:2015', 'ISO/IEC 27001:2022 & JIS Q 27001:2023'];
+    if (JSON.stringify(layout.captionLines) !== JSON.stringify(expectedCaption) ||
+        layout.captionBackground !== 'rgb(255, 255, 255)' ||
+        !near(layout.caption.x, layout.iso.x) || !near(layout.caption.width, layout.iso.width) ||
+        layout.caption.y > layout.iso.y + 107 || layout.caption.y + layout.caption.height < layout.iso.y + 130) {
+      throw new Error(`Homepage certification caption failed at ${width}px: ${JSON.stringify(layout)}`);
+    }
+    if (layout.sectionBackground !== 'rgb(238, 238, 238)' || layout.panelBackground !== 'rgb(255, 255, 255)' || layout.panelBorder !== 'rgb(215, 222, 230)' || layout.panelRadius !== '6px' || layout.panelPadding !== '20px' || layout.panelSizing !== 'border-box' || layout.isolation !== 'auto' || layout.blend !== 'normal' || layout.direction !== (shouldStack ? 'column' : 'row') || layout.gridColumns !== (shouldGrid ? 2 : 1) || layout.fontSize !== '16px' || !near(parseFloat(layout.lineHeight), 27.2) || layout.textColor !== 'rgb(34, 34, 34)' || layout.listGap !== '12px' || layout.panel.width > 396 || !near(layout.privacy.width, 149) || !near(layout.privacy.height, 149) || !near(layout.iso.width, 189) || !near(layout.iso.height, 149) || (shouldGrid ? !(layout.panel.x < layout.copy.x) : !(layout.panel.y < layout.copy.y)) || layout.overflow || !layout.imagesLoaded || !layout.isoAssets || contrast < 4.5 || grayContrast < 4.5 || JSON.stringify(layout.certifications) !== JSON.stringify(expectedCertifications) || panelPixel.some((channel) => channel !== 255)) {
       throw new Error(`Homepage certification readability failed at ${width}px: ${JSON.stringify({ layout, panelPixel, contrast, grayContrast })}`);
     }
     await page.close();
@@ -144,7 +156,7 @@ try {
     await page.goto(`http://127.0.0.1:${server.address().port}/index.html`, { waitUntil: 'load' });
     await page.locator('.certification-panel').scrollIntoViewIfNeeded();
     await page.locator('.certification-marks__privacy img').evaluate((image) => image.decode());
-    await page.locator('.certification-marks__iso').evaluate((image) => image.decode());
+    await page.locator('.certification-marks__iso img').evaluateAll((images) => Promise.all(images.map((image) => image.decode())));
     const zoom = await page.evaluate(() => {
       const rect = (selector) => { const box = document.querySelector(selector).getBoundingClientRect(); return { x: box.x, y: box.y, width: box.width, height: box.height, right: box.right }; };
       return {
@@ -152,7 +164,7 @@ try {
         fontSize: getComputedStyle(document.querySelector('.certification-copy')).fontSize,
         panel: rect('.certification-panel'), privacy: rect('.certification-marks__privacy img'), iso: rect('.certification-marks__iso'), copy: rect('.certification-copy'),
         overflow: document.documentElement.scrollWidth > innerWidth,
-        imagesLoaded: document.querySelector('.certification-marks__privacy img').naturalWidth === 200 && document.querySelector('.certification-marks__iso').naturalWidth === 354
+        imagesLoaded: document.querySelector('.certification-marks__privacy img').naturalWidth === 200 && document.querySelector('.certification-marks__eqa').naturalWidth === 261 && document.querySelector('.certification-marks__anab').naturalWidth === 2500
       };
     });
     if (zoom.innerWidth < 700 || zoom.innerWidth > 730 || Math.abs(zoom.devicePixelRatio - 2) > 0.1 || zoom.visualScale !== 1 || zoom.fontSize !== '16px' || zoom.panel.width !== 396 || zoom.panel.right > zoom.innerWidth || zoom.privacy.width !== 149 || zoom.privacy.height !== 149 || zoom.iso.width !== 189 || zoom.iso.height !== 149 || zoom.copy.y <= zoom.panel.y || zoom.overflow || !zoom.imagesLoaded) {
