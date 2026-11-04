@@ -6,7 +6,7 @@ import AxeBuilder from '@axe-core/playwright';
 
 const repoRoot = path.resolve(import.meta.dirname, '..');
 const outputRoot = path.join(repoRoot, '_site');
-const pages = ['/', '/scan.html', '/film.html', '/largeformat.html', '/microfilm.html', '/telework.html', '/form.html', '/speed-ad.html', '/news/news_260526.html', '/sample2.html'];
+const pages = ['/', '/scan.html', '/film.html', '/largeformat.html', '/microfilm.html', '/telework.html', '/form.html', '/speed-ad.html', '/news/news_260526.html', '/sample2.html', '/recruit.html'];
 
 const server = http.createServer((request, response) => {
   const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
@@ -48,12 +48,17 @@ try {
       await page.screenshot({ path: path.join(repoRoot, '.deploy', 'sample2-pdf-iframe.png'), fullPage: true });
       console.log('sample2 PDF iframe responses and screenshot passed.');
     }
-    const results = await new AxeBuilder({ page }).analyze();
-    console.log(`Axe details ${pagePath}: ${results.violations.map((violation) => `${violation.id}/${violation.impact}: ${violation.nodes.map((node) => node.html).join(' | ')}`).join(', ') || 'none'}`);
-    for (const violation of results.violations.filter((violation) => ['critical', 'serious'].includes(violation.impact))) {
-      critical.push(`${pagePath}: ${violation.id} (${violation.nodes.length} nodes)`);
+    const tabNames = pagePath === '/recruit.html' ? ['社員採用', 'パート・アルバイト採用'] : [null];
+    for (const tabName of tabNames) {
+      if (tabName) await page.getByRole('tab', { name: tabName, exact: true }).click();
+      const state = tabName ? `${pagePath} ${tabName}` : pagePath;
+      const results = await new AxeBuilder({ page }).analyze();
+      console.log(`Axe details ${state}: ${results.violations.map((violation) => `${violation.id}/${violation.impact}: ${violation.nodes.map((node) => node.html).join(' | ')}`).join(', ') || 'none'}`);
+      for (const violation of results.violations.filter((violation) => ['critical', 'serious'].includes(violation.impact))) {
+        critical.push(`${state}: ${violation.id} (${violation.nodes.length} nodes)`);
+      }
+      console.log(`Axe ${state}: ${results.violations.length} total violations, ${results.violations.filter((violation) => ['critical', 'serious'].includes(violation.impact)).length} serious/critical.`);
     }
-    console.log(`Axe ${pagePath}: ${results.violations.length} total violations, ${results.violations.filter((violation) => ['critical', 'serious'].includes(violation.impact)).length} serious/critical.`);
     await page.close();
   }
   if (critical.length) throw new Error(`Serious or critical accessibility violations:\n${critical.join('\n')}`);
