@@ -61,4 +61,4 @@ for (const href of pageStyleSheetPaths()) {
 }
 
 console.log('CSP script readiness passed: 48 public HTML pages, 0 inline executable scripts or event attributes.');
-console.log('CSP style readiness passed: 48 public HTML pages, 0 inline style tags/attributes; 10 exact external page stylesheets.');
+console.log(`CSP style readiness passed: 48 public HTML pages, 0 inline style tags/attributes; ${pageStyleSheetPaths().length} exact external page stylesheets.`);

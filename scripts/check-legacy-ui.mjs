@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
-import { chromium } from '@playwright/test';
+import { chromium, expect } from '@playwright/test';
 
 const root = path.resolve(import.meta.dirname, '..');
 const output = path.join(root, '_site');
@@ -65,9 +65,90 @@ try {
       if (new URL(request.url()).hostname === '127.0.0.1' && !request.url().endsWith('.pdf')) localAssetFailures.push(`${request.url()} (${request.failure()?.errorText || 'unknown'})`);
     });
     page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
+    page.on('pageerror', (error) => errors.push(error.message));
     const response = await page.goto(`http://127.0.0.1:${server.address().port}/${pageName}.html`, { waitUntil: 'domcontentloaded' });
     if (!response?.ok()) throw new Error(`${pageName}.html did not return 2xx at ${width}px.`);
     await page.waitForFunction(() => window.jQuery?.fn?.jquery === '3.7.1' && Boolean(window.jQuery?.fn?.collapse));
+    if (pageName === 'recruit') {
+      const originalUrl = page.url();
+      const employee = page.getByRole('tab', { name: '社員採用', exact: true });
+      const partTime = page.getByRole('tab', { name: 'パート・アルバイト採用', exact: true });
+      const panels = page.getByRole('tabpanel', { includeHidden: true });
+      await expect(page).toHaveTitle('採用情報｜社員・パート・アルバイト｜アブロードアウトソーシング');
+      await expect(page.locator('h1')).toHaveText('採用情報');
+      await expect(employee).toHaveAttribute('aria-selected', 'true');
+      await expect(employee).toHaveAttribute('tabindex', '0');
+      await expect(partTime).toHaveAttribute('tabindex', '-1');
+      await expect(panels).toHaveCount(2);
+      await expect(panels.nth(0)).toBeVisible();
+      await expect(panels.nth(1)).toBeHidden();
+      for (const [index, tab] of [employee, partTime].entries()) {
+        await expect(tab).toHaveAttribute('aria-controls', await panels.nth(index).getAttribute('id'));
+        await expect(panels.nth(index)).toHaveAttribute('aria-labelledby', await tab.getAttribute('id'));
+      }
+      const tabBoxes = await Promise.all([employee.boundingBox(), partTime.boundingBox()]);
+      if (Math.abs(tabBoxes[0].y - tabBoxes[1].y) > 1) throw new Error(`Recruit tabs must share a row at ${width}px.`);
+
+      await partTime.click();
+      await expect(partTime).toHaveAttribute('aria-selected', 'true');
+      await expect(employee).toHaveAttribute('tabindex', '-1');
+      await expect(panels.nth(0)).toBeHidden();
+      await expect(panels.nth(1)).toBeVisible();
+      await expect(page).toHaveURL(originalUrl);
+      if (await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)) throw new Error(`Recruit part-time panel overflows at ${width}px.`);
+      for (const [key, selected] of [['ArrowRight', employee], ['ArrowLeft', partTime], ['Home', employee], ['End', partTime]]) {
+        await page.keyboard.press(key);
+        await expect(selected).toBeFocused();
+        await expect(selected).toHaveAttribute('aria-selected', 'true');
+        await expect(selected).toHaveAttribute('tabindex', '0');
+        await expect(page).toHaveURL(originalUrl);
+      }
+      await page.keyboard.press('Tab');
+      await expect(partTime).not.toBeFocused();
+      await expect(employee).not.toBeFocused();
+      await employee.focus();
+      await page.keyboard.press('Enter');
+      await expect(employee).toHaveAttribute('aria-selected', 'true');
+      await partTime.focus();
+      await page.keyboard.press('Space');
+      await expect(partTime).toHaveAttribute('aria-selected', 'true');
+      await expect(page).toHaveURL(originalUrl);
+
+      const engageUrl = 'https://en-gage.net/abroad-o_jobs/';
+      await page.route(engageUrl, (route) => route.fulfill({ status: 200, contentType: 'text/html', body: '<title>Recruitment destination</title>' }));
+      for (const tab of [employee, partTime]) {
+        await tab.click();
+        const link = page.getByRole('link', { name: '現在の募集職種を見る（engage）', exact: true });
+        await expect(link).toHaveAttribute('href', engageUrl);
+        const target = await link.getAttribute('target');
+        if (target && target !== '_self') throw new Error('Recruit CTA must navigate in the same tab.');
+        await link.click();
+        await expect(page).toHaveURL(engageUrl);
+        await page.goto(originalUrl, { waitUntil: 'domcontentloaded' });
+      }
+      await page.goto(`${originalUrl}?source=check#existing-fragment`, { waitUntil: 'domcontentloaded' });
+      const decoratedUrl = page.url();
+      await partTime.click();
+      await expect(page).toHaveURL(decoratedUrl);
+      await page.reload({ waitUntil: 'domcontentloaded' });
+      await expect(employee).toHaveAttribute('aria-selected', 'true');
+      await expect(panels.nth(1)).toBeHidden();
+      await expect(page).toHaveURL(decoratedUrl);
+
+      const fallback = await browser.newPage({ viewport: { width, height: 900 }, javaScriptEnabled: false });
+      await fallback.route('**/*', (route) => ['127.0.0.1', 'localhost'].includes(new URL(route.request().url()).hostname) ? route.continue() : route.fulfill({ status: 204, body: '' }));
+      try {
+        await fallback.goto(originalUrl, { waitUntil: 'domcontentloaded' });
+        await expect(fallback.getByText('お客様とチームをつなぎ、仕事の進め方をよりよくする。', { exact: true })).toBeVisible();
+        await expect(fallback.getByText('一つひとつの丁寧な作業が、お客様の仕事を支える。', { exact: true })).toBeVisible();
+        await expect(fallback.getByRole('link', { name: '現在の募集職種を見る（engage）', exact: true })).toHaveCount(2);
+        if (await fallback.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)) throw new Error(`Recruit fallback overflows at ${width}px.`);
+      } finally {
+        await fallback.close();
+      }
+      await page.goto(originalUrl, { waitUntil: 'domcontentloaded' });
+      console.log(`Recruit tabs, keyboard, same-tab CTA, stable URL, reload and no-JS fallback passed at ${width}px.`);
+    }
     const geometry = await page.evaluate(() => ({
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       header: document.querySelector('header')?.getBoundingClientRect().height || 0,

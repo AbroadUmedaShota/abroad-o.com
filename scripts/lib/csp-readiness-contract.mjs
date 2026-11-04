@@ -9,7 +9,7 @@ export const pageStyleSheets = new Map([
   ['input.html', '/css/pages/legacy-no-link.css'],
   ['largeformat.html', '/css/pages/legacy-no-link.css'],
   ['microfilm.html', '/css/pages/legacy-no-link.css'],
-  ['recruit.html', '/css/pages/legacy-no-link.css'],
+  ['recruit.html', '/css/pages/recruit.css'],
   ['rule.html', '/css/pages/legacy-no-link.css'],
   ['sample.html', '/css/pages/legacy-no-link.css'],
   ['sample2.html', '/css/pages/legacy-no-link.css'],
@@ -30,6 +30,7 @@ export const pageStyleSheets = new Map([
 const pageStyleFingerprints = new Map([
   ['/css/pages/legacy-no-link.css', '2092c2908856'],
   ['/css/pages/form.css', 'ba4675b242e1'],
+  ['/css/pages/recruit.css', 'f1a1fc840931'],
   ['/css/pages/news-index.css', '160cf5669050'],
   ['/css/pages/news-office-move.css', '4c4fcc77f120'],
   ['/css/pages/news-251212.css', '96762581c2b4'],

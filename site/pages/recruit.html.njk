@@ -1,7 +1,7 @@
 ---
 permalink: "/recruit.html"
-title: "アブロードアウトソーシング株式会社│リクルート"
-description: "アブロードアウトソーシング株式会社の採用情報ページです。"
+title: "採用情報｜社員・パート・アルバイト｜アブロードアウトソーシング"
+description: "アブロードアウトソーシングの社員、パート・アルバイトの仕事をご紹介します。案件運営・業務改善からスキャン・データ確認まで、現在の募集職種と応募方法は採用サイトをご確認ください。"
 canonicalUrl: "https://www.abroad-o.com/recruit.html"
 layoutVariant: "legacy"
 activeNav: "about"
@@ -9,38 +9,166 @@ activeNav: "about"
 {% extends "layouts/site.njk" %}
 
 {% block headExtras %}
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <!-- Bootstrap -->
-    <!-- Global site tag (gtag.js) - Google Analytics -->
 {% include "partials/analytics.njk" %}
-    {% include "partials/styles-legacy-core.njk" %}
+{% include "partials/styles-legacy-core.njk" %}
     <link href="style.css" rel="stylesheet">
-    <!--カノニカルタグ-->
-    <!--favicon-->
-    <link rel="shortcut icon" href="image/favicon.png" >
-    <!-- Google Web Fonts-->
-<!-- 追加CSS -->
-    <link rel="stylesheet" href="/css/pages/legacy-no-link.css">
+    <link rel="shortcut icon" href="image/favicon.png">
+    <link rel="stylesheet" href="/css/pages/recruit.css">
 {% endblock %}
+
 {% block main %}
-<main>
-    <section id="title_top">
-      <div class="container">
-        <h1>リクルート</h1>
-      </div><!--container-->
+<main class="recruit-page">
+  <section class="recruit-hero" aria-labelledby="recruit-title">
+    <div class="container">
+      <p class="recruit-eyebrow">RECRUIT</p>
+      <h1 id="recruit-title">採用情報</h1>
+      <p class="recruit-hero-copy">人と仕事をつなぎ、<br>お客様の業務を支える。</p>
+      <p class="recruit-introduction">アブロードアウトソーシングは、データ入力やスキャニング、データ集計・分析などを通じて、お客様の業務を支える会社です。私たちの仕事と、日々大切にしていることをご紹介します。</p>
+    </div>
+  </section>
+
+  <div class="container recruit-content">
+    <div class="recruit-tabs" data-recruit-tabs hidden>
+      <button type="button" id="recruit-tab-employee" class="recruit-tab" data-recruit-panel="recruit-employee">社員採用</button>
+      <button type="button" id="recruit-tab-parttime" class="recruit-tab" data-recruit-panel="recruit-parttime" aria-label="パート・アルバイト採用"><span class="recruit-tab-label">パート・アルバイト</span><span class="recruit-tab-label">採用</span></button>
+    </div>
+
+    <section id="recruit-employee" class="recruit-panel" aria-labelledby="recruit-employee-title">
+      <div class="recruit-panel-intro">
+        <h2 id="recruit-employee-title" class="recruit-category">社員採用</h2>
+        <p class="recruit-catchphrase">お客様とチームをつなぎ、<br>仕事の進め方をよりよくする。</p>
+        <p>お客様の依頼を理解し、作業を組み立て、チームと連携して納品まで進める。日々の気づきから、より正確で効率的な方法を考える。案件運営と業務改善に関わる仕事をご紹介します。</p>
+      </div>
+
+      <section class="recruit-section" aria-labelledby="employee-roles">
+        <h3 id="employee-roles">仕事の役割</h3>
+        <div class="recruit-card-grid">
+          <div class="recruit-card">
+            <span class="recruit-card-number" aria-hidden="true">01</span>
+            <h4>依頼内容を整理する</h4>
+            <p>お客様が求める仕上がりや仕様、納期を確認し、必要な作業を整理します。お客様と作業を担当するメンバーの認識を揃え、仕事を進める準備をします。</p>
+          </div>
+          <div class="recruit-card">
+            <span class="recruit-card-number" aria-hidden="true">02</span>
+            <h4>品質と納期を守る</h4>
+            <p>作業の進捗や仕上がりを確認し、チームと連携して納品までの流れを支えます。困りごとを共有し、必要な調整を行います。</p>
+          </div>
+          <div class="recruit-card">
+            <span class="recruit-card-number" aria-hidden="true">03</span>
+            <h4>仕事の進め方を改善する</h4>
+            <p>確認しにくい手順や繰り返し発生する作業を見直し、誰もが進めやすい方法を考えます。日々の工夫を、仕事の正確さと効率につなげます。</p>
+          </div>
+        </div>
+        <a class="recruit-text-link" href="/service.html">サービス内容を詳しく見る <span aria-hidden="true">→</span></a>
+      </section>
+
+      <section class="recruit-section recruit-values" aria-labelledby="employee-values">
+        <div>
+          <p class="recruit-eyebrow">OUR VALUES</p>
+          <h3 id="employee-values">大切にしたい姿勢</h3>
+          <p>一人で抱え込まず、周囲と考える。<br>その積み重ねが、よりよい仕事につながります。</p>
+        </div>
+        <ul class="recruit-value-list">
+          <li>相手の話を聞き、目的や希望を理解する</li>
+          <li>曖昧な点やわからないことを確認する</li>
+          <li>周囲と協力し、必要な情報を共有する</li>
+          <li>日々の気づきから改善を考える</li>
+        </ul>
+      </section>
+
+      <section class="recruit-section recruit-location" aria-labelledby="employee-location">
+        <h3 id="employee-location">会社と勤務拠点</h3>
+        <p>2012年の設立以来、データ入力やスキャニングをはじめとするアウトソーシングサービスを提供しています。業務の標準化と効率化を通じて、お客様が本来の仕事に力を注げる環境づくりを支えています。</p>
+        <dl>
+          <dt>会社名</dt><dd>アブロードアウトソーシング株式会社</dd>
+          <dt>本社所在地</dt><dd>〒101-0032<br>東京都千代田区岩本町2-11-9 IT2ビル8階</dd>
+        </dl>
+        <a class="recruit-text-link" href="/about.html">会社概要を見る <span aria-hidden="true">→</span></a>
+      </section>
+
+      <section class="recruit-apply" aria-labelledby="employee-apply">
+        <h3 id="employee-apply">現在の募集情報</h3>
+        <p>社員の仕事に関心をお持ちの方へ。募集中の職種・雇用形態は、採用サイト「engage」の求人一覧でご確認ください。</p>
+        <p class="recruit-availability">現在、engageにはパート・アルバイトの求人を掲載しています。</p>
+        <a class="recruit-apply-button" href="https://en-gage.net/abroad-o_jobs/">現在の募集職種を見る（engage） <span aria-hidden="true">↗</span></a>
+        <p class="recruit-apply-note">募集職種・雇用形態・勤務条件はリンク先の各求人をご確認ください。</p>
+      </section>
     </section>
 
-    <section id="recruit_top">
-      <div class="container">
-        <p>comming soon...</p>
-      </div><!--container-->
+    <section id="recruit-parttime" class="recruit-panel" aria-labelledby="recruit-parttime-title">
+      <div class="recruit-panel-intro">
+        <h2 id="recruit-parttime-title" class="recruit-category">パート・アルバイト採用</h2>
+        <p class="recruit-catchphrase">一つひとつの丁寧な作業が、<br>お客様の仕事を支える。</p>
+        <p>書類をスキャンする、データを照合する、WEBサービスの運用をサポートする。アブロードアウトソーシングには、お客様の業務を支えるさまざまな仕事があります。仕事内容を知り、ご自身に合う募集を探してみてください。</p>
+      </div>
+
+      <section class="recruit-section" aria-labelledby="parttime-jobs">
+        <h3 id="parttime-jobs">具体的な仕事内容</h3>
+        <div class="recruit-card-grid">
+          <div class="recruit-card">
+            <span class="recruit-card-number" aria-hidden="true">01</span>
+            <h4>書類のスキャン・検品</h4>
+            <p>書類を確認し、スキャナーでデータ化します。画像と原稿を照合し、読み取り漏れや向きなどを確認して、納品前のチェックにつなげます。</p>
+          </div>
+          <div class="recruit-card">
+            <span class="recruit-card-number" aria-hidden="true">02</span>
+            <h4>データ入力・確認</h4>
+            <p>指定システムへの入力や、Excelを使った照合、データのチェックなどを行います。原稿や確認項目に沿って、一つひとつ丁寧に確かめます。</p>
+          </div>
+          <div class="recruit-card">
+            <span class="recruit-card-number" aria-hidden="true">03</span>
+            <h4>WEBサービス運用・<br>開発サポート</h4>
+            <p>問い合わせ対応、データ確認、動作検証、資料作成、進行補助などを通じて、WEBサービスの運用や開発を支えます。</p>
+          </div>
+        </div>
+        <p class="recruit-detail-note">担当する業務や応募条件は、各求人の仕事内容をご確認ください。</p>
+      </section>
+
+      <section class="recruit-section recruit-values" aria-labelledby="parttime-values">
+        <div>
+          <p class="recruit-eyebrow">WORK TOGETHER</p>
+          <h3 id="parttime-values">仕事で大切にすること</h3>
+          <p>丁寧な確認と、こまめな相談。<br>周囲と協力して仕事を進めます。</p>
+        </div>
+        <ul class="recruit-value-list">
+          <li>作業を始める前に手順を確認する</li>
+          <li>確認する項目に沿って丁寧にチェックする</li>
+          <li>わからないことや気づいたことを相談する</li>
+        </ul>
+      </section>
+
+      <section class="recruit-section recruit-location" aria-labelledby="parttime-location">
+        <h3 id="parttime-location">働く場所・勤務条件</h3>
+        <dl>
+          <dt>本社所在地</dt><dd>〒101-0032<br>東京都千代田区岩本町2-11-9 IT2ビル8階</dd>
+          <dt>勤務条件</dt><dd>勤務日数・時間・時給・福利厚生は、engageの各求人でご案内しています。希望する職種の掲載内容をご確認ください。</dd>
+        </dl>
+        <a class="recruit-text-link" href="/about.html">会社概要を見る <span aria-hidden="true">→</span></a>
+      </section>
+
+      <section class="recruit-section" aria-labelledby="parttime-flow">
+        <h3 id="parttime-flow">応募の流れ</h3>
+        <ol class="recruit-flow">
+          <li><span class="recruit-flow-number" aria-hidden="true">1</span><div><h4>募集を見る</h4><p>engageの採用ページで、現在募集中の職種をご覧ください。</p></div></li>
+          <li><span class="recruit-flow-number" aria-hidden="true">2</span><div><h4>仕事内容・条件を確認</h4><p>希望する求人の仕事内容、勤務条件、応募資格をご確認ください。</p></div></li>
+          <li><span class="recruit-flow-number" aria-hidden="true">3</span><div><h4>求人ページから応募</h4><p>engageの案内に沿って、希望する求人へご応募ください。</p></div></li>
+        </ol>
+      </section>
+
+      <section class="recruit-apply" aria-labelledby="parttime-apply">
+        <h3 id="parttime-apply">ご自身に合う仕事を探す</h3>
+        <p>詳しい仕事内容や勤務条件、応募方法は、採用サイト「engage」でご案内しています。</p>
+        <a class="recruit-apply-button" href="https://en-gage.net/abroad-o_jobs/">現在の募集職種を見る（engage） <span aria-hidden="true">↗</span></a>
+        <p class="recruit-apply-note">募集職種・雇用形態・勤務条件はリンク先の各求人をご確認ください。</p>
+      </section>
     </section>
-  </main>
+  </div>
+</main>
 {% endblock %}
 
 {% block scripts %}
 {% include "partials/scripts-legacy-core.njk" %}
-    <!-- Custom Theme JavaScript -->
     <script src="js/custom.js"></script>
     <script src="js/legacy-smooth-scroll-all-ready.js"></script>
+    <script src="/js/recruit-tabs.js"></script>
 {% endblock %}
